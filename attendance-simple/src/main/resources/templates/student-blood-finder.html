@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Blood Finder | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);}
+
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px; gap: 10px;
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+        /* 🧱 Main Layout */
+        .main-wrapper { margin-left: 320px; flex: 1; padding: 40px; max-width: 1400px; display: flex; gap: 35px; }
+        .content-area { flex: 1; }
+        .emergency-sidebar { width: 380px; }
+
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px;}
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border); padding: 10px 20px;
+            border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            color: var(--text); font-weight: 700; font-size: 13px; transition: var(--transition); box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); }
+
+        /* 💎 Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #ef4444, #b91c1c); border-radius: 35px; padding: 40px;
+            color: white; margin-bottom: 35px; box-shadow: 0 15px 35px rgba(239, 68, 68, 0.25);
+            position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center;
+        }
+        .hero-banner::after {
+            content: ''; position: absolute; right: -50px; top: -50px;
+            width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none;
+        }
+        .hero-banner h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px;}
+        .btn-broadcast {
+            background: white; color: #b91c1c; border: none; padding: 15px 28px; border-radius: 16px;
+            font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1;
+        }
+        .btn-broadcast:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+
+        /* 🔥 ULTRA PREMIUM LARGE SEARCH BAR */
+        .premium-search-container {
+            background: var(--glass-bg); backdrop-filter: blur(25px);
+            border: 1px solid var(--border); border-radius: 28px;
+            padding: 15px; display: flex; gap: 15px; align-items: center;
+            margin-bottom: 40px; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .premium-search-container:focus-within {
+            border-color: var(--accent); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .ps-input-group {
+            display: flex; align-items: center; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 20px;
+            height: 70px; padding: 0 25px; transition: var(--transition);
+        }
+        .ps-input-group:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+
+        .ps-icon { font-size: 24px; margin-right: 15px; color: var(--accent); }
+
+        .ps-select {
+            border: none; background: transparent; font-size: 16px; font-weight: 800;
+            color: var(--text); outline: none; width: 220px; cursor: pointer;
+            appearance: none; -webkit-appearance: none; font-family: inherit;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%236366f1' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat; background-position: right 0 center;
+        }
+        .ps-select option { background: var(--surface); color: var(--text); font-weight: 600; }
+
+        .ps-input {
+            border: none; background: transparent; font-size: 16px; font-weight: 500;
+            color: var(--text); outline: none; width: 100%; font-family: inherit;
+        }
+        .ps-input::placeholder { color: var(--subtext); font-weight: 500; }
+
+        .ps-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white;
+            border: none; border-radius: 20px; height: 70px; padding: 0 45px;
+            font-size: 18px; font-weight: 800; cursor: pointer; transition: var(--transition);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 10px; white-space: nowrap;
+        }
+        .ps-btn:hover { transform: scale(1.03); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4); }
+
+        /* 📇 Forms & Cards Select Input styling */
+        select.input-control {
+            appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat; background-position-x: 96%; background-position-y: center;
+        }
+        select.input-control:focus {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%236366f1' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+        }
+        select.input-control option { background: #1e293b; color: #f8fafc; font-weight: 500;}
+
+        /* 📇 Cards */
+        .card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 35px; padding: 35px; margin-bottom: 24px; box-shadow: var(--card-shadow);
+        }
+        .card h3 { margin-bottom: 25px; font-weight: 800; display: flex; align-items: center; gap: 12px; font-size: 20px;}
+
+        .input-control {
+            width: 100%; padding: 16px 20px; border: 1px solid var(--border); border-radius: 16px;
+            margin-bottom: 15px; outline: none; background: var(--surface); color: var(--text); font-family: inherit; font-weight: 500; transition: 0.3s;
+        }
+        .input-control:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); background: var(--bg); }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none;
+            padding: 16px; width: 100%; border-radius: 16px; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
+        }
+        .btn-danger:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(239, 68, 68, 0.3); }
+
+        .donor-list-container { max-height: 550px; overflow-y: auto; padding-right: 10px; margin-top: 25px; }
+        .donor-list-container::-webkit-scrollbar { width: 5px; }
+        .donor-list-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        .donor-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+            padding: 22px 25px; margin-bottom: 16px; display: flex; align-items: center; gap: 20px; transition: var(--transition); box-shadow: 0 5px 15px rgba(0,0,0,0.01);
+        }
+        .donor-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.1); }
+        .donor-avatar { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px; flex-shrink: 0; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);}
+        .donor-avatar.blue { background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2)); color: #818cf8; border: 1px solid rgba(167, 139, 250, 0.3); }
+        .donor-avatar.red { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2)); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+
+        .donor-info { flex: 1; }
+        .donor-info h4 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+        .donor-info p { font-size: 13px; color: var(--subtext); display: flex; align-items: center; gap: 8px; margin-bottom: 3px; font-weight: 500;}
+
+        .blood-tag { padding: 8px 20px; border-radius: 14px; font-weight: 800; font-size: 16px; }
+        .tag-blue { background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
+        .tag-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* 🔥 DYNAMIC SEARCH RESULTS AREA */
+        #searchResultsArea {
+            background: rgba(99, 102, 241, 0.03); border: 1px dashed var(--accent);
+            border-radius: 35px; padding: 35px; margin-bottom: 40px; box-shadow: var(--card-shadow);
+            display: none;
+        }
+
+        .broadcast-alert {
+            background: var(--surface); border-left: 4px solid #ef4444;
+            padding: 20px; margin-bottom: 15px; border-radius: 18px; box-shadow: var(--card-shadow); transition: var(--transition);
+            border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+        }
+        .broadcast-alert:hover { transform: translateX(-5px); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);}
+        .broadcast-alert h4 { color: #ef4444; margin-bottom: 12px; font-weight: 800; font-size: 16px; letter-spacing: 0.5px; }
+
+        .b-tag { font-size: 12px; font-weight: 700; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .b-contact { font-size: 14px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; opacity: 0; transition: 0.3s; }
+        .modal-card { background: var(--surface); padding: 40px; border-radius: 35px; width: 100%; max-width: 500px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: scale(0.9); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-finance">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Career Hub</a>
+        <a href="/student-blood-finder" class="active">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${username != null and username.length() >= 2 ? #strings.substring(username,0,2).toUpperCase() : 'TR'}">AD</div>
+            <div class="user-info">
+                <span style="font-size:14px; font-weight:800; color:var(--text); display:block;" th:text="${username != null ? username : 'Teacher'}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Teacher</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</div>
+
+<div class="main-wrapper">
+    <div class="content-area">
+        <div class="topbar animate-up">
+            <h1>Blood <span style="font-weight: 300; color: var(--subtext);">Finder</span></h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">☀️</span>
+                <span id="theme-text">Day Mode</span>
+            </button>
+        </div>
+
+        <div class="hero-banner animate-up delay-1">
+            <div>
+                <h1 style="margin-bottom: 5px;">🩸 KYAU Blood Bank</h1>
+                <p style="opacity: 0.9; font-size: 14px; font-weight: 500;">Name, Blood, Email, Address, Contact — Every detail helps save a life.</p>
+            </div>
+            <button class="btn-broadcast" onclick="openModal('broadcastModal')">📢 Broadcast Emergency</button>
+        </div>
+
+        <div class="premium-search-container animate-up delay-1">
+
+            <div class="ps-input-group" style="width: 320px;">
+                <span class="ps-icon">🩸</span>
+                <select id="searchBlood" class="ps-select" onchange="filterDonors()">
+                    <option value="ALL">All Blood Groups</option>
+                    <option value="A+">A+ (Positive)</option>
+                    <option value="A-">A- (Negative)</option>
+                    <option value="B+">B+ (Positive)</option>
+                    <option value="B-">B- (Negative)</option>
+                    <option value="O+">O+ (Positive)</option>
+                    <option value="O-">O- (Negative)</option>
+                    <option value="AB+">AB+ (Positive)</option>
+                    <option value="AB-">AB- (Negative)</option>
+                </select>
+            </div>
+
+            <div class="ps-input-group" style="flex: 1;">
+                <span class="ps-icon">📍</span>
+                <input type="text" id="searchLocation" class="ps-input" placeholder="Search by hospital, area, or location... (e.g. Sirajganj)" onkeyup="filterDonors()">
+            </div>
+
+            <button class="ps-btn" onclick="filterDonors()">
+                <span style="font-size: 20px;">🔍</span> Find Donor
+            </button>
+
+        </div>
+
+        <div id="searchResultsArea" class="animate-up delay-2">
+            <h3 style="color: var(--text); font-weight: 800; margin-bottom: 25px; font-size: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 2px dashed var(--accent); padding-bottom: 15px;">
+                🔍 Live Search Results
+            </h3>
+            <div id="searchResultsList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            </div>
+        </div>
+
+        <div id="mainDirectoryGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 35px;">
+            <div class="card animate-up delay-2" style="border-top: 4px solid #ef4444;">
+                <h3 style="color: var(--text);">🚨 Available Today</h3>
+                <form action="/student-blood-finder/emergency" method="POST">
+                    <input type="text" name="phone" class="input-control" placeholder="Contact Number" required>
+                    <input type="text" name="address" class="input-control" placeholder="Current Location" required>
+                    <select name="bloodGroup" class="input-control" required style="margin-bottom: 20px;">
+                        <option value="" disabled selected>-- Select Blood Group --</option>
+                        <option value="A+">A+</option><option value="A-">A-</option>
+                        <option value="B+">B+</option><option value="B-">B-</option>
+                        <option value="O+">O+</option><option value="O-">O-</option>
+                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                    </select>
+                    <button type="submit" class="btn-danger">I am Available Today</button>
+                </form>
+
+                <div class="donor-list-container">
+                    <div th:if="${emergencyDonors == null or emergencyDonors.isEmpty()}" style="text-align:center; padding: 30px; color:var(--subtext); border: 2px dashed var(--border); border-radius: 20px; margin-top: 20px;">No active donors available today.</div>
+                    <div class="donor-card" th:each="d : ${emergencyDonors}" th:attr="data-blood=${d.bloodGroup}, data-location=${#strings.toLowerCase(d.address)}">
+                        <div class="donor-avatar red" th:text="${#strings.substring(d.name,0,1).toUpperCase()}">A</div>
+                        <div class="donor-info">
+                            <h4 th:text="${d.name}">Name</h4>
+                            <p><span>📞</span> <span th:text="${d.phone}">017...</span></p>
+                            <p style="color: #ef4444; font-weight: 700;"><span>📍</span> <span th:text="${d.address}">Location</span></p>
+                        </div>
+                        <div class="blood-tag tag-red" th:text="${d.bloodGroup}">A+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card animate-up delay-2" style="border-top: 4px solid var(--accent);">
+                <h3 style="color: var(--text);">🩸 Permanent Directory</h3>
+                <form action="/student-blood-finder/register" method="POST">
+                    <input type="text" name="phone" class="input-control" placeholder="Contact Number" required>
+                    <input type="email" name="email" class="input-control" placeholder="Email Address" required>
+                    <input type="text" name="address" class="input-control" placeholder="Full Address" required>
+                    <select name="bloodGroup" class="input-control" required style="margin-bottom: 20px;">
+                        <option value="" disabled selected>-- Select Blood Group --</option>
+                        <option value="A+">A+</option><option value="A-">A-</option>
+                        <option value="B+">B+</option><option value="B-">B-</option>
+                        <option value="O+">O+</option><option value="O-">O-</option>
+                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                    </select>
+                    <button type="submit" class="btn-primary">Join Directory</button>
+                </form>
+
+                <div class="donor-list-container">
+                    <div th:if="${generalDonors == null or generalDonors.isEmpty()}" style="text-align:center; padding: 30px; color:var(--subtext); border: 2px dashed var(--border); border-radius: 20px; margin-top: 20px;">Directory is empty.</div>
+                    <div class="donor-card" th:each="d : ${generalDonors}" th:attr="data-blood=${d.bloodGroup}, data-location=${#strings.toLowerCase(d.address)}">
+                        <div class="donor-avatar blue" th:text="${#strings.substring(d.name,0,1).toUpperCase()}">A</div>
+                        <div class="donor-info">
+                            <h4 th:text="${d.name}">Name</h4>
+                            <p><span>📧</span> <span th:text="${d.email}">email@mail.com</span></p>
+                            <p><span>📞</span> <span th:text="${d.phone}">017...</span></p>
+                            <p><span>📍</span> <span th:text="${d.address}">Location</span></p>
+                        </div>
+                        <div class="blood-tag tag-blue" th:text="${d.bloodGroup}">A+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="emergency-sidebar animate-up delay-3">
+        <div class="card" style="height: 100%; padding: 35px; position: sticky; top: 20px;">
+            <h3 style="color: #ef4444; border-bottom: 2px dashed var(--border); padding-bottom: 15px; margin-bottom: 20px;">🚨 Urgent Feeds</h3>
+            <div th:if="${broadcasts == null or broadcasts.isEmpty()}" style="color: var(--subtext); text-align: center; padding: 40px 0; font-size: 14px;">No urgent broadcasts right now.</div>
+
+            <div class="broadcast-alert" th:each="b : ${broadcasts}">
+                <h4 th:text="'URGENT: ' + ${b.bloodGroup}"></h4>
+                <div style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span class="b-tag" th:text="${b.bags} + ' Bags'"></span>
+                    <span class="b-tag" th:text="${b.hospital}"></span>
+                </div>
+                <div class="b-contact">
+                    <span>📞</span> <span th:text="${b.contact}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="broadcastModal">
+    <div class="modal-card">
+        <h2 style="margin-bottom:25px; font-weight: 800; color: var(--text); font-size: 24px;">📢 Send Alert</h2>
+        <form action="/student-blood-finder/broadcast" method="POST">
+            <input type="text" name="bags" class="input-control" placeholder="Bags Needed" required>
+            <input type="text" name="time" class="input-control" placeholder="Time Requirements" required>
+            <input type="text" name="hospital" class="input-control" placeholder="Hospital Name & Location" required>
+            <input type="text" name="contact" class="input-control" placeholder="Emergency Contact Number" required>
+            <select name="bloodGroup" class="input-control" required style="margin-bottom: 20px;">
+                <option value="" disabled selected>-- Select Blood Group Needed --</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+            <button type="submit" class="btn-danger" style="margin-top: 10px;" onclick="this.innerHTML='⏳ Sending Alert...'">Send Urgent Alert</button>
+            <button type="button" onclick="closeModal('broadcastModal')" style="margin-top:15px; width:100%; border:none; background:none; cursor:pointer; color:var(--subtext); font-weight: 800; padding: 10px; transition: 0.3s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--subtext)'">Cancel Notification</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // 🔥 FIXED: Smart Independent Search Display Engine
+    function filterDonors() {
+        let bloodFilter = document.getElementById('searchBlood').value;
+        let locFilter = document.getElementById('searchLocation').value.toLowerCase().trim();
+
+        const searchArea = document.getElementById('searchResultsArea');
+        const searchList = document.getElementById('searchResultsList');
+
+        // Always make sure the main directory cards are fully visible structurally
+        document.querySelectorAll('#mainDirectoryGrid .donor-card').forEach(item => item.style.display = 'flex');
+
+        // If no active search params exist, hide the search block and return to normal
+        if (bloodFilter === 'ALL' && locFilter === '') {
+            searchArea.style.display = 'none';
+            return;
+        }
+
+        // Active search state
+        searchArea.style.display = 'block';
+        searchList.innerHTML = ''; // Clear previous cloned results
+        let matchCount = 0;
+
+        document.querySelectorAll('#mainDirectoryGrid .donor-card').forEach(item => {
+            let matchBlood = (bloodFilter === 'ALL' || item.getAttribute('data-blood') === bloodFilter);
+            let matchLoc = item.getAttribute('data-location').includes(locFilter);
+
+            if (matchBlood && matchLoc) {
+                // Clone the matched card and append it to our new search container
+                let clone = item.cloneNode(true);
+                clone.style.display = 'flex';
+                clone.style.margin = '0'; // reset bottom margin for the new grid layout
+                searchList.appendChild(clone);
+                matchCount++;
+            }
+        });
+
+        if (matchCount === 0) {
+            searchList.innerHTML = '<div style="grid-column: 1 / -1; background: var(--surface); padding: 30px; border-radius: 20px; border: 1px dashed var(--border); text-align: center; color: var(--subtext); font-weight: 600;">No matching donors found.</div>';
+        }
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            Swal.fire({
+                title: 'Broadcast Sent!',
+                text: 'Your emergency alert has been sent to everyone via email.',
+                icon: 'success',
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#ef4444',
+                borderRadius: '20px'
+            });
+        }
+    };
+</script>
+</body>
+</html>

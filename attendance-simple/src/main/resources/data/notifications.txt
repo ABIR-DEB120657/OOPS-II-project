@@ -1,0 +1,39 @@
+1|ALERT|Admin|Exam registration pending for Md. Rakibul Islam|2026-05-12|read|0|ADMIN
+2|SYSTEM|Admin|Leave request approved for Siam Hossain|2026-05-12|unread|0|ADMIN
+3|INFO|Admin|Grade sheet updated for Md. Radoun Hossin Mukta|2026-05-12|read|0|ADMIN
+4|ALERT|Admin|Attendance below 75% for Md. Shahariar Ahmed Kanon|2026-05-12|read|0|ADMIN
+5|SYSTEM|Admin|Password reset successful for Mst. Anamika Jahan|2026-05-11|read|0|ADMIN
+6|ALERT|Admin|Exam registration pending for Md. Sojib Ahmed|2026-05-11|read|0|ADMIN
+7|INFO|Admin|Grade sheet updated for Most. Ananna Khandaker|2026-05-12|unread|0|ADMIN
+8|SYSTEM|Admin|Leave request approved for Md. Rakib Hasan Riyad|2026-05-11|read|0|ADMIN
+9|ALERT|Admin|Exam registration pending for Most. Khadija Khatun|2026-05-12|read|0|ADMIN
+10|ALERT|Admin|Attendance below 75% for Md. Rezwan Ahmed Ratul|2026-05-12|unread|0|ADMIN
+11|INFO|Admin|Fees payment confirmation received from Maruf Ibna Abdullah Rifat|2026-05-11|read|0|ADMIN
+12|SYSTEM|Admin|Password reset successful for Md. Rabbi|2026-05-11|unread|0|ADMIN
+13|ALERT|Admin|Attendance below 75% for Mst. Mushkat Jahan Shila|2026-05-12|unread|0|ADMIN
+14|INFO|Admin|Grade sheet updated for Ijaj Ahmed Rafi|2026-05-12|unread|0|ADMIN
+15|ALERT|Admin|Exam registration pending for Md. Sabbir Hossain Rahat|2026-05-11|read|0|ADMIN
+16|SYSTEM|Admin|Password reset successful for Abid Hasan Hujaifa|2026-05-12|read|0|ADMIN
+17|INFO|Admin|Fees payment confirmation received from Sabiha Rumman Medha|2026-05-11|read|0|ADMIN
+18|ALERT|Admin|Exam registration pending for Md. Intaj Hassan Nibir|2026-05-12|read|0|ADMIN
+19|ALERT|Admin|Exam registration pending for Md. Asif Foysal|2026-05-11|unread|0|ADMIN
+20|INFO|Admin|Fees payment confirmation received from Tarak Rahman Shakib|2026-05-11|unread|0|ADMIN
+21|SYSTEM|Admin|Leave request approved for Fardin Khan Sadi|2026-05-11|read|0|ADMIN
+22|INFO|Admin|Fees payment confirmation received from Abir Deb|2026-05-11|unread|0|ADMIN
+23|INFO|Admin|Grade sheet updated for Robiul Awal Sumon|2026-05-11|read|0|ADMIN
+24|INFO|Admin|Fees payment confirmation received from Bashudeb Kumer Paul|2026-05-12|read|0|ADMIN
+25|SYSTEM|Admin|Password reset successful for Md. Abdur Rahim Ratul|2026-05-12|read|0|ADMIN
+26|SYSTEM|Admin|Password reset successful for Tahsin Tasnim Tandra|2026-05-12|unread|0|ADMIN
+27|ALERT|Admin|Exam registration pending for Maream|2026-05-12|read|0|ADMIN
+28|INFO|Admin|Grade sheet updated for Md. Imran Hassain|2026-05-11|read|0|ADMIN
+29|INFO|Admin|Grade sheet updated for Abu Sowad Mohammad Ali Siam|2026-05-11|unread|0|ADMIN
+30|ALERT|Admin|Attendance below 75% for Fatima Rahman Shoshi|2026-05-11|unread|0|ADMIN
+31|SYSTEM|Admin|Leave request approved for Rukaiya Rafiq Ulfa|2026-05-11|read|0|ADMIN
+32|SYSTEM|Admin|Leave request approved for S. M. Salman Farshi|2026-05-12|unread|0|ADMIN
+33|ALERT|Admin|Exam registration pending for Tawhidur Rahman Shishir|2026-05-12|read|0|ADMIN
+34|ALERT|Admin|Attendance below 75% for Md.Rashedul Islam|2026-05-11|unread|0|ADMIN
+35|INFO|Admin|Grade sheet updated for Md. Samiul Islam Shihab|2026-05-11|read|0|ADMIN
+36|ALERT|Admin|Attendance below 75% for Md. Abu Raihan|2026-05-12|unread|0|ADMIN
+37|ALERT|Admin|Exam registration pending for Md. Shimul Sarkar|2026-05-12|unread|0|ADMIN
+38|ALERT|Admin|Exam registration pending for Khairun Nahar Sara|2026-05-11|unread|0|ADMIN
+39|ALERT|Admin|Attendance below 75% for Md. Montasir Monir Alif|2026-05-11|read|0|ADMIN

@@ -1,0 +1,235 @@
+1|Md. Rakibul Islam|CSE|CSE-0311|Software Engineering|3|78|A-|3.50|Spring 2025
+1|Md. Rakibul Islam|CSE|CSE-0412|Data Structures|3|83|A|3.75|Spring 2025
+1|Md. Rakibul Islam|CSE|CSE-0513|Database Systems|3|80|A|3.75|Spring 2025
+1|Md. Rakibul Islam|CSE|CSE-0614|Computer Networks|3|96|A+|4.00|Spring 2025
+1|Md. Rakibul Islam|CSE|CSE-0715|Operating Systems|3|79|A-|3.50|Summer 2025
+1|Md. Rakibul Islam|CSE|CSE-0816|Machine Learning|3|86|A+|4.00|Summer 2025
+2|Siam Hossain|CSE|CSE-0311|Software Engineering|3|81|A|3.75|Spring 2025
+2|Siam Hossain|CSE|CSE-0412|Data Structures|3|76|A-|3.50|Spring 2025
+2|Siam Hossain|CSE|CSE-0513|Database Systems|3|88|A+|4.00|Spring 2025
+2|Siam Hossain|CSE|CSE-0614|Computer Networks|3|92|A+|4.00|Spring 2025
+2|Siam Hossain|CSE|CSE-0715|Operating Systems|3|94|A+|4.00|Summer 2025
+2|Siam Hossain|CSE|CSE-0816|Machine Learning|3|5|F|0.00|Summer 2025
+3|Md. Radoun Hossin Mukta|CSE|CSE-0311|Software Engineering|3|93|A+|4.00|Spring 2025
+3|Md. Radoun Hossin Mukta|CSE|CSE-0412|Data Structures|3|27|F|0.00|Spring 2025
+3|Md. Radoun Hossin Mukta|CSE|CSE-0513|Database Systems|3|97|A+|4.00|Spring 2025
+3|Md. Radoun Hossin Mukta|CSE|CSE-0614|Computer Networks|3|85|A+|4.00|Spring 2025
+3|Md. Radoun Hossin Mukta|CSE|CSE-0715|Operating Systems|3|94|A+|4.00|Summer 2025
+3|Md. Radoun Hossin Mukta|CSE|CSE-0816|Machine Learning|3|100|A+|4.00|Summer 2025
+4|Md. Shahariar Ahmed Kanon|CSE|CSE-0311|Software Engineering|3|87|A+|4.00|Spring 2025
+4|Md. Shahariar Ahmed Kanon|CSE|CSE-0412|Data Structures|3|84|A|3.75|Spring 2025
+4|Md. Shahariar Ahmed Kanon|CSE|CSE-0513|Database Systems|3|93|A+|4.00|Spring 2025
+4|Md. Shahariar Ahmed Kanon|CSE|CSE-0614|Computer Networks|3|53|C|2.25|Spring 2025
+4|Md. Shahariar Ahmed Kanon|CSE|CSE-0715|Operating Systems|3|85|A+|4.00|Summer 2025
+4|Md. Shahariar Ahmed Kanon|CSE|CSE-0816|Machine Learning|3|35|F|0.00|Summer 2025
+5|Mst. Anamika Jahan|CSE|CSE-0311|Software Engineering|3|50|C|2.25|Spring 2025
+5|Mst. Anamika Jahan|CSE|CSE-0412|Data Structures|3|33|F|0.00|Spring 2025
+5|Mst. Anamika Jahan|CSE|CSE-0513|Database Systems|3|25|F|0.00|Spring 2025
+5|Mst. Anamika Jahan|CSE|CSE-0614|Computer Networks|3|1|F|0.00|Spring 2025
+5|Mst. Anamika Jahan|CSE|CSE-0715|Operating Systems|3|5|F|0.00|Summer 2025
+5|Mst. Anamika Jahan|CSE|CSE-0816|Machine Learning|3|26|F|0.00|Summer 2025
+6|Md. Sojib Ahmed|CSE|CSE-0311|Software Engineering|3|20|F|0.00|Spring 2025
+6|Md. Sojib Ahmed|CSE|CSE-0412|Data Structures|3|36|F|0.00|Spring 2025
+6|Md. Sojib Ahmed|CSE|CSE-0513|Database Systems|3|58|C+|2.50|Spring 2025
+6|Md. Sojib Ahmed|CSE|CSE-0614|Computer Networks|3|12|F|0.00|Spring 2025
+6|Md. Sojib Ahmed|CSE|CSE-0715|Operating Systems|3|55|C+|2.50|Summer 2025
+6|Md. Sojib Ahmed|CSE|CSE-0816|Machine Learning|3|59|C+|2.50|Summer 2025
+7|Most. Ananna Khandaker|CSE|CSE-0311|Software Engineering|3|52|C|2.25|Spring 2025
+7|Most. Ananna Khandaker|CSE|CSE-0412|Data Structures|3|57|C+|2.50|Spring 2025
+7|Most. Ananna Khandaker|CSE|CSE-0513|Database Systems|3|53|C|2.25|Spring 2025
+7|Most. Ananna Khandaker|CSE|CSE-0614|Computer Networks|3|57|C+|2.50|Spring 2025
+7|Most. Ananna Khandaker|CSE|CSE-0715|Operating Systems|3|53|C|2.25|Summer 2025
+7|Most. Ananna Khandaker|CSE|CSE-0816|Machine Learning|3|61|B-|2.75|Summer 2025
+8|Md. Rakib Hasan Riyad|CSE|CSE-0311|Software Engineering|3|57|C+|2.50|Spring 2025
+8|Md. Rakib Hasan Riyad|CSE|CSE-0412|Data Structures|3|41|D|2.00|Spring 2025
+8|Md. Rakib Hasan Riyad|CSE|CSE-0513|Database Systems|3|55|C+|2.50|Spring 2025
+8|Md. Rakib Hasan Riyad|CSE|CSE-0614|Computer Networks|3|53|C|2.25|Spring 2025
+8|Md. Rakib Hasan Riyad|CSE|CSE-0715|Operating Systems|3|58|C+|2.50|Summer 2025
+8|Md. Rakib Hasan Riyad|CSE|CSE-0816|Machine Learning|3|60|B-|2.75|Summer 2025
+9|Most. Khadija Khatun|CSE|CSE-0311|Software Engineering|3|63|B-|2.75|Spring 2025
+9|Most. Khadija Khatun|CSE|CSE-0412|Data Structures|3|52|C|2.25|Spring 2025
+9|Most. Khadija Khatun|CSE|CSE-0513|Database Systems|3|63|B-|2.75|Spring 2025
+9|Most. Khadija Khatun|CSE|CSE-0614|Computer Networks|3|53|C|2.25|Spring 2025
+9|Most. Khadija Khatun|CSE|CSE-0715|Operating Systems|3|61|B-|2.75|Summer 2025
+9|Most. Khadija Khatun|CSE|CSE-0816|Machine Learning|3|57|C+|2.50|Summer 2025
+10|Md. Rezwan Ahmed Ratul|CSE|CSE-0311|Software Engineering|3|59|C+|2.50|Spring 2025
+10|Md. Rezwan Ahmed Ratul|CSE|CSE-0412|Data Structures|3|66|B|3.00|Spring 2025
+10|Md. Rezwan Ahmed Ratul|CSE|CSE-0513|Database Systems|3|57|C+|2.50|Spring 2025
+10|Md. Rezwan Ahmed Ratul|CSE|CSE-0614|Computer Networks|3|69|B|3.00|Spring 2025
+10|Md. Rezwan Ahmed Ratul|CSE|CSE-0715|Operating Systems|3|57|C+|2.50|Summer 2025
+10|Md. Rezwan Ahmed Ratul|CSE|CSE-0816|Machine Learning|3|69|B|3.00|Summer 2025
+11|Maruf Ibna Abdullah Rifat|CSE|CSE-0311|Software Engineering|3|68|B|3.00|Spring 2025
+11|Maruf Ibna Abdullah Rifat|CSE|CSE-0412|Data Structures|3|64|B-|2.75|Spring 2025
+11|Maruf Ibna Abdullah Rifat|CSE|CSE-0513|Database Systems|3|55|C+|2.50|Spring 2025
+11|Maruf Ibna Abdullah Rifat|CSE|CSE-0614|Computer Networks|3|74|B+|3.25|Spring 2025
+11|Maruf Ibna Abdullah Rifat|CSE|CSE-0715|Operating Systems|3|69|B|3.00|Summer 2025
+11|Maruf Ibna Abdullah Rifat|CSE|CSE-0816|Machine Learning|3|69|B|3.00|Summer 2025
+12|Md. Rabbi|CSE|CSE-0311|Software Engineering|3|62|B-|2.75|Spring 2025
+12|Md. Rabbi|CSE|CSE-0412|Data Structures|3|66|B|3.00|Spring 2025
+12|Md. Rabbi|CSE|CSE-0513|Database Systems|3|71|B+|3.25|Spring 2025
+12|Md. Rabbi|CSE|CSE-0614|Computer Networks|3|70|B+|3.25|Spring 2025
+12|Md. Rabbi|CSE|CSE-0715|Operating Systems|3|72|B+|3.25|Summer 2025
+12|Md. Rabbi|CSE|CSE-0816|Machine Learning|3|68|B|3.00|Summer 2025
+13|Mst. Mushkat Jahan Shila|CSE|CSE-0311|Software Engineering|3|74|B+|3.25|Spring 2025
+13|Mst. Mushkat Jahan Shila|CSE|CSE-0412|Data Structures|3|75|A-|3.50|Spring 2025
+13|Mst. Mushkat Jahan Shila|CSE|CSE-0513|Database Systems|3|74|B+|3.25|Spring 2025
+13|Mst. Mushkat Jahan Shila|CSE|CSE-0614|Computer Networks|3|68|B|3.00|Spring 2025
+13|Mst. Mushkat Jahan Shila|CSE|CSE-0715|Operating Systems|3|73|B+|3.25|Summer 2025
+13|Mst. Mushkat Jahan Shila|CSE|CSE-0816|Machine Learning|3|70|B+|3.25|Summer 2025
+14|Ijaj Ahmed Rafi|CSE|CSE-0311|Software Engineering|3|79|A-|3.50|Spring 2025
+14|Ijaj Ahmed Rafi|CSE|CSE-0412|Data Structures|3|66|B|3.00|Spring 2025
+14|Ijaj Ahmed Rafi|CSE|CSE-0513|Database Systems|3|71|B+|3.25|Spring 2025
+14|Ijaj Ahmed Rafi|CSE|CSE-0614|Computer Networks|3|68|B|3.00|Spring 2025
+14|Ijaj Ahmed Rafi|CSE|CSE-0715|Operating Systems|3|74|B+|3.25|Summer 2025
+14|Ijaj Ahmed Rafi|CSE|CSE-0816|Machine Learning|3|75|A-|3.50|Summer 2025
+15|Md. Sabbir Hossain Rahat|CSE|CSE-0311|Software Engineering|3|73|B+|3.25|Spring 2025
+15|Md. Sabbir Hossain Rahat|CSE|CSE-0412|Data Structures|3|79|A-|3.50|Spring 2025
+15|Md. Sabbir Hossain Rahat|CSE|CSE-0513|Database Systems|3|69|B|3.00|Spring 2025
+15|Md. Sabbir Hossain Rahat|CSE|CSE-0614|Computer Networks|3|80|A|3.75|Spring 2025
+15|Md. Sabbir Hossain Rahat|CSE|CSE-0715|Operating Systems|3|70|B+|3.25|Summer 2025
+15|Md. Sabbir Hossain Rahat|CSE|CSE-0816|Machine Learning|3|75|A-|3.50|Summer 2025
+16|Abid Hasan Hujaifa|CSE|CSE-0311|Software Engineering|3|78|A-|3.50|Spring 2025
+16|Abid Hasan Hujaifa|CSE|CSE-0412|Data Structures|3|73|B+|3.25|Spring 2025
+16|Abid Hasan Hujaifa|CSE|CSE-0513|Database Systems|3|82|A|3.75|Spring 2025
+16|Abid Hasan Hujaifa|CSE|CSE-0614|Computer Networks|3|74|B+|3.25|Spring 2025
+16|Abid Hasan Hujaifa|CSE|CSE-0715|Operating Systems|3|83|A|3.75|Summer 2025
+16|Abid Hasan Hujaifa|CSE|CSE-0816|Machine Learning|3|73|B+|3.25|Summer 2025
+17|Sabiha Rumman Medha|CSE|CSE-0311|Software Engineering|3|80|A|3.75|Spring 2025
+17|Sabiha Rumman Medha|CSE|CSE-0412|Data Structures|3|90|A+|4.00|Spring 2025
+17|Sabiha Rumman Medha|CSE|CSE-0513|Database Systems|3|81|A|3.75|Spring 2025
+17|Sabiha Rumman Medha|CSE|CSE-0614|Computer Networks|3|82|A|3.75|Spring 2025
+17|Sabiha Rumman Medha|CSE|CSE-0715|Operating Systems|3|92|A+|4.00|Summer 2025
+17|Sabiha Rumman Medha|CSE|CSE-0816|Machine Learning|3|96|A+|4.00|Summer 2025
+18|Md. Intaj Hassan Nibir|CSE|CSE-0311|Software Engineering|3|96|A+|4.00|Spring 2025
+18|Md. Intaj Hassan Nibir|CSE|CSE-0412|Data Structures|3|75|A-|3.50|Spring 2025
+18|Md. Intaj Hassan Nibir|CSE|CSE-0513|Database Systems|3|80|A|3.75|Spring 2025
+18|Md. Intaj Hassan Nibir|CSE|CSE-0614|Computer Networks|3|77|A-|3.50|Spring 2025
+18|Md. Intaj Hassan Nibir|CSE|CSE-0715|Operating Systems|3|84|A|3.75|Summer 2025
+18|Md. Intaj Hassan Nibir|CSE|CSE-0816|Machine Learning|3|1|F|0.00|Summer 2025
+19|Md. Asif Foysal|CSE|CSE-0311|Software Engineering|3|99|A+|4.00|Spring 2025
+19|Md. Asif Foysal|CSE|CSE-0412|Data Structures|3|80|A|3.75|Spring 2025
+19|Md. Asif Foysal|CSE|CSE-0513|Database Systems|3|80|A|3.75|Spring 2025
+19|Md. Asif Foysal|CSE|CSE-0614|Computer Networks|3|22|F|0.00|Spring 2025
+19|Md. Asif Foysal|CSE|CSE-0715|Operating Systems|3|98|A+|4.00|Summer 2025
+19|Md. Asif Foysal|CSE|CSE-0816|Machine Learning|3|42|D|2.00|Summer 2025
+20|Tarak Rahman Shakib (Re-add)|CSE|CSE-0311|Software Engineering|3|5|F|0.00|Spring 2025
+20|Tarak Rahman Shakib (Re-add)|CSE|CSE-0412|Data Structures|3|91|A+|4.00|Spring 2025
+20|Tarak Rahman Shakib (Re-add)|CSE|CSE-0513|Database Systems|3|49|D|2.00|Spring 2025
+20|Tarak Rahman Shakib (Re-add)|CSE|CSE-0614|Computer Networks|3|87|A+|4.00|Spring 2025
+20|Tarak Rahman Shakib (Re-add)|CSE|CSE-0715|Operating Systems|3|88|A+|4.00|Summer 2025
+20|Tarak Rahman Shakib (Re-add)|CSE|CSE-0816|Machine Learning|3|48|D|2.00|Summer 2025
+21|Fardin Khan Sadi|CSE|CSE-0311|Software Engineering|3|42|D|2.00|Spring 2025
+21|Fardin Khan Sadi|CSE|CSE-0412|Data Structures|3|93|A+|4.00|Spring 2025
+21|Fardin Khan Sadi|CSE|CSE-0513|Database Systems|3|50|C|2.25|Spring 2025
+21|Fardin Khan Sadi|CSE|CSE-0614|Computer Networks|3|49|D|2.00|Spring 2025
+21|Fardin Khan Sadi|CSE|CSE-0715|Operating Systems|3|25|F|0.00|Summer 2025
+21|Fardin Khan Sadi|CSE|CSE-0816|Machine Learning|3|37|F|0.00|Summer 2025
+22|Abir Deb|CSE|CSE-0311|Software Engineering|3|100|A+|4.00|Spring 2025
+22|Abir Deb|CSE|CSE-0412|Data Structures|3|30|F|0.00|Spring 2025
+22|Abir Deb|CSE|CSE-0513|Database Systems|3|99|A+|4.00|Spring 2025
+22|Abir Deb|CSE|CSE-0614|Computer Networks|3|43|D|2.00|Spring 2025
+22|Abir Deb|CSE|CSE-0715|Operating Systems|3|48|D|2.00|Summer 2025
+22|Abir Deb|CSE|CSE-0816|Machine Learning|3|59|C+|2.50|Summer 2025
+23|Robiul Awal Sumon(17th)|CSE|CSE-0311|Software Engineering|3|23|F|0.00|Spring 2025
+23|Robiul Awal Sumon(17th)|CSE|CSE-0412|Data Structures|3|41|D|2.00|Spring 2025
+23|Robiul Awal Sumon(17th)|CSE|CSE-0513|Database Systems|3|54|C|2.25|Spring 2025
+23|Robiul Awal Sumon(17th)|CSE|CSE-0614|Computer Networks|3|33|F|0.00|Spring 2025
+23|Robiul Awal Sumon(17th)|CSE|CSE-0715|Operating Systems|3|53|C|2.25|Summer 2025
+23|Robiul Awal Sumon(17th)|CSE|CSE-0816|Machine Learning|3|53|C|2.25|Summer 2025
+24|Bashudeb Kumer Paul|CSE|CSE-0311|Software Engineering|3|15|F|0.00|Spring 2025
+24|Bashudeb Kumer Paul|CSE|CSE-0412|Data Structures|3|54|C|2.25|Spring 2025
+24|Bashudeb Kumer Paul|CSE|CSE-0513|Database Systems|3|50|C|2.25|Spring 2025
+24|Bashudeb Kumer Paul|CSE|CSE-0614|Computer Networks|3|45|D|2.00|Spring 2025
+24|Bashudeb Kumer Paul|CSE|CSE-0715|Operating Systems|3|62|B-|2.75|Summer 2025
+24|Bashudeb Kumer Paul|CSE|CSE-0816|Machine Learning|3|56|C+|2.50|Summer 2025
+25|Md. Abdur Rahim Ratul|CSE|CSE-0311|Software Engineering|3|54|C|2.25|Spring 2025
+25|Md. Abdur Rahim Ratul|CSE|CSE-0412|Data Structures|3|50|C|2.25|Spring 2025
+25|Md. Abdur Rahim Ratul|CSE|CSE-0513|Database Systems|3|64|B-|2.75|Spring 2025
+25|Md. Abdur Rahim Ratul|CSE|CSE-0614|Computer Networks|3|59|C+|2.50|Spring 2025
+25|Md. Abdur Rahim Ratul|CSE|CSE-0715|Operating Systems|3|64|B-|2.75|Summer 2025
+25|Md. Abdur Rahim Ratul|CSE|CSE-0816|Machine Learning|3|58|C+|2.50|Summer 2025
+26|Tahsin Tasnim Tandra|CSE|CSE-0311|Software Engineering|3|50|C|2.25|Spring 2025
+26|Tahsin Tasnim Tandra|CSE|CSE-0412|Data Structures|3|62|B-|2.75|Spring 2025
+26|Tahsin Tasnim Tandra|CSE|CSE-0513|Database Systems|3|57|C+|2.50|Spring 2025
+26|Tahsin Tasnim Tandra|CSE|CSE-0614|Computer Networks|3|65|B|3.00|Spring 2025
+26|Tahsin Tasnim Tandra|CSE|CSE-0715|Operating Systems|3|60|B-|2.75|Summer 2025
+26|Tahsin Tasnim Tandra|CSE|CSE-0816|Machine Learning|3|61|B-|2.75|Summer 2025
+27|Maream|CSE|CSE-0311|Software Engineering|3|59|C+|2.50|Spring 2025
+27|Maream|CSE|CSE-0412|Data Structures|3|63|B-|2.75|Spring 2025
+27|Maream|CSE|CSE-0513|Database Systems|3|56|C+|2.50|Spring 2025
+27|Maream|CSE|CSE-0614|Computer Networks|3|68|B|3.00|Spring 2025
+27|Maream|CSE|CSE-0715|Operating Systems|3|56|C+|2.50|Summer 2025
+27|Maream|CSE|CSE-0816|Machine Learning|3|68|B|3.00|Summer 2025
+28|Md. Imran Hassain|CSE|CSE-0311|Software Engineering|3|67|B|3.00|Spring 2025
+28|Md. Imran Hassain|CSE|CSE-0412|Data Structures|3|65|B|3.00|Spring 2025
+28|Md. Imran Hassain|CSE|CSE-0513|Database Systems|3|58|C+|2.50|Spring 2025
+28|Md. Imran Hassain|CSE|CSE-0614|Computer Networks|3|68|B|3.00|Spring 2025
+28|Md. Imran Hassain|CSE|CSE-0715|Operating Systems|3|64|B-|2.75|Summer 2025
+28|Md. Imran Hassain|CSE|CSE-0715|Operating Systems|3|61|B-|2.75|Summer 2025
+28|Md. Imran Hassain|CSE|CSE-0816|Machine Learning|3|68|B|3.00|Summer 2025
+29|Abu Sowad Mohammad Ali Siam|CSE|CSE-0311|Software Engineering|3|69|B|3.00|Spring 2025
+29|Abu Sowad Mohammad Ali Siam|CSE|CSE-0412|Data Structures|3|64|B-|2.75|Spring 2025
+29|Abu Sowad Mohammad Ali Siam|CSE|CSE-0513|Database Systems|3|74|B+|3.25|Spring 2025
+29|Abu Sowad Mohammad Ali Siam|CSE|CSE-0614|Computer Networks|3|66|B|3.00|Spring 2025
+29|Abu Sowad Mohammad Ali Siam|CSE|CSE-0715|Operating Systems|3|65|B|3.00|Summer 2025
+29|Abu Sowad Mohammad Ali Siam|CSE|CSE-0816|Machine Learning|3|69|B|3.00|Summer 2025
+30|Fatima Rahman Shoshi|CSE|CSE-0311|Software Engineering|3|70|B+|3.25|Spring 2025
+30|Fatima Rahman Shoshi|CSE|CSE-0412|Data Structures|3|72|B+|3.25|Spring 2025
+30|Fatima Rahman Shoshi|CSE|CSE-0513|Database Systems|3|69|B|3.00|Spring 2025
+30|Fatima Rahman Shoshi|CSE|CSE-0614|Computer Networks|3|73|B+|3.25|Spring 2025
+30|Fatima Rahman Shoshi|CSE|CSE-0715|Operating Systems|3|74|B+|3.25|Summer 2025
+30|Fatima Rahman Shoshi|CSE|CSE-0816|Machine Learning|3|79|A-|3.50|Summer 2025
+31|Rukaiya Rafiq Ulfa|CSE|CSE-0311|Software Engineering|3|77|A-|3.50|Spring 2025
+31|Rukaiya Rafiq Ulfa|CSE|CSE-0412|Data Structures|3|66|B|3.00|Spring 2025
+31|Rukaiya Rafiq Ulfa|CSE|CSE-0513|Database Systems|3|75|A-|3.50|Spring 2025
+31|Rukaiya Rafiq Ulfa|CSE|CSE-0614|Computer Networks|3|69|B|3.00|Spring 2025
+31|Rukaiya Rafiq Ulfa|CSE|CSE-0715|Operating Systems|3|84|A|3.75|Summer 2025
+31|Rukaiya Rafiq Ulfa|CSE|CSE-0816|Machine Learning|3|78|A-|3.50|Summer 2025
+32|S. M. Salman Farshi|CSE|CSE-0311|Software Engineering|3|72|B+|3.25|Spring 2025
+32|S. M. Salman Farshi|CSE|CSE-0412|Data Structures|3|71|B+|3.25|Spring 2025
+32|S. M. Salman Farshi|CSE|CSE-0513|Database Systems|3|74|B+|3.25|Spring 2025
+32|S. M. Salman Farshi|CSE|CSE-0614|Computer Networks|3|84|A|3.75|Spring 2025
+32|S. M. Salman Farshi|CSE|CSE-0715|Operating Systems|3|79|A-|3.50|Summer 2025
+32|S. M. Salman Farshi|CSE|CSE-0816|Machine Learning|3|83|A|3.75|Summer 2025
+33|Tawhidur Rahman Shishir|CSE|CSE-0311|Software Engineering|3|76|A-|3.50|Spring 2025
+33|Tawhidur Rahman Shishir|CSE|CSE-0412|Data Structures|3|74|B+|3.25|Spring 2025
+33|Tawhidur Rahman Shishir|CSE|CSE-0513|Database Systems|3|81|A|3.75|Spring 2025
+33|Tawhidur Rahman Shishir|CSE|CSE-0614|Computer Networks|3|76|A-|3.50|Spring 2025
+33|Tawhidur Rahman Shishir|CSE|CSE-0715|Operating Systems|3|80|A|3.75|Summer 2025
+33|Tawhidur Rahman Shishir|CSE|CSE-0816|Machine Learning|3|78|A-|3.50|Summer 2025
+34|Md.Rashedul Islam (17th)|CSE|CSE-0311|Software Engineering|3|82|A|3.75|Spring 2025
+34|Md.Rashedul Islam (17th)|CSE|CSE-0412|Data Structures|3|85|A+|4.00|Spring 2025
+34|Md.Rashedul Islam (17th)|CSE|CSE-0513|Database Systems|3|77|A-|3.50|Spring 2025
+34|Md.Rashedul Islam (17th)|CSE|CSE-0614|Computer Networks|3|77|A-|3.50|Spring 2025
+34|Md.Rashedul Islam (17th)|CSE|CSE-0715|Operating Systems|3|82|A|3.75|Summer 2025
+34|Md.Rashedul Islam (17th)|CSE|CSE-0816|Machine Learning|3|75|A-|3.50|Summer 2025
+35|Md. Samiul Islam Shihab|CSE|CSE-0311|Software Engineering|3|76|A-|3.50|Spring 2025
+35|Md. Samiul Islam Shihab|CSE|CSE-0412|Data Structures|3|81|A|3.75|Spring 2025
+35|Md. Samiul Islam Shihab|CSE|CSE-0513|Database Systems|3|9|F|0.00|Spring 2025
+35|Md. Samiul Islam Shihab|CSE|CSE-0614|Computer Networks|3|85|A+|4.00|Spring 2025
+35|Md. Samiul Islam Shihab|CSE|CSE-0715|Operating Systems|3|92|A+|4.00|Summer 2025
+35|Md. Samiul Islam Shihab|CSE|CSE-0816|Machine Learning|3|81|A|3.75|Summer 2025
+36|Md. Abu Raihan|CSE|CSE-0311|Software Engineering|3|38|F|0.00|Spring 2025
+36|Md. Abu Raihan|CSE|CSE-0412|Data Structures|3|100|A+|4.00|Spring 2025
+36|Md. Abu Raihan|CSE|CSE-0513|Database Systems|3|82|A|3.75|Spring 2025
+36|Md. Abu Raihan|CSE|CSE-0614|Computer Networks|3|86|A+|4.00|Spring 2025
+36|Md. Abu Raihan|CSE|CSE-0715|Operating Systems|3|20|F|0.00|Summer 2025
+36|Md. Abu Raihan|CSE|CSE-0816|Machine Learning|3|84|A|3.75|Summer 2025
+37|Md. Shimul Sarkar|CSE|CSE-0311|Software Engineering|3|48|D|2.00|Spring 2025
+37|Md. Shimul Sarkar|CSE|CSE-0412|Data Structures|3|85|A+|4.00|Spring 2025
+37|Md. Shimul Sarkar|CSE|CSE-0513|Database Systems|3|35|F|0.00|Spring 2025
+37|Md. Shimul Sarkar|CSE|CSE-0614|Computer Networks|3|97|A+|4.00|Spring 2025
+37|Md. Shimul Sarkar|CSE|CSE-0715|Operating Systems|3|39|F|0.00|Summer 2025
+37|Md. Shimul Sarkar|CSE|CSE-0816|Machine Learning|3|50|C|2.25|Summer 2025
+38|Khairun Nahar Sara|CSE|CSE-0311|Software Engineering|3|48|D|2.00|Spring 2025
+38|Khairun Nahar Sara|CSE|CSE-0412|Data Structures|3|9|F|0.00|Spring 2025
+38|Khairun Nahar Sara|CSE|CSE-0513|Database Systems|3|51|C|2.25|Spring 2025
+38|Khairun Nahar Sara|CSE|CSE-0614|Computer Networks|3|51|C|2.25|Spring 2025
+38|Khairun Nahar Sara|CSE|CSE-0715|Operating Systems|3|99|A+|4.00|Summer 2025
+38|Khairun Nahar Sara|CSE|CSE-0816|Machine Learning|3|41|D|2.00|Summer 2025
+39|Md. Montasir Monir Alif|CSE|CSE-0311|Software Engineering|3|43|D|2.00|Spring 2025
+39|Md. Montasir Monir Alif|CSE|CSE-0412|Data Structures|3|3|F|0.00|Spring 2025
+39|Md. Montasir Monir Alif|CSE|CSE-0513|Database Systems|3|50|C|2.25|Spring 2025
+39|Md. Montasir Monir Alif|CSE|CSE-0614|Computer Networks|3|45|D|2.00|Spring 2025
+39|Md. Montasir Monir Alif|CSE|CSE-0715|Operating Systems|3|36|F|0.00|Summer 2025
+39|Md. Montasir Monir Alif|CSE|CSE-0816|Machine Learning|3|40|D|2.00|Summer 2025

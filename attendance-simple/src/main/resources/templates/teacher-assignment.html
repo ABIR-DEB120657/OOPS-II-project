@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Assignment - Nexus One</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --primary: #6D5DFC;
+            --primary-hover: #5b4be8;
+            --primary-light: #EEECFF;
+            --blue: #3B82F6;
+            --green: #22C55E;
+            --red: #EF4444;
+            --orange: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.02);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px; background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+        }
+        .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; }
+        .logo-img { width: 36px; height: 36px; border-radius: 8px; }
+        .logo-text { font-weight: 700; font-size: 15px; line-height: 1.2; letter-spacing: -0.01em; }
+        .logo-sub { color: var(--text-muted); font-weight: 500; font-size: 11px; }
+
+        .menu-section { padding: 0 12px; flex: 1; overflow-y: auto; }
+        .menu-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px 12px; font-weight: 600; }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 4px;
+            border-radius: var(--radius-md); text-decoration: none; color: var(--text-muted);
+            font-size: 14px; font-weight: 500; transition: var(--transition); border-left: 3px solid transparent;
+        }
+        .menu-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .menu-item:hover { background: var(--bg); color: var(--text-main); }
+        .menu-item.active { background: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+        .badge { margin-left: auto; background: var(--red); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: var(--bg); border: 1px solid var(--border); text-decoration: none; transition: var(--transition); }
+        .user-card:hover { border-color: var(--primary); }
+        .avatar-wrap { position: relative; width: 36px; height: 36px; }
+        .avatar { width: 100%; height: 100%; border-radius: 10px; object-fit: cover; }
+        .status-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--green); border: 2px solid var(--bg); border-radius: 50%; }
+        .user-info { flex: 1; overflow: hidden; }
+        .user-name { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+        .logout-btn { display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin-top: 8px; color: var(--red); font-size: 13px; font-weight: 500; text-decoration: none; border-radius: var(--radius-md); transition: var(--transition); }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); }
+
+        /* --- MAIN CONTENT & TOPBAR --- */
+        .main-wrapper { margin-left: 260px; flex: 1; display: flex; flex-direction: column; }
+
+        .topbar {
+            height: 70px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;
+        }
+        .search-bar { position: relative; width: 320px; }
+        .search-bar input { width: 100%; padding: 10px 16px 10px 40px; border-radius: 99px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-size: 13px; outline: none; transition: var(--transition); }
+        .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background: var(--surface); }
+        .search-bar svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); }
+
+        .topbar-actions { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+        .icon-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
+
+        .container { padding: 32px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* --- STATS GRID --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .stat-title { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .stat-icon svg { width: 20px; height: 20px; }
+        .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-main); }
+
+        .c-purple { color: var(--primary); background: var(--primary-light); }
+        .c-blue { color: var(--blue); background: rgba(59, 130, 246, 0.15); }
+        .c-green { color: var(--green); background: rgba(34, 197, 94, 0.15); }
+        .c-orange { color: var(--orange); background: rgba(245, 158, 11, 0.15); }
+
+        /* --- PAGE HEADER & ACTIONS --- */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .page-title p { font-size: 14px; color: var(--text-muted); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #818cf8); color: white; border: none;
+            padding: 10px 20px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(109, 93, 252, 0.2);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(109, 93, 252, 0.3); }
+
+        /* --- ASSIGNMENT LIST (CARDS) --- */
+        .empty-state { text-align: center; padding: 48px; background: var(--surface); border-radius: var(--radius-lg); border: 1px dashed var(--border); color: var(--text-muted); font-size: 14px; }
+
+        .task-card { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 16px; overflow: hidden; transition: var(--transition); }
+        .task-card:hover { border-color: #cbd5e1; box-shadow: var(--shadow-md); }
+        .task-card.overdue-card { border-left: 3px solid var(--red); }
+
+        .task-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--surface); transition: var(--transition); }
+        .task-header:hover { background: var(--bg); }
+        .task-info { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+        .task-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+        .task-course { font-size: 13px; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+
+        /* ── PROGRESS BAR ── */
+        .progress-wrap { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+        .progress-bar-bg { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; width: 140px; flex-shrink: 0; }
+        .progress-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), var(--green)); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .progress-text { font-size: 11px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+
+        .badge-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .modern-badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .mb-batch { background: var(--bg); color: var(--text-main); border: 1px solid var(--border); }
+        .mb-progress { background: rgba(34, 197, 94, 0.1); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.2); }
+        .mb-deadline { background: rgba(245, 158, 11, 0.1); color: var(--orange); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .mb-overdue { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .action-btns { display: flex; gap: 6px; margin-left: 12px; }
+        .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); color: var(--text-muted); }
+        .btn-icon:hover { background: var(--bg); color: var(--text-main); }
+        .btn-icon.delete:hover { background: rgba(239, 68, 68, 0.1); color: var(--red); border-color: rgba(239, 68, 68, 0.2); }
+
+        .chevron { width: 16px; height: 16px; color: var(--text-muted); transition: transform 0.3s; margin-left: 8px; flex-shrink: 0; }
+        .task-card.expanded .chevron { transform: rotate(180deg); }
+
+        .task-body { display: none; border-top: 1px solid var(--border); background: var(--bg); }
+        .task-card.expanded .task-body { display: block; }
+
+        /* ── FILTER BAR ── */
+        .filter-bar {
+            padding: 12px 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+        }
+        .filter-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; flex-shrink: 0; }
+        .filter-btn {
+            padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 600;
+            border: 1px solid var(--border); background: var(--surface); cursor: pointer;
+            transition: var(--transition); color: var(--text-muted); white-space: nowrap;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .filter-btn.fb-active { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+        .filter-count { background: rgba(0,0,0,0.07); border-radius: 99px; padding: 1px 6px; font-size: 10px; font-weight: 700; }
+
+        /* Inner Table */
+        .inner-table { width: 100%; border-collapse: collapse; }
+        .inner-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 12px 24px; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface); font-weight: 600; }
+        .inner-table td { padding: 14px 24px; font-size: 13px; color: var(--text-main); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .inner-table tr:last-child td { border-bottom: none; }
+        .inner-table tr.hidden-row { display: none; }
+
+        /* ── LATE PILL ── */
+        .late-pill {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 700;
+            background: rgba(239, 68, 68, 0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2);
+            margin-left: 6px; vertical-align: middle;
+        }
+
+        .status-pill { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .sp-pending { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+        .sp-approved { background: rgba(34, 197, 94, 0.15); color: #16a34a; }
+        .sp-rejected { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+        .sp-awaiting { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+
+        /* ── FILE PREVIEW BUTTONS ── */
+        .file-action-group { display: flex; align-items: center; gap: 6px; }
+        .btn-preview {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            border: 1px solid var(--primary); color: var(--primary); background: var(--primary-light);
+            cursor: pointer; transition: var(--transition); text-decoration: none;
+        }
+        .btn-preview:hover { background: var(--primary); color: white; }
+        .btn-download {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 7px; font-size: 12px;
+            border: 1px solid var(--border); color: var(--text-muted); background: var(--surface);
+            cursor: pointer; transition: var(--transition); text-decoration: none;
+        }
+        .btn-download:hover { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.08); }
+
+        .eval-btn { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; transition: var(--transition); color: white; display: inline-flex; align-items: center; gap: 4px; }
+        .eb-approve { background: var(--green); } .eb-approve:hover { background: #16a34a; transform: translateY(-1px); }
+        .eb-reject { background: var(--red); } .eb-reject:hover { background: #dc2626; transform: translateY(-1px); }
+
+        /* --- SLIDE-IN DRAWER (MODAL) --- */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .drawer-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .drawer {
+            position: fixed; top: 0; right: 0; height: 100vh; width: 440px; max-width: 100vw;
+            background: var(--surface); z-index: 1000; transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+        .drawer.active { transform: translateX(0); }
+
+        .drawer-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .drawer-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; transition: var(--transition); }
+        .close-btn:hover { background: var(--bg); color: var(--text-main); }
+
+        .drawer-body { padding: 24px; flex: 1; overflow-y: auto; }
+        .drawer-footer { padding: 20px 24px; border-top: 1px solid var(--border); background: var(--bg); display: flex; justify-content: flex-end; gap: 12px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
+        .form-control {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-md);
+            font-size: 14px; background: var(--surface); color: var(--text-main); font-family: inherit;
+            transition: var(--transition); outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .form-control[readonly] { background: var(--bg); color: var(--text-muted); cursor: not-allowed; }
+
+        .btn-outline { padding: 10px 20px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); font-size: 14px; font-weight: 600; cursor: pointer; color: var(--text-main); transition: var(--transition); }
+        .btn-outline:hover { background: var(--bg); }
+
+        /* Toasts */
+        .toast { padding: 14px 20px; border-radius: var(--radius-md); margin-bottom: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; animation: slideDown 0.3s ease-out forwards; }
+        .toast-success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .toast-info { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .toast-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* ── FILE PREVIEW MODAL ── */
+        .preview-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .preview-overlay.open { display: flex; }
+        .preview-modal {
+            background: var(--surface); border-radius: var(--radius-lg);
+            width: 100%; max-width: 900px; height: 85vh;
+            display: flex; flex-direction: column;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.25); overflow: hidden;
+            animation: modalPop 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes modalPop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .preview-modal-header {
+            padding: 16px 24px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+        }
+        .preview-modal-title { font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .preview-modal-body { flex: 1; overflow: hidden; background: #f1f5f9; position: relative; }
+        .preview-modal-body iframe { width: 100%; height: 100%; border: none; }
+        .preview-modal-body img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; margin: auto; padding: 20px; position: absolute; inset: 0; }
+        .preview-no-support { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: var(--text-muted); font-size: 14px; font-weight: 500; }
+        .preview-no-support svg { color: #cbd5e1; }
+
+        /* No result row */
+        .no-result-row td { text-align: center; color: var(--text-muted); font-size: 13px; padding: 32px; font-style: italic; }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/images/kyau_logo.png" alt="KYAU Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiM2RDVERkMiIHJ4PSI4Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE2IDZMMjQgMTRMMTYgMjJMOCAxNEwxNiA2WiIvPjwvc3ZnPg=='"/>
+        <div>
+            <div class="logo-text">Nexus One</div>
+            <div class="logo-sub">Teacher Portal</div>
+        </div>
+    </div>
+    <div class="menu-section">
+        <div class="menu-label">Menu</div>
+        <a href="/teacher-portal" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Dashboard
+        </a>
+        <a href="/attendance" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Mark Attendance
+        </a>
+        <a href="/teacher-assignment" class="menu-item active">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Assignments
+        </a>
+        <a href="/teacher-leave" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Leave Requests
+            <span class="badge" th:if="${pendingLeaveCount != null and pendingLeaveCount > 0}" th:text="${pendingLeaveCount}"></span>
+        </a>
+
+        <div class="menu-label">Apps</div>
+        <a href="/teacher-appointment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Faculty Sync
+        </a>
+        <a href="/teacher-jobs" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Career Hub
+        </a>
+        <a href="/notifications/teacher" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> Notifications
+            <span class="badge" th:if="${unreadNotifCount != null and unreadNotifCount > 0}" th:text="${unreadNotifCount}"></span>
+        </a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card">
+            <div class="avatar-wrap">
+                <img th:src="${session.teacherId != null ? '/teachers/' + session.teacherId + '.jpg' : '/teachers/0.jpg'}" class="avatar" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiM2RDVERkMiIHJ4PSI4Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE2IDZMMjQgMTRMMTYgMjJMOCAxNEwxNiA2WiIvPjwvc3ZnPg=='"/>
+                <div class="status-dot"></div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" th:text="${session.loggedIn != null ? session.loggedIn : 'Teacher'}">Teacher</div>
+                <div class="user-role" th:text="${teacher != null ? teacher.getDesignation() : 'Lecturer'}">Lecturer</div>
+            </div>
+        </a>
+        <a href="/logout" class="logout-btn">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> Sign Out
+        </a>
+    </div>
+</aside>
+
+<main class="main-wrapper">
+    <header class="topbar">
+        <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="globalSearch" placeholder="Search assignments, courses..." oninput="globalSearchCards(this.value)">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" title="Help">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="toast-success" class="toast toast-success" th:if="${param.assignmentSuccess}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Assignment successfully published to the target batch!
+        </div>
+        <div id="toast-edit" class="toast toast-info" th:if="${param.editSuccess}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            Assignment details have been updated!
+        </div>
+        <div id="toast-delete" class="toast toast-danger" th:if="${param.deleteSuccess}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Assignment and all related submissions have been deleted!
+        </div>
+
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Assignments</h1>
+                <p>Manage course tasks and evaluate student submissions.</p>
+            </div>
+            <button class="btn-primary" onclick="openDrawer()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Create Assignment
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Assignments</div>
+                    <div class="stat-icon c-purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                </div>
+                <div class="stat-value" th:text="${tasksData != null ? tasksData.size() : 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Pending Review</div>
+                    <div class="stat-icon c-orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                </div>
+                <div class="stat-value pending-stat">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Active Courses</div>
+                    <div class="stat-icon c-blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                    </div>
+                </div>
+                <div class="stat-value active-courses-stat">--</div>
+            </div>
+        </div>
+
+        <div id="assignmentList">
+            <div class="empty-state" th:if="${tasksData == null or tasksData.isEmpty()}">
+                <svg style="margin: 0 auto 12px; width: 48px; height: 48px; color: #cbd5e1;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <h3>No Assignments Yet</h3>
+                <p style="margin-top: 4px;">Click the 'Create Assignment' button to issue your first task.</p>
+            </div>
+
+            <div class="task-card"
+                 th:each="data, iterStat : ${tasksData}"
+                 th:id="'card-' + ${iterStat.index}"
+                 th:attr="data-end-date=${data.task.endDate}">
+
+                <div class="task-header" th:data-idx="${iterStat.index}" onclick="toggleAccordion(this.getAttribute('data-idx'))">
+                    <div class="task-info">
+                        <div class="task-title" th:text="${data.task.topicName}">Topic Name</div>
+                        <div class="task-course">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            <span th:text="${data.task.courseCode} + ' — ' + ${data.task.courseName}">Course Info</span>
+                        </div>
+                        <div class="progress-wrap">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill"
+                                     th:style="'width: ' + ${data.totalStudents > 0 ? (data.submittedCount * 100 / data.totalStudents) : 0} + '%'">
+                                </div>
+                            </div>
+                            <span class="progress-text"
+                                  th:text="${data.submittedCount} + ' of ' + ${data.totalStudents} + ' submitted ('
+                                      + ${data.totalStudents > 0 ? (data.submittedCount * 100 / data.totalStudents) : 0} + '%)'">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; flex-shrink: 0; margin-left: 16px;">
+                        <div class="badge-group">
+                            <div class="modern-badge mb-batch">🎯 Batch <span th:text="${data.task.batch}"></span></div>
+                            <div class="modern-badge mb-progress">📥 <span th:text="${data.submittedCount} + '/' + ${data.totalStudents}"></span> Submitted</div>
+                            <div class="modern-badge mb-deadline">⏳ <span th:text="${data.task.endDate}"></span></div>
+                        </div>
+
+                        <div class="action-btns" onclick="event.stopPropagation();">
+                            <button class="btn-icon" title="Edit Assignment"
+                                    th:data-id="${data.task.assignmentId}"
+                                    th:data-code="${data.task.courseCode}"
+                                    th:data-name="${data.task.courseName}"
+                                    th:data-batch="${data.task.batch}"
+                                    th:data-topic="${data.task.topicName}"
+                                    th:data-deadline="${data.task.endDate}"
+                                    onclick="openEditPopup(this.getAttribute('data-id'), this.getAttribute('data-code'), this.getAttribute('data-name'), this.getAttribute('data-batch'), this.getAttribute('data-topic'), this.getAttribute('data-deadline'))">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <form th:id="'deleteForm-' + ${data.task.assignmentId}" th:action="@{'/teacher-portal/assignment/delete/' + ${data.task.assignmentId}}" method="post" style="margin: 0;">
+                                <button type="button" class="btn-icon delete" title="Delete Assignment"
+                                        th:data-id="${data.task.assignmentId}"
+                                        onclick="confirmDelete(this.getAttribute('data-id'))">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                </div>
+
+                <div class="task-body" th:id="'body-' + ${iterStat.index}">
+
+                    <div class="filter-bar" th:id="'filterBar-' + ${iterStat.index}">
+                        <span class="filter-label">🔍 Filter</span>
+                        <button class="filter-btn fb-active" th:data-idx="${iterStat.index}" onclick="filterStudents(this.getAttribute('data-idx'), 'all', this)">
+                            All <span class="filter-count">0</span>
+                        </button>
+                        <button class="filter-btn" th:data-idx="${iterStat.index}" onclick="filterStudents(this.getAttribute('data-idx'), 'submitted', this)">
+                            📥 Submitted <span class="filter-count">0</span>
+                        </button>
+                        <button class="filter-btn" th:data-idx="${iterStat.index}" onclick="filterStudents(this.getAttribute('data-idx'), 'pending', this)">
+                            ⏳ Pending <span class="filter-count">0</span>
+                        </button>
+                        <button class="filter-btn" th:data-idx="${iterStat.index}" onclick="filterStudents(this.getAttribute('data-idx'), 'late', this)">
+                            ⏰ Late <span class="filter-count">0</span>
+                        </button>
+                        <button class="filter-btn" th:data-idx="${iterStat.index}" onclick="filterStudents(this.getAttribute('data-idx'), 'approved', this)">
+                            ✅ Approved <span class="filter-count">0</span>
+                        </button>
+                        <button class="filter-btn" th:data-idx="${iterStat.index}" onclick="filterStudents(this.getAttribute('data-idx'), 'rejected', this)">
+                            ❌ Rejected <span class="filter-count">0</span>
+                        </button>
+                    </div>
+
+                    <table class="inner-table">
+                        <thead>
+                        <tr>
+                            <th>Student Details</th>
+                            <th>Submission Date</th>
+                            <th>Attachment</th>
+                            <th>Status</th>
+                            <th>Evaluation</th>
+                        </tr>
+                        </thead>
+                        <tbody th:id="'tbody-' + ${iterStat.index}">
+
+                        <tr th:each="s : ${data.studentList}"
+                            class="student-row"
+                            th:attr="data-status=${s.status}, data-end-date=${data.task.endDate}, data-has-file=${s.status != 'NOT_SUBMITTED' ? 'true' : 'false'}">
+
+                            <td>
+                                <div style="font-weight: 600; color: var(--text-main);" th:text="${s.studentStrId}">ID</div>
+                                <div style="font-size: 12px; color: var(--text-muted);" th:text="${s.studentName}">Name</div>
+                            </td>
+
+                            <td>
+                                <span style="font-weight: 500;" th:text="${s.submissionDate}">-</span>
+                            </td>
+
+                            <td>
+                                <div class="file-action-group" th:if="${s.status != 'NOT_SUBMITTED'}">
+                                    <button type="button" class="btn-preview"
+                                            th:data-path="${s.filePath}"
+                                            onclick="previewFile('/assignments/' + this.getAttribute('data-path'), this.getAttribute('data-path'))">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        Preview
+                                    </button>
+                                    <a th:href="@{'/assignments/' + ${s.filePath}}" target="_blank" class="btn-download" title="Download file">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                    </a>
+                                </div>
+                                <span th:if="${s.status == 'NOT_SUBMITTED'}" style="color: #cbd5e1; font-size: 13px;">—</span>
+                            </td>
+
+                            <td>
+                                <div class="status-cell-wrap">
+                                    <span class="status-pill"
+                                          th:classappend="${s.status == 'APPROVED' ? 'sp-approved' : (s.status == 'REJECTED' ? 'sp-rejected' : (s.status == 'PENDING' ? 'sp-pending' : 'sp-awaiting'))}"
+                                          th:text="${s.status != 'NOT_SUBMITTED' ? s.status : 'Awaiting'}">PENDING</span>
+                                </div>
+                            </td>
+
+                            <td>
+                                <form th:if="${s.status != 'NOT_SUBMITTED'}"
+                                      th:id="'approveForm-' + ${data.task.assignmentId} + '-' + ${s.studentId}"
+                                      th:action="@{'/teacher-portal/assignment/approve/' + ${data.task.assignmentId} + '/' + ${s.studentId}}"
+                                      method="post" style="display:none;"></form>
+                                <form th:if="${s.status != 'NOT_SUBMITTED'}"
+                                      th:id="'rejectForm-' + ${data.task.assignmentId} + '-' + ${s.studentId}"
+                                      th:action="@{'/teacher-portal/assignment/reject/' + ${data.task.assignmentId} + '/' + ${s.studentId}}"
+                                      method="post" style="display:none;"></form>
+
+                                <div style="display: flex; gap: 8px;" th:if="${s.status != 'NOT_SUBMITTED'}">
+                                    <button type="button" class="eval-btn eb-approve"
+                                            th:data-aid="${data.task.assignmentId}"
+                                            th:data-sid="${s.studentId}"
+                                            onclick="evalWithFeedback(this.getAttribute('data-aid'), this.getAttribute('data-sid'), 'approve')">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        Approve
+                                    </button>
+                                    <button type="button" class="eval-btn eb-reject"
+                                            th:data-aid="${data.task.assignmentId}"
+                                            th:data-sid="${s.studentId}"
+                                            onclick="evalWithFeedback(this.getAttribute('data-aid'), this.getAttribute('data-sid'), 'reject')">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        Reject
+                                    </button>
+                                </div>
+                                <span th:if="${s.status == 'NOT_SUBMITTED'}" style="color: var(--text-muted); font-size: 12px; font-style: italic;">No Action</span>
+                            </td>
+                        </tr>
+
+                        <tr class="no-result-row" style="display:none;">
+                            <td colspan="5">No students match this filter.</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div></div></div></div>
+</main>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="assignmentDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">New Assignment</div>
+        <button class="close-btn" onclick="closeDrawer()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form action="/teacher-portal/assignment/create" method="post" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+        <div class="drawer-body">
+
+            <div class="form-group">
+                <label class="form-label">Department</label>
+                <select id="assignmentDeptSelect" class="form-control" onchange="loadDynamicAssignmentCourses()" required>
+                    <option value="">-- Select Dept --</option>
+                    <option value="CSE">CSE</option>
+                    <option value="EEE">EEE</option>
+                    <option value="BBA">BBA</option>
+                    <option value="English">English</option>
+                    <option value="Law">Law</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target Batch</label>
+                <select id="assignmentBatchSelect" name="batch" class="form-control" onchange="loadDynamicAssignmentCourses()" required>
+                    <option value="">-- Select Batch --</option>
+                    <option value="17th">17th</option>
+                    <option value="18th">18th</option>
+                    <option value="19th">19th</option>
+                    <option value="20th">20th</option>
+                    <option value="21st">21st</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Course Code</label>
+                <select id="assignmentCourseCodeSelect" name="courseCode" class="form-control" onchange="autoFillCourseTitleName()" required>
+                    <option value="">-- Select Course Code --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Course Title Name</label>
+                <input type="text" id="assignmentCourseNameInput" name="courseName" class="form-control" placeholder="Auto-filled from drop-down" readonly required/>
+            </div>
+
+            <div class="form-group" style="border-top: 1px solid var(--border); padding-top: 20px; margin-top: 24px;">
+                <label class="form-label">Topic Title</label>
+                <input type="text" name="topicName" class="form-control" placeholder="e.g. Lab Project Report" required/>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Deadline Date</label>
+                <input type="date" name="endDate" class="form-control" required/>
+            </div>
+
+        </div>
+        <div class="drawer-footer">
+            <button type="button" class="btn-outline" onclick="closeDrawer()">Cancel</button>
+            <button type="submit" class="btn-primary">Publish Task</button>
+        </div>
+    </form>
+</div>
+
+<div class="preview-overlay" id="filePreviewOverlay" onclick="closePreview()">
+    <div class="preview-modal" onclick="event.stopPropagation()">
+        <div class="preview-modal-header">
+            <div class="preview-modal-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span id="previewFileName">File Preview</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <a id="previewDownloadLink" href="#" target="_blank" class="btn-preview" style="font-size:12px;padding:5px 10px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download
+                </a>
+                <button class="close-btn" onclick="closePreview()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+        <div class="preview-modal-body" id="previewBody"></div>
+    </div>
+</div>
+
+<script>
+    // ═══════════════════════════════════════════
+    //  DRAWER
+    // ═══════════════════════════════════════════
+    function openDrawer() {
+        document.getElementById('drawerOverlay').classList.add('active');
+        document.getElementById('assignmentDrawer').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+        document.getElementById('drawerOverlay').classList.remove('active');
+        document.getElementById('assignmentDrawer').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // ═══════════════════════════════════════════
+    //  DYNAMIC FORM (DRAWER)
+    // ═══════════════════════════════════════════
+    let assignmentCachedCourses = [];
+
+    function loadDynamicAssignmentCourses() {
+        const dept = document.getElementById('assignmentDeptSelect').value;
+        const batch = document.getElementById('assignmentBatchSelect').value;
+        const courseSelect = document.getElementById('assignmentCourseCodeSelect');
+        const titleInput = document.getElementById('assignmentCourseNameInput');
+
+        courseSelect.innerHTML = '<option value="">-- Select Course Code --</option>';
+        titleInput.value = '';
+        assignmentCachedCourses = [];
+
+        if (!dept || !batch) return;
+
+        fetch(`/api/courses/filter?department=${encodeURIComponent(dept)}&batch=${encodeURIComponent(batch)}`)
+            .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+            .then(courses => {
+                assignmentCachedCourses = courses;
+                courses.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.courseCode;
+                    opt.textContent = c.courseCode;
+                    courseSelect.appendChild(opt);
+                });
+            })
+            .catch(err => console.error("Error fetching courses:", err));
+    }
+
+    function autoFillCourseTitleName() {
+        const selectCode = document.getElementById('assignmentCourseCodeSelect').value;
+        const titleInput = document.getElementById('assignmentCourseNameInput');
+        const matched = assignmentCachedCourses.find(c => c.courseCode === selectCode);
+        titleInput.value = matched ? (matched.courseName || matched.courseTitle) : '';
+    }
+
+    // ═══════════════════════════════════════════
+    //  ACCORDION
+    // ═══════════════════════════════════════════
+    function toggleAccordion(index) {
+        document.getElementById('card-' + index).classList.toggle('expanded');
+    }
+
+    // ═══════════════════════════════════════════
+    //  LATE SUBMISSION DETECTION
+    // ═══════════════════════════════════════════
+    function initLateDetection() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        document.querySelectorAll('.student-row').forEach(row => {
+            const endDateStr = row.getAttribute('data-end-date');
+            const hasFile = row.getAttribute('data-has-file') === 'true';
+            if (!endDateStr) return;
+
+            const endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+
+            if (today > endDate && hasFile) {
+                const statusWrap = row.querySelector('.status-cell-wrap');
+                if (statusWrap && !statusWrap.querySelector('.late-pill')) {
+                    const pill = document.createElement('span');
+                    pill.className = 'late-pill';
+                    pill.innerHTML = '⏰ LATE';
+                    statusWrap.appendChild(pill);
+                }
+            }
+        });
+
+        // Mark overdue task cards
+        document.querySelectorAll('.task-card').forEach(card => {
+            const endDateStr = card.getAttribute('data-end-date');
+            if (!endDateStr) return;
+            const endDate = new Date(endDateStr);
+            endDate.setHours(23, 59, 59, 999);
+            if (today > endDate) {
+                card.classList.add('overdue-card');
+                const badgeGroup = card.querySelector('.badge-group');
+                if (badgeGroup && !badgeGroup.querySelector('.mb-overdue')) {
+                    const b = document.createElement('div');
+                    b.className = 'modern-badge mb-overdue';
+                    b.textContent = '⚠️ Overdue';
+                    badgeGroup.appendChild(b);
+                }
+                const deadlineBadge = card.querySelector('.mb-deadline');
+                if (deadlineBadge) deadlineBadge.style.cssText += 'background:rgba(239,68,68,0.1);color:var(--red);border-color:rgba(239,68,68,0.2);';
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  FILTER COUNTS  — compute per card body
+    // ═══════════════════════════════════════════
+    function initFilterCounts() {
+        document.querySelectorAll('.task-card').forEach((card, index) => {
+            const body = document.getElementById('body-' + index);
+            if (!body) return;
+
+            const rows = body.querySelectorAll('.student-row');
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            let counts = { all: rows.length, submitted: 0, pending: 0, late: 0, approved: 0, rejected: 0 };
+
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                const hasFile = row.getAttribute('data-has-file') === 'true';
+                const endDateStr = row.getAttribute('data-end-date');
+                const endDate = endDateStr ? new Date(endDateStr) : null;
+                if (endDate) endDate.setHours(23, 59, 59, 999);
+
+                if (hasFile) counts.submitted++;
+                if (status === 'NOT_SUBMITTED' || status === 'PENDING') counts.pending++;
+                if (endDate && today > endDate && (status === 'PENDING' || status === 'NOT_SUBMITTED')) counts.late++;
+                if (status === 'APPROVED') counts.approved++;
+                if (status === 'REJECTED') counts.rejected++;
+            });
+
+            const filterBar = body.querySelector('.filter-bar');
+            if (!filterBar) return;
+            const keys = ['all', 'submitted', 'pending', 'late', 'approved', 'rejected'];
+            filterBar.querySelectorAll('.filter-count').forEach((span, i) => {
+                span.textContent = counts[keys[i]];
+            });
+        });
+
+        // Update pending review stat card
+        let totalPending = 0;
+        document.querySelectorAll('.student-row[data-status="PENDING"]').forEach(() => totalPending++);
+        const pendingEl = document.querySelector('.pending-stat');
+        if (pendingEl) pendingEl.textContent = totalPending;
+
+        // Count unique course codes for active courses
+        const codes = new Set();
+        document.querySelectorAll('.task-card').forEach(card => {
+            const courseSpan = card.querySelector('.task-course span');
+            if (courseSpan) {
+                const text = courseSpan.textContent.split('—')[0].trim();
+                if (text) codes.add(text);
+            }
+        });
+        const activeCourseEl = document.querySelector('.active-courses-stat');
+        if (activeCourseEl) activeCourseEl.textContent = codes.size;
+    }
+
+    // ═══════════════════════════════════════════
+    //  FILTER STUDENTS
+    // ═══════════════════════════════════════════
+    function filterStudents(cardIndex, filterType, btn) {
+        const body = document.getElementById('body-' + cardIndex);
+        const rows = body.querySelectorAll('.student-row');
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            const hasFile = row.getAttribute('data-has-file') === 'true';
+            const endDateStr = row.getAttribute('data-end-date');
+            const endDate = endDateStr ? new Date(endDateStr) : null;
+            if (endDate) endDate.setHours(23, 59, 59, 999);
+
+            let show = false;
+            switch (filterType) {
+                case 'all':       show = true; break;
+                case 'submitted': show = hasFile; break;
+                case 'pending':   show = (status === 'NOT_SUBMITTED' || status === 'PENDING'); break;
+                case 'late':      show = (endDate && today > endDate && (status === 'PENDING' || status === 'NOT_SUBMITTED')); break;
+                case 'approved':  show = (status === 'APPROVED'); break;
+                case 'rejected':  show = (status === 'REJECTED'); break;
+            }
+            row.style.display = show ? '' : 'none';
+            if (show) visibleCount++;
+        });
+
+        // Show "no result" row if nothing matches
+        const noResultRow = body.querySelector('.no-result-row');
+        if (noResultRow) noResultRow.style.display = visibleCount === 0 ? '' : 'none';
+
+        // Active button state
+        const filterBar = btn.closest('.filter-bar');
+        filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('fb-active'));
+        btn.classList.add('fb-active');
+    }
+
+    // ═══════════════════════════════════════════
+    //  FILE PREVIEW MODAL
+    // ═══════════════════════════════════════════
+    function previewFile(url, fileName) {
+        const overlay = document.getElementById('filePreviewOverlay');
+        const body = document.getElementById('previewBody');
+        const titleEl = document.getElementById('previewFileName');
+        const dlLink = document.getElementById('previewDownloadLink');
+
+        titleEl.textContent = fileName || 'File Preview';
+        dlLink.href = url;
+
+        const ext = (url.split('.').pop() || '').toLowerCase().split('?')[0];
+        const imgExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+
+        if (imgExts.includes(ext)) {
+            body.innerHTML = `<img src="${url}" alt="${fileName}" style="max-width:100%;max-height:100%;object-fit:contain;display:block;margin:auto;padding:24px;">`;
+        } else if (ext === 'pdf') {
+            body.innerHTML = `<iframe src="${url}" title="${fileName}"></iframe>`;
+        } else {
+            body.innerHTML = `
+                <div class="preview-no-support">
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>Preview unavailable for <strong>.${ext}</strong> files</span>
+                    <a href="${url}" target="_blank" class="btn-preview" style="margin-top:8px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download File
+                    </a>
+                </div>`;
+        }
+
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview() {
+        document.getElementById('filePreviewOverlay').classList.remove('open');
+        document.getElementById('previewBody').innerHTML = '';
+        document.body.style.overflow = '';
+    }
+
+    // Close preview on Escape
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+
+    // ═══════════════════════════════════════════
+    //  EVAL WITH FEEDBACK (Approve / Reject)
+    // ═══════════════════════════════════════════
+    function evalWithFeedback(assignmentId, studentId, action) {
+        const isApprove = action === 'approve';
+        Swal.fire({
+            title: isApprove ? '✅ Approve Submission' : '❌ Reject Submission',
+            html: `
+                <p style="font-size:13px;color:#64748B;margin-bottom:10px;text-align:left;">
+                    ${isApprove ? 'Add optional feedback or praise for the student:' : 'Reason for rejection (optional):'}
+                </p>
+                <textarea id="swFeedbackText"
+                    placeholder="${isApprove ? 'Great work! Well structured report...' : 'Please redo section 2 and resubmit...'}"
+                    style="width:100%;border:1px solid #E2E8F0;border-radius:10px;padding:10px 14px;
+                           font-size:13px;font-family:Inter,sans-serif;resize:vertical;min-height:90px;
+                           outline:none;color:#0F172A;box-sizing:border-box;transition:border-color 0.2s;"
+                    onfocus="this.style.borderColor='#6D5DFC'" onblur="this.style.borderColor='#E2E8F0'">
+                </textarea>`,
+            confirmButtonText: isApprove ? '✅ Approve' : '❌ Reject',
+            confirmButtonColor: isApprove ? '#22C55E' : '#EF4444',
+            cancelButtonColor: '#64748B',
+            showCancelButton: true,
+            reverseButtons: true,
+            customClass: { popup: 'swal2-border-radius' },
+            preConfirm: () => {
+                const formId = `${action}Form-${assignmentId}-${studentId}`;
+                const form = document.getElementById(formId);
+                if (form) form.submit();
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  SWEETALERT ACTIONS (Delete / Edit)
+    // ═══════════════════════════════════════════
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Delete Assignment?',
+            text: "This action will permanently remove the assignment and all student submissions.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#64748B',
+            confirmButtonText: 'Yes, delete it',
+            background: '#ffffff',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm-' + id).submit();
+            }
+        });
+    }
+
+    function openEditPopup(id, code, name, batch, topic, deadline) {
+        Swal.fire({
+            title: 'Edit Assignment',
+            html: `
+                <form id="editForm-${id}" action="/teacher-portal/assignment/edit" method="post" style="text-align:left; font-family:'Inter',sans-serif;">
+                    <input type="hidden" name="assignmentId" value="${id}">
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;display:block;">Course Code</label>
+                        <input type="text" name="courseCode" style="width:100%;height:42px;font-size:14px;border:1px solid #E2E8F0;border-radius:10px;padding:0 14px;outline:none;" value="${code}">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;display:block;">Course Title</label>
+                        <input type="text" name="courseName" style="width:100%;height:42px;font-size:14px;border:1px solid #E2E8F0;border-radius:10px;padding:0 14px;outline:none;" value="${name}">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;display:block;">Target Batch</label>
+                        <input type="text" name="batch" style="width:100%;height:42px;font-size:14px;border:1px solid #E2E8F0;border-radius:10px;padding:0 14px;outline:none;" value="${batch}">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;display:block;">Topic Title</label>
+                        <input type="text" name="topicName" style="width:100%;height:42px;font-size:14px;border:1px solid #E2E8F0;border-radius:10px;padding:0 14px;outline:none;" value="${topic}">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;display:block;">Deadline</label>
+                        <input type="date" name="endDate" style="width:100%;height:42px;font-size:14px;border:1px solid #E2E8F0;border-radius:10px;padding:0 14px;outline:none;" value="${deadline}">
+                    </div>
+                </form>`,
+            showCancelButton: true,
+            confirmButtonText: 'Save Changes',
+            confirmButtonColor: '#6D5DFC',
+            cancelButtonColor: '#64748B',
+            preConfirm: () => { document.getElementById(`editForm-${id}`).submit(); }
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  GLOBAL SEARCH (topbar)
+    // ═══════════════════════════════════════════
+    function globalSearchCards(query) {
+        const q = query.toLowerCase().trim();
+        document.querySelectorAll('.task-card').forEach(card => {
+            const title = card.querySelector('.task-title')?.textContent.toLowerCase() || '';
+            const course = card.querySelector('.task-course span')?.textContent.toLowerCase() || '';
+            card.style.display = (!q || title.includes(q) || course.includes(q)) ? '' : 'none';
+        });
+    }
+
+    // ═══════════════════════════════════════════
+    //  AUTO-HIDE TOASTS
+    // ═══════════════════════════════════════════
+    setTimeout(() => {
+        document.querySelectorAll('.toast').forEach(toast => {
+            toast.style.transition = 'opacity 0.3s ease';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.style.display = 'none', 300);
+        });
+        if (window.history.replaceState) {
+            const url = new URL(window.location);
+            ['assignmentSuccess', 'editSuccess', 'deleteSuccess'].forEach(p => url.searchParams.delete(p));
+            window.history.replaceState({path: url.href}, '', url.href);
+        }
+    }, 4000);
+
+    // ═══════════════════════════════════════════
+    //  INIT ON DOM READY
+    // ═══════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', () => {
+        initLateDetection();
+        initFilterCounts();
+    });
+</script>
+</body>
+</html>

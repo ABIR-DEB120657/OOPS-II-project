@@ -1,0 +1,40 @@
+1|06224205101001|CSE|18th|Md. Rakibul Islam|rakibul19980101@gmail.com|O+|01643-623400|Belkuchi
+2|06224205101002|CSE|18th|Siam Hossain|siamhossain.cse18@gmail.com|B+|01717-412612|Shahjadpur
+3|06224205101003|CSE|18th|Md. Radoun Hossin Mukta|redwanhossain957@gmail.com|O+|01797-560474|Ullapara
+4|06224205101004|CSE|18th|Md. Shahariar Ahmed Kanon|shahariarkanon816@gmail.com|B+|01845-981362|Sirajganj
+5|06224205101005|CSE|18th|Mst. Anamika Jahan|anamikajahann12@gmail.com|O+|01738-128521|Belkuchi
+6|06224205101006|CSE|18th|Md. Sojib Ahmed|mdsojibahmed544@gmail.com|B+|1754301132|Ullapara
+7|06224205101007|CSE|18th|Most. Ananna Khandaker|anuananna177@gmail.com|AB+|1773483358|Sirajganj sodor
+8|06224205101008|CSE|18th|Md. Rakib Hasan Riyad|hasanrk2005@gmail.com|A+|01554-839357|Sirajganj sodor
+9|06224205101010|CSE|18th|Most. Khadija Khatun|tanzinmaria0101@gmail.com|O+|01861-111297|Belkuchi
+10|06224205101011|CSE|18th|Md. Rezwan Ahmed Ratul|rezwanahmedratul007@gmail.com|A+|01603-521519|Belkuchi
+11|06224205101012|CSE|18th|Maruf Ibna Abdullah Rifat|marufibneabdullah51@gmail.com|O+|01870-632063|Shahjadpur
+12|06224205101013|CSE|18th|Md. Rabbi|rabbimollah2269@gmail.com|O+|01719-712269|Enayetpur
+13|06224205101014|CSE|18th|Mst. Mushkat Jahan Shila|mashkatshila@gmail.com|A+|01319-737676|Ullapara
+14|06224205101016|CSE|18th|Ijaj Ahmed Rafi|rafi01752@gmail.com|O+|01752-909577|Sirajganj sodor
+15|06224205101017|CSE|18th|Md. Sabbir Hossain Rahat|rahatbabu122@gmail.com|O+|01798-819616|Enayetpur
+16|06224205101018|CSE|18th|Abid Hasan Hujaifa|abidhasanhujaifa1215@gmail.com|A+|01302-451935|Enayetpur
+17|06224205101019|CSE|18th|Sabiha Rumman Medha|sabiha.rumman.10@gmail.com|A+|01814-932244|Sirajganj sodor
+18|06224205101020|CSE|18th|Md. Intaj Hassan Nibir|intajnibir07@gmail.com|A+|01721-799926|Sirajganj sodor
+19|06224205101021|CSE|18th|Md. Asif Foysal|asifshakhmd@gmail.com|B+|01754-044354|Sirajganj sodor
+20|06224205101022|CSE|18th|Tarak Rahman Shakib (Re-add)|tarak3552@gmail.com|||
+21|06224205101023|CSE|18th|Fardin Khan Sadi|fardinkyau@gmail.com|O+|01787-832872|Sirajganj sodor
+22|06224205101024|CSE|18th|Abir Deb|debabir82@gmail.com|B+|01916-827826|Sirajganj sodor
+23|0622410105101024|CSE|18th|Robiul Awal Sumon(17th)|sumon.ras.012@gmail.com|||
+24|06224205101025|CSE|18th|Bashudeb Kumer Paul|bashudebpaul9@gmail.com|O+|01716-049996|
+25|06224205101026|CSE|18th|Md. Abdur Rahim Ratul|mdabdurrahimratul2005@gmail.com|O+|01786-500883|Shahjadpur
+26|06224205101027|CSE|18th|Tahsin Tasnim Tandra|tandra8281@gmail.com|A+|1786698281|Sirajganj sodor
+27|06224205101028|CSE|18th|Maream|mareamtaherakib@gmail.com|O+|01580-581167|Shahjadpur
+28|06224205101029|CSE|18th|Md. Imran Hassain|mdimranhossain4777@gmail.com|B+|01330-507488|Enayetpur
+29|06224205101030|CSE|18th|Abu Sowad Mohammad Ali Siam|siamahmed224ry@gmail.com|O+|01943-079868|Belkuchi
+30|06224205101031|CSE|18th|Fatima Rahman Shoshi|fatimarahmanshoshi31@gmail.com|O+|01341-901709|Tangail
+31|06224205101032|CSE|18th|Rukaiya Rafiq Ulfa|rukaiyaulfa@gmail.com|B+|01345-166651|Enayetpur
+32|06224205101033|CSE|18th|S. M. Salman Farshi|salman.kyau@gmail.com|B+|01718-896337|Ullapara
+33|06224205101034|CSE|18th|Tawhidur Rahman Shishir|shishirpk07.bd@gmail.com|B+|01819-373433|Shahjadpur
+34|0622410105101034|CSE|18th|Md.Rashedul Islam (17th)|2005rashedul@gmail.com|||
+35|06224205101035|CSE|18th|Md. Samiul Islam Shihab|shihab35.cse.kyau@gmail.com|B+|01301-945171|Shahjadpur
+36|06224205101036|CSE|18th|Md. Abu Raihan|bd01712692663@gmail.com||01637-426116|
+37|06224205101037|CSE|18th|Md. Shimul Sarkar|shamimsarkar20004@gmail.com|O+|01756-351617|
+38|06224205101038|CSE|18th|Khairun Nahar Sara|khairunnsara@gmail.com|B+|01632-886305|Sirajganj sodor
+39|06224205101039|CSE|18th|Md. Montasir Monir Alif|mr.alifpm16@gmail.com|AB+|01824-063908|Belkuchi
+40|0622|CSE|18th|nibir|nibir@gmail.com|||

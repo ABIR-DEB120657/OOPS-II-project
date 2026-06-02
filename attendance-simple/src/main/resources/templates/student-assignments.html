@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Assignments | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);}
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px;
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+        /* 🧱 Main Layout */
+        .main { margin-left: 320px; flex: 1; padding: 40px; max-width: 1400px; }
+
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px;}
+
+        /* PREMIUM THEME TOGGLE BUTTON */
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; color: var(--text);
+            font-weight: 700; font-size: 13px; transition: var(--transition); outline: none; box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); border-color: var(--accent); }
+
+        /* 📚 Assignment Grid */
+        .assignment-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
+
+        /* 💎 Premium Assignment Card */
+        .a-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 35px; padding: 35px; box-shadow: var(--card-shadow);
+            display: flex; flex-direction: column; transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .a-card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1); }
+        .a-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #6366f1, #a855f7); opacity: 0; transition: var(--transition);
+        }
+        .a-card:hover::before { opacity: 1; }
+
+        .a-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .course-code {
+            background: rgba(99, 102, 241, 0.1); color: var(--accent);
+            padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 800;
+            border: 1px solid rgba(99, 102, 241, 0.2); letter-spacing: 0.5px;
+        }
+        .deadline { color: #ef4444; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; background: rgba(239, 68, 68, 0.1); padding: 8px 16px; border-radius: 12px;}
+
+        .a-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px;}
+        .a-teacher { font-size: 14px; color: var(--subtext); margin-bottom: 30px; font-weight: 500;}
+
+        /* Modern Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border); padding: 25px; text-align: center;
+            border-radius: 20px; margin-bottom: 20px; background: rgba(255,255,255,0.02); transition: var(--transition);
+        }
+        .upload-area:hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.05); }
+        .file-input { display: none; }
+        .upload-label { cursor: pointer; color: var(--accent); font-size: 14px; font-weight: 700; display: flex; flex-direction: column; gap: 10px; transition: 0.3s;}
+
+        .btn-submit {
+            background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none;
+            padding: 16px; width: 100%; border-radius: 18px; font-weight: 800; cursor: pointer;
+            transition: var(--transition); font-size: 15px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4); }
+
+        /* Status Badges */
+        .status-pill { padding: 15px; text-align: center; border-radius: 16px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px;}
+        .status-done { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-review { background: rgba(99, 102, 241, 0.15); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2); }
+        .status-rejected { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .btn-cancel {
+            width: 100%; background: rgba(239, 68, 68, 0.1); color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2); padding: 15px; border-radius: 16px;
+            font-weight: 800; cursor: pointer; transition: var(--transition); margin-top: 15px; font-size: 14px;
+        }
+        .btn-cancel:hover { background: #ef4444; color: white; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar" id="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-finance">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments" class="active">📚 Assignments</a>
+
+        <a href="/student-outlines">📑 Course Outlines</a>
+
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Career Hub</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${initials}">AD</div>
+            <div class="user-info">
+                <span style="font-size:14px; font-weight:800; color:var(--text); display:block;" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Student</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar animate-up">
+        <h1>My <span style="font-weight: 300; color: var(--subtext);">Assignments</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div th:if="${assignments == null or assignments.isEmpty()}" class="animate-up delay-1" style="text-align: center; padding: 100px 40px; color: var(--subtext); background: var(--glass-bg); border-radius: 40px; border: 2px dashed var(--border); backdrop-filter: blur(10px);">
+        <div style="font-size: 60px; margin-bottom: 25px;">✨</div>
+        <h3 style="font-weight: 800; color: var(--text); font-size: 24px; margin-bottom: 10px;">All caught up!</h3>
+        <p style="font-size: 15px;">You have no pending assignments right now. Enjoy your free time!</p>
+    </div>
+
+    <div class="assignment-grid">
+        <div class="a-card animate-up delay-1" th:each="a : ${assignments}">
+            <div class="a-header">
+                <span class="course-code" th:text="${a.courseCode}">CSE-101</span>
+                <span class="deadline">⌛ <span th:text="${a.endDate}"></span></span>
+            </div>
+            <div class="a-title" th:text="${a.topicName}">Topic Name</div>
+            <div class="a-teacher">👨‍🏫 Assigned by <span style="font-weight: 700; color: var(--text);" th:text="${a.teacherName}">Teacher Name</span></div>
+
+            <form th:if="${a.status == 'NOT_SUBMITTED'}" action="/student-assignments/submit" method="POST" enctype="multipart/form-data" style="margin-top: auto;">
+                <input type="hidden" name="assignmentId" th:value="${a.assignmentId}">
+                <div class="upload-area" th:id="'upload-box-' + ${a.assignmentId}">
+                    <label class="upload-label">
+                        <span style="font-size: 28px; margin-bottom: 5px;" th:id="'upload-icon-' + ${a.assignmentId}">📁</span>
+                        <span th:id="'upload-text-' + ${a.assignmentId}">Click to attach file</span>
+                        <input type="file" name="file" class="file-input" required accept=".pdf,.doc,.docx,.zip,.rar" th:onchange="'showFileName(this, ' + ${a.assignmentId} + ')'">
+                    </label>
+                </div>
+                <button type="submit" class="btn-submit" onclick="this.innerHTML='⏳ Submitting...'">Submit Assignment</button>
+            </form>
+
+            <div th:if="${a.status == 'PENDING'}" style="margin-top: auto;">
+                <div class="status-pill status-review">⏳ Under Evaluation</div>
+                <form th:id="'cancelForm-' + ${a.assignmentId}" action="/student-assignments/cancel" method="POST">
+                    <input type="hidden" name="assignmentId" th:value="${a.assignmentId}">
+                    <button type="button" class="btn-cancel" th:onclick="confirmCancel('cancelForm-' + [[${a.assignmentId}]])">🚫 Cancel Submission</button>
+                </form>
+            </div>
+
+            <div th:if="${a.status == 'APPROVED'}" class="status-pill status-done" style="margin-top: auto;">
+                ✅ Completed & Approved
+            </div>
+
+            <div th:if="${a.status == 'REJECTED'}" class="status-pill status-rejected" style="margin-top: auto;">
+                ❌ Evaluation Rejected
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // 🔥 PREVIEW SELECTED FILE dynamically
+    function showFileName(input, id) {
+        const textBox = document.getElementById('upload-text-' + id);
+        const iconBox = document.getElementById('upload-icon-' + id);
+        const uploadArea = document.getElementById('upload-box-' + id);
+
+        if (input.files && input.files[0]) {
+            textBox.innerText = input.files[0].name;
+            textBox.style.color = '#10b981';
+            iconBox.innerText = '📄';
+            uploadArea.style.borderColor = '#10b981';
+            uploadArea.style.background = 'rgba(16, 185, 129, 0.05)';
+            uploadArea.style.transform = 'scale(1.02)';
+        } else {
+            textBox.innerText = 'Click to attach file';
+            textBox.style.color = 'var(--accent)';
+            iconBox.innerText = '📁';
+            uploadArea.style.borderColor = 'var(--border)';
+            uploadArea.style.background = 'rgba(255,255,255,0.02)';
+            uploadArea.style.transform = 'scale(1)';
+        }
+    }
+
+    // 🔥 LUXURY CANCEL CONFIRMATION
+    function confirmCancel(formId) {
+        Swal.fire({
+            title: 'Cancel Submission?',
+            text: "Are you sure? Your submitted file will be permanently removed.",
+            icon: 'warning',
+            showCancelButton: true,
+            background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+            color: document.body.classList.contains('dark-mode') ? '#f1f5f9' : '#0f172a',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Yes, cancel it!',
+            borderRadius: '20px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById(formId).submit();
+            }
+        });
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        }
+
+        // ✅ TOAST NOTIFICATION FOR SUCCESS PARAMS
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            let type = urlParams.get('success');
+            let msg = type === 'submitted' ? 'Assignment submitted successfully!' : 'Submission canceled successfully.';
+
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            Swal.fire({
+                title: 'Success!',
+                text: msg,
+                icon: 'success',
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#6366f1',
+                borderRadius: '20px',
+                timer: 2500,
+                showConfirmButton: false
+            });
+        }
+    };
+</script>
+</body>
+</html>

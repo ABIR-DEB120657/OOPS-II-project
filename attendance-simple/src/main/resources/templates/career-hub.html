@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Career Hub | Nexus One Luxury</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+
+        /* ✅ Aesthetic Themes */
+        body {
+            --bg: #f1f5f9;
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --surface: rgba(255, 255, 255, 0.7);
+            --border: rgba(0, 0, 0, 0.06);
+            --text: #1e293b;
+            --subtext: #64748b;
+            --accent: #6366f1;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        body.dark-mode {
+            --bg: #050508;
+            --sidebar-bg: rgba(15, 15, 25, 0.8);
+            --surface: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f1f5f9;
+            --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+        }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px);
+            background: var(--sidebar-bg); backdrop-filter: blur(25px);
+            border: 1px solid var(--border); margin: 20px; border-radius: 30px;
+            padding: 30px 20px; position: fixed; display: flex; flex-direction: column; z-index: 1000;
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 0 15px var(--accent); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); }
+        .menu a { display: flex; align-items: center; gap: 15px; padding: 14px 20px; border-radius: 18px; text-decoration: none; color: var(--subtext); font-size: 14px; font-weight: 500; margin-bottom: 8px; transition: 0.3s; }
+        .menu a:hover { background: var(--surface); color: var(--text); }
+        .menu a.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+
+        /* 🧱 Main Layout (Mini LinkedIn Style) */
+        .main-wrapper { margin-left: 320px; flex: 1; padding: 40px; max-width: 1500px; display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
+        .feed-area { flex: 1; }
+        .stats-sidebar { position: sticky; top: 40px; height: calc(100vh - 80px); overflow-y: auto; }
+        .stats-sidebar::-webkit-scrollbar { display: none; }
+
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; grid-column: 1 / -1; }
+        .topbar h1 { font-size: 32px; font-weight: 800; }
+        .theme-toggle { background: var(--surface); border: 1px solid var(--border); padding: 10px 20px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; font-size: 13px; transition: 0.3s; }
+
+        /* 🔴 Hero & Search */
+        .hero-banner {
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            border-radius: 35px; padding: 40px; color: white; margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.2); display: flex; justify-content: space-between; align-items: center;
+        }
+        .hero-text h1 { font-size: 30px; font-weight: 800; margin-bottom: 10px; }
+        .btn-post-job { background: white; color: #4f46e5; border: none; padding: 14px 28px; border-radius: 18px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-post-job:hover { transform: translateY(-3px); }
+
+        .search-box {
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            padding: 20px; border-radius: 25px; border: 1px solid var(--border);
+            margin-bottom: 30px; display: flex; gap: 15px;
+        }
+        .search-box select, .search-box input {
+            padding: 15px 20px; border: 1px solid var(--border); border-radius: 18px;
+            background: var(--surface); color: var(--text); outline: none; font-family: inherit; font-size: 14px;
+        }
+        .btn-search { background: var(--accent); color: white; border: none; padding: 0 30px; border-radius: 18px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+
+        /* 💼 Professional Job Card */
+        .job-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 25px;
+            padding: 30px; margin-bottom: 20px; transition: var(--transition);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        }
+        .job-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1); }
+
+        .j-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .j-company-info { display: flex; align-items: center; gap: 15px; }
+        .c-logo { width: 50px; height: 50px; border-radius: 14px; background: rgba(99, 102, 241, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; }
+        .j-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+        .j-company { font-size: 14px; color: var(--subtext); font-weight: 600; }
+
+        .badge { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .badge-active { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-expired { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+        .j-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag { background: var(--bg); border: 1px solid var(--border); color: var(--subtext); padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+
+        .j-desc { font-size: 14px; color: var(--subtext); line-height: 1.6; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .j-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 20px; }
+        .j-stats { display: flex; gap: 15px; font-size: 13px; color: var(--subtext); font-weight: 600; }
+        .j-actions { display: flex; gap: 10px; }
+        .btn-apply { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .btn-bookmark { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 10px 15px; border-radius: 12px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-bookmark:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+
+        /* 📊 Right Sidebar Cards */
+        .side-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 25px; padding: 25px; margin-bottom: 20px; }
+        .side-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed var(--border); }
+        .app-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .app-item:last-child { border: none; }
+        .app-title { font-size: 14px; font-weight: 700; color: var(--text); }
+        .app-date { font-size: 11px; color: var(--subtext); }
+
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-card { background: var(--bg); padding: 35px; border-radius: 35px; width: 100%; max-width: 550px; border: 1px solid var(--border); }
+        .modal-overlay.active { display: flex; }
+        .input-control { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 15px; margin-bottom: 15px; outline: none; background: var(--surface); color: var(--text); font-family: inherit; }
+
+        /* Sidebar Bottom */
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; }
+        .logout-btn { width: 100%; padding: 15px; border-radius: 18px; background: rgba(239, 68, 68, 0.1); color: #f87171; text-decoration: none; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .logout-btn:hover { background: #ef4444; color: white; }
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="sidebar-menus">
+        <div class="menu">
+            <a href="/student-portal">💠 Dashboard</a>
+            <a href="/student-finance">💎 Finance & Fees</a>
+            <a href="/student-leave">📅 Leave Request</a>
+            <a href="/student-assignments">📚 Assignments</a>
+            <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+            <a href="/student-jobs" class="active">💼 Career Hub</a>
+            <a href="/student-blood-finder">🩸 Blood Finder</a>
+            <a href="/my-notifications">🔔 Notifications</a>
+        </div>
+    </div>
+    <div class="sidebar-bottom">
+        <div style="margin-bottom: 15px; text-align: center;">
+            <p style="font-size: 14px; font-weight: 700;" th:text="${student.name}">Abir Deb</p>
+        </div>
+        <a href="/logout" class="logout-btn">Sign Out</a>
+    </div>
+</div>
+
+<div class="main-wrapper">
+    <div class="topbar">
+        <h1>Career <span style="font-weight: 300; color: var(--subtext);">Hub</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div class="feed-area">
+        <div class="hero-banner">
+            <div class="hero-text">
+                <h1>Unlock Your Next Opportunity</h1>
+                <p style="opacity: 0.9;">Find internships, part-time jobs, and tuition near you.</p>
+            </div>
+            <button class="btn-post-job" onclick="openModal('postJobModal')">✨ Post a Tuition / Job</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by skills, title, or company..." style="flex:1;">
+            <select id="deptFilter" style="width: 200px;">
+                <option value="ALL">All Departments</option>
+                <option value="CSE">CSE</option>
+                <option value="EEE">EEE</option>
+                <option value="BBA">BBA</option>
+                <option value="Pharmacy">Pharmacy</option>
+            </select>
+            <button class="btn-search" onclick="filterJobs()">Search</button>
+        </div>
+
+        <div class="job-feed">
+            <div th:if="${jobs == null or jobs.isEmpty()}" style="text-align:center; padding: 40px; color:var(--subtext);">
+                No active job circulars available.
+            </div>
+
+            <div class="job-card" th:each="job : ${jobs}" th:attr="data-title=${#strings.toLowerCase(job.title)}, data-dept=${#strings.toLowerCase(job.departmentTags)}">
+                <div class="j-header">
+                    <div class="j-company-info">
+                        <div class="c-logo" th:text="${#strings.substring(job.company,0,1).toUpperCase()}">C</div>
+                        <div>
+                            <h2 class="j-title" th:text="${job.title}">Job Title</h2>
+                            <p class="j-company" th:text="${job.company}">Company Name</p>
+                        </div>
+                    </div>
+                    <span class="badge" th:classappend="'badge-' + ${#strings.toLowerCase(job.status)}" th:text="${job.status}">ACTIVE</span>
+                </div>
+
+                <div class="j-tags">
+                    <span class="tag">💼 <span th:text="${job.type}">Full-time</span></span>
+                    <span class="tag">🎓 <span th:text="${job.departmentTags}">CSE</span></span>
+                    <span class="tag" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">⏳ <span th:text="${job.deadline}">2026-06-15</span></span>
+                </div>
+
+                <p class="j-desc" th:text="${job.description}">Detailed description of the job...</p>
+
+                <div class="j-footer">
+                    <div class="j-stats">
+                        <span>👁️ <span th:text="${job.views}">120</span> Views</span>
+                        <span>📝 <span th:text="${job.applyCount}">5</span> Applied</span>
+                    </div>
+                    <div class="j-actions">
+                        <button class="btn-bookmark" title="Save Job">🔖</button>
+                        <form th:if="${job.status == 'ACTIVE'}" action="/student-jobs/apply" method="POST" style="margin:0;">
+                            <input type="hidden" name="jobId" th:value="${job.id}">
+                            <input type="hidden" name="jobTitle" th:value="${job.title}">
+                            <button type="submit" class="btn-apply">Apply Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-sidebar">
+        <div class="side-card" style="text-align: center;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 25px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white; font-weight: 800;" th:text="${initials}">AD</div>
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--text);" th:text="${student.name}">Abir Deb</h2>
+            <p style="font-size: 12px; color: var(--subtext); margin-top: 5px;">Student Portal Career Profile</p>
+        </div>
+
+        <div class="side-card">
+            <h3>📝 My Applications</h3>
+            <div th:if="${applications == null or applications.isEmpty()}" style="text-align:center; color:var(--subtext); font-size: 12px;">
+                You haven't applied to any jobs yet.
+            </div>
+            <div class="app-item" th:each="app : ${applications}">
+                <div>
+                    <div class="app-title" th:text="${app.jobTitle}">Job Title</div>
+                    <div class="app-date" th:text="'Applied on: ' + ${app.dateApplied}">Date</div>
+                </div>
+                <span class="badge badge-pending" th:text="${app.status}">Pending</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="postJobModal">
+    <div class="modal-card">
+        <h2 style="margin-bottom:20px; font-weight: 800;">✨ Post a Job / Tuition</h2>
+        <p style="font-size: 12px; color: var(--subtext); margin-bottom: 20px;">Your post will be reviewed by an Admin before it becomes publicly visible.</p>
+
+        <form action="/student-jobs/post" method="POST">
+            <input type="text" name="title" class="input-control" placeholder="Job Title (e.g. Need Math Tutor)" required>
+            <input type="text" name="company" class="input-control" placeholder="Company / Location" required>
+
+            <div style="display: flex; gap: 15px;">
+                <select name="type" class="input-control" required>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Tuition">Tuition</option>
+                    <option value="Remote">Remote</option>
+                    <option value="Internship">Internship</option>
+                </select>
+                <input type="date" name="deadline" class="input-control" required>
+            </div>
+
+            <input type="text" name="departmentTags" class="input-control" placeholder="Target Dept (e.g. CSE, EEE, ALL)" required>
+            <input type="url" name="mediaLink" class="input-control" placeholder="Related Link or Drive PDF (Optional)">
+            <textarea name="description" class="input-control" rows="4" placeholder="Job Description & Requirements..." required></textarea>
+
+            <button type="submit" class="btn-post-job" style="width: 100%;">Submit for Approval 🚀</button>
+            <button type="button" onclick="closeModal('postJobModal')" style="margin-top:15px; width:100%; border:none; background:none; cursor:pointer; color:var(--subtext); font-weight: 700;">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function filterJobs() {
+        let keyword = document.getElementById('searchInput').value.toLowerCase();
+        let dept = document.getElementById('deptFilter').value.toLowerCase();
+        let allJobs = document.querySelectorAll('.job-card');
+
+        allJobs.forEach(item => {
+            let itemTitle = item.getAttribute('data-title');
+            let itemDept = item.getAttribute('data-dept');
+
+            let matchKey = itemTitle.includes(keyword);
+            let matchDept = (dept === 'all' || itemDept.includes(dept) || itemDept.includes('all'));
+
+            item.style.display = (matchKey && matchDept) ? 'block' : 'none';
+        });
+    }
+
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        }
+    };
+</script>
+</body>
+</html>

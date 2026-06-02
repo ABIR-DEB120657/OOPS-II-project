@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Faculty Sync | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);}
+
+        /* 🔥 FIXED: Logout Button Design with Gap */
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px; gap: 10px;
+            background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+        /* 🧱 Main Area */
+        .main { margin-left: 320px; flex: 1; padding: 40px; max-width: 1400px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 35px; }
+
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; grid-column: 1 / -1; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+
+        /* PREMIUM THEME TOGGLE BUTTON */
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; color: var(--text);
+            font-weight: 700; font-size: 13px; transition: var(--transition); outline: none; box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); border-color: var(--accent); }
+
+        /* 🎯 Premium Luxury Cards */
+        .lux-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 35px; padding: 40px; box-shadow: var(--card-shadow); margin-bottom: 24px;
+            position: relative; overflow: hidden;
+        }
+        .lux-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+        }
+
+        .section-header { margin-bottom: 30px; }
+        .section-header h2 { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;}
+        .section-header p { font-size: 14px; color: var(--subtext); margin-top: 8px; font-weight: 500;}
+
+        /* PREMIUM INPUT & SELECT FORM DESIGN */
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--subtext); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+
+        .input-control {
+            width: 100%; padding: 16px 20px; border-radius: 16px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px; font-weight: 500; outline: none; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .input-control:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); background: var(--bg); }
+        .input-control:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* 🔥 FIXED: BULLETPROOF CUSTOM PREMIUM SELECT BUG */
+        select.input-control {
+            appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 15px center !important;
+            background-size: 20px !important;
+        }
+        select.input-control:focus {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+        }
+        select.input-control option { background: #1e293b; color: #f8fafc; font-weight: 500;}
+
+        .btn-submit {
+            background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; padding: 18px; width: 100%;
+            border-radius: 18px; font-weight: 800; cursor: pointer; transition: var(--transition); font-size: 15px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); margin-top: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4); }
+
+        /* Premium Activity Feed Design */
+        .activity-feed { display: flex; flex-direction: column; gap: 18px; }
+        .appt-item {
+            background: var(--surface); border: 1px solid var(--border); padding: 22px; border-radius: 24px;
+            display: flex; justify-content: space-between; align-items: center; transition: var(--transition); box-shadow: var(--card-shadow);
+        }
+        .appt-item:hover { transform: translateX(8px); border-color: var(--accent); box-shadow: 0 15px 30px rgba(99,102,241,0.1);}
+
+        .teacher-info { display: flex; align-items: center; gap: 18px; }
+        .t-avatar {
+            width: 50px; height: 50px; border-radius: 16px; background: rgba(99, 102, 241, 0.1);
+            color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .status-badge { padding: 8px 16px; border-radius: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .status-pending { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .status-approved { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);
+            width: 38px; height: 38px; border-radius: 12px; cursor: pointer; margin-left: 12px; transition: var(--transition); font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-cancel:hover { background: #ef4444; color: white; transform: rotate(90deg) scale(1.1); box-shadow: 0 5px 15px rgba(239,68,68,0.3);}
+
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-finance">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment" class="active">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Job Circulars</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${initials}">AD</div>
+            <div class="user-info">
+                <span style="font-size:14px; font-weight:800; color:var(--text); display:block;" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Student</span>
+            </div>
+        </div>
+
+        <a href="/logout" class="btn-logout">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar animate-up">
+        <h1>Faculty <span style="font-weight: 300; color: var(--subtext);">Sync</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div class="form-container">
+        <div class="lux-card animate-up delay-1">
+            <div class="section-header">
+                <h2>✨ Reserve a Slot</h2>
+                <p>Connect with your faculty members effortlessly.</p>
+            </div>
+
+            <form action="/student-appointment/request" method="POST" id="appointmentForm">
+                <div class="input-group">
+                    <label>Department</label>
+                    <select id="deptSelect" name="department" class="input-control" required>
+                        <option value="" disabled selected>-- Choose Department --</option>
+                        <option value="CSE">Computer Science (CSE)</option>
+                        <option value="EEE">Electrical (EEE)</option>
+                        <option value="BBA">Business Admin (BBA)</option>
+                        <option value="English">English</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Civil">Civil Engineering</option>
+                        <option value="Law">Law</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Select Faculty</label>
+                    <select id="teacherSelect" name="teacherName" class="input-control" required disabled>
+                        <option value="">Waiting for department...</option>
+                    </select>
+                    <input type="hidden" name="teacherEmail" id="teacherEmail">
+                </div>
+
+                <div class="input-group">
+                    <label>Discussion Topic</label>
+                    <input type="text" name="topic" class="input-control" placeholder="What's on your mind?" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Requested Duration</label>
+                    <select name="duration" class="input-control" required>
+                        <option value="15 Minutes">15 Minutes (Quick Sync)</option>
+                        <option value="30 Minutes">30 Minutes (Standard)</option>
+                        <option value="1 Hour">1 Hour (Deep Dive)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit" onclick="this.innerHTML='⏳ Dispatching Request...';">Dispatch Request 📨</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="feed-container animate-up delay-2">
+        <div class="section-header">
+            <h2>🕒 Sync History</h2>
+            <p>Track your ongoing appointment status.</p>
+        </div>
+        <div class="activity-feed">
+            <div th:if="${appointments == null or appointments.isEmpty()}" style="text-align:center; padding: 80px 20px; border: 2px dashed var(--border); border-radius: 35px; background: rgba(255,255,255,0.02);">
+                <div style="font-size: 50px; margin-bottom: 15px;">📭</div>
+                <h3 style="color: var(--text); font-weight: 800; margin-bottom: 5px;">No active sync sessions.</h3>
+                <p style="font-size: 14px; color: var(--subtext);">Book an appointment to see it here.</p>
+            </div>
+
+            <div class="appt-item" th:each="a : ${appointments}">
+                <div class="teacher-info">
+                    <div class="t-avatar" th:text="${#strings.substring(a.teacherName,0,1).toUpperCase()}">T</div>
+                    <div>
+                        <h4 th:text="${a.teacherName}" style="font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 4px;">Teacher Name</h4>
+                        <p th:text="${a.topic}" style="font-size: 13px; color: var(--subtext); font-weight: 500;"></p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span class="status-badge" th:classappend="'status-' + ${#strings.toLowerCase(a.status)}" th:text="${a.status}">Pending</span>
+
+                    <button type="button" class="btn-cancel revoke-sync-btn" title="Revoke Appointment" th:attr="data-id=${a.id}">✕</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Teacher Data Filtering
+    const teachersList = [];
+    /*[# th:each="t : ${teachers}"]*/
+    teachersList.push({ name: [[${t.name}]], dept: [[${t.department}]], email: [[${t.email}]] });
+    /*[/]*/
+
+    const deptSelect = document.getElementById('deptSelect');
+    const teacherSelect = document.getElementById('teacherSelect');
+    const emailInput = document.getElementById('teacherEmail');
+
+    deptSelect.addEventListener('change', function() {
+        const selectedDept = this.value;
+        teacherSelect.innerHTML = '<option value="" disabled selected>-- Select Faculty --</option>';
+
+        const filtered = teachersList.filter(t => t.dept && t.dept.toUpperCase().includes(selectedDept.toUpperCase()));
+
+        if(filtered.length > 0) {
+            teacherSelect.disabled = false;
+            filtered.forEach(t => {
+                let opt = document.createElement('option');
+                opt.value = t.name; opt.textContent = t.name; opt.dataset.email = t.email;
+                teacherSelect.appendChild(opt);
+            });
+        } else {
+            teacherSelect.innerHTML = '<option value="" disabled selected>No faculty found for this department</option>';
+            teacherSelect.disabled = true;
+        }
+    });
+
+    teacherSelect.addEventListener('change', function() {
+        emailInput.value = this.options[this.selectedIndex].dataset.email || '';
+    });
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        }
+
+        // ✅ URL parameters handling for Gorgeous SweetAlert Popups
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('success') || params.has('deleted')) {
+            let msg = params.has('success') ? 'Sync Request dispatched and Email sent!' : 'Sync Request revoked successfully.';
+
+            // Clear URL variables immediately
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            Swal.fire({
+                title: 'Success!',
+                text: msg,
+                icon: 'success',
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#6366f1',
+                borderRadius: '20px'
+            });
+        }
+
+        // 🔥 SweetAlert2 Event Listener for Revoking Appointments
+        document.querySelectorAll('.revoke-sync-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const appointmentId = this.getAttribute('data-id');
+
+                Swal.fire({
+                    title: 'Revoke this request?',
+                    text: "Are you sure you want to cancel this faculty sync session?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                    color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                    confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, Revoke it!',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Dynamically create a hidden form and submit it to Backend
+                        let form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/student-appointment/delete/' + appointmentId;
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+=======================================================
+       NEXUS ONE - COMPLETE STUDENT PROFILE RECORD     
+=======================================================
+👤 PERSONAL INFORMATION
+Name         : Abir Deb
+Student ID   : 06224205101024
+DOB          : 2004-03-13
+Blood Group  : B+
+Gender       : Male
+Religion     : Hinduism
+-------------------------------------------------------
+📱 CONTACT INFORMATION
+Mobile       : 1916827826
+Email        : debabir82@gmail.com
+Present Addr : dorga road sirajgonj
+Perm. Addr   : dorga road sirajgonj
+-------------------------------------------------------
+👨‍👩‍👦 FAMILY INFORMATION
+Father's Name: ripon deb
+Father's Mob : 1916827826
+Mother's Name: bondona deb
+Mother's Mob : 1865856063
+-------------------------------------------------------
+🎓 ACADEMIC BACKGROUND
+SSC Board    : rajshahi
+SSC Year     : 2020
+SSC GPA      : 5.00
+SSC School   : sobuj kanon high scholl and collage
+HSC Board    : rajshahi
+HSC Year     : 2022
+HSC GPA      : 4.28
+HSC College  : degree collage
+-------------------------------------------------------
+🏛️ ADMISSION INFORMATION
+Program      : Bachelor of Computer Science & Engineering
+Admission Dt : 2024-05-01
+=======================================================
+Generated on : 2026-05-20

@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Career Hub | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);}
+
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px; gap: 10px;
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+        /* 🧱 Main Layout */
+        .main-wrapper { margin-left: 320px; flex: 1; padding: 40px; max-width: 1400px; display: grid; grid-template-columns: 1fr 380px; gap: 35px; }
+        .topbar { grid-column: 1 / -1; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
+
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; color: var(--text);
+            font-weight: 700; font-size: 13px; transition: var(--transition); outline: none; box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); border-color: var(--accent); }
+
+        /* 💎 Premium Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border-radius: 35px; padding: 40px; color: white; margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.2); position: relative; overflow: hidden;
+        }
+        .hero-banner::after {
+            content: ''; position: absolute; right: -50px; top: -50px;
+            width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;
+        }
+        .btn-post-job {
+            background: white; color: #ef4444; border: none; padding: 16px 28px;
+            border-radius: 18px; font-weight: 800; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); font-size: 15px; z-index: 1;
+        }
+        .btn-post-job:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+
+        /* 🔍 Search Box */
+        .search-box {
+            background: var(--glass-bg); padding: 20px; border-radius: 25px; border: 1px solid var(--border);
+            margin-bottom: 30px; display: flex; gap: 20px; align-items: center; backdrop-filter: blur(20px); box-shadow: var(--card-shadow);
+        }
+        .search-box input {
+            padding: 16px 20px; border: 1px solid var(--border); border-radius: 16px;
+            background: var(--surface); color: var(--text); outline: none; font-family: inherit; font-size: 14px; font-weight: 500; transition: 0.3s;
+        }
+        .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .btn-search { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; border: none; padding: 0 35px; border-radius: 16px; font-weight: 800; cursor: pointer; height: 50px; transition: 0.3s; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2); }
+        .btn-search:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(99, 102, 241, 0.3); }
+
+        /* 👑 Segmented Controls (Tabs) */
+        .tabs-container { display: flex; background: var(--surface); border: 1px solid var(--border); padding: 8px; border-radius: 20px; margin-bottom: 30px; gap: 8px; grid-column: 1; box-shadow: var(--card-shadow); }
+        .tab-btn { flex: 1; padding: 14px; border-radius: 14px; background: transparent; border: none; color: var(--subtext); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25); }
+
+        select, select.input-control, .search-box select {
+            width: 100%; padding: 16px 20px; border-radius: 16px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px; font-weight: 500; outline: none; transition: 0.3s;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat; background-position-x: 94%; background-position-y: center;
+        }
+        select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        select option { background: #1e293b; color: #f8fafc; font-weight: 500; }
+
+        /* 💼 Job Cards */
+        .job-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 30px; padding: 35px; margin-bottom: 25px; transition: var(--transition);
+            box-shadow: var(--card-shadow); position: relative; overflow: hidden;
+        }
+        .job-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #6366f1, #a855f7); }
+        .job-card.student-posted-card::before { background: linear-gradient(90deg, #10b981, #059669); }
+        .job-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1); }
+
+        .j-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .j-company-info { display: flex; align-items: center; gap: 18px; }
+        .c-logo { width: 55px; height: 55px; border-radius: 18px; background: rgba(99, 102, 241, 0.1); color: #818cf8; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .j-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; color: var(--text); letter-spacing: -0.5px;}
+        .j-company { font-size: 14px; color: var(--subtext); font-weight: 600; }
+
+        .badge { padding: 6px 14px; border-radius: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;}
+        .badge-active { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        .j-tags { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tag { background: var(--surface); border: 1px solid var(--border); color: var(--subtext); padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 700; transition: var(--transition); }
+        .job-card:hover .tag { border-color: rgba(99, 102, 241, 0.3); }
+        .j-desc { font-size: 14px; color: var(--subtext); line-height: 1.7; margin-bottom: 25px; font-weight: 500;}
+
+        .j-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 20px; }
+
+        .action-container { display: flex; gap: 12px; align-items: center; }
+        .btn-apply { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; border: none; padding: 12px 25px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: var(--transition); font-size: 14px; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);}
+        .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(99, 102, 241, 0.35); }
+        .btn-apply:disabled { cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: none; }
+
+        .btn-delete-post { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 12px 20px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: var(--transition); font-size: 14px; display: none; }
+        .btn-delete-post:hover { background: #ef4444; color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);}
+
+        /* 📊 Sidebar Stats */
+        .side-card { background: var(--surface); border: 1px solid var(--border); border-radius: 35px; padding: 35px; margin-bottom: 25px; transition: var(--transition); box-shadow: var(--card-shadow); }
+        .side-card h3 { font-size: 20px; margin-bottom: 20px; color: var(--text); font-weight: 800; border-bottom: 2px dashed var(--border); padding-bottom: 15px; letter-spacing: -0.5px;}
+        .app-item { border-bottom: 1px solid var(--border); padding: 15px 0; transition: 0.3s;}
+        .app-item:last-child { border: none; padding-bottom: 0;}
+        .app-item:hover { transform: translateX(5px); }
+        .app-title { font-size: 15px; font-weight: 800; color: var(--text); }
+
+        /* 🔥 PREMIUM LUXURY MODAL RE-DESIGN */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; opacity: 0; transition: 0.3s; }
+        .modal-card { background: var(--surface); padding: 45px; border-radius: 35px; width: 100%; max-width: 650px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform: scale(0.9); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; font-weight: 800; color: var(--subtext); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+
+        .input-control { width: 100%; padding: 16px 20px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px; font-weight: 500; outline: none; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);}
+        .input-control:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); background: var(--bg); }
+
+        textarea.input-control { resize: vertical; min-height: 120px; }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-finance">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs" class="active">💼 Career Hub</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${initials}">AD</div>
+            <div class="user-info">
+                <span style="font-size:14px; font-weight:800; color:var(--text); display:block;" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Student</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</div>
+
+<div class="main-wrapper">
+    <div class="topbar animate-up">
+        <h1>Career <span style="font-weight: 300; color: var(--subtext);">Hub</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div class="feed-area">
+        <div class="hero-banner animate-up delay-1">
+            <div>
+                <h1 style="font-size: 28px; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.5px;">Unlock Your Next Opportunity</h1>
+                <p style="font-size: 15px; opacity: 0.9; font-weight: 500;">Find internships, part-time jobs, and tuition.</p>
+            </div>
+            <button class="btn-post-job" onclick="openModal('postJobModal')">✨ Post Job / Tuition</button>
+        </div>
+
+        <div class="search-box animate-up delay-1">
+            <input type="text" id="searchInput" placeholder="Search title or company..." style="flex:1;">
+            <div style="width: 240px;">
+                <select id="deptFilter">
+                    <option value="ALL">All Departments</option>
+                    <option value="CSE">Computer Science (CSE)</option>
+                    <option value="EEE">Electrical (EEE)</option>
+                    <option value="BBA">Business Admin (BBA)</option>
+                    <option value="English">English</option>
+                    <option value="Law">Law</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Civil">Civil Engineering</option>
+                    <option value="Architecture">Architecture</option>
+                    <option value="Public Health">Public Health</option>
+                    <option value="Economics">Economics</option>
+                    <option value="Textile">Textile Engineering</option>
+                    <option value="Journalism">Journalism</option>
+                </select>
+            </div>
+            <button class="btn-search" onclick="filterJobs()">Search</button>
+        </div>
+
+        <div class="tabs-container animate-up delay-2">
+            <button class="tab-btn active" id="officialTab" onclick="switchTab('official')">🏛️ Official Circulars</button>
+            <button class="tab-btn" id="studentTab" onclick="switchTab('student')">🎓 Student Tuitions</button>
+        </div>
+
+        <div id="officialSection" class="job-section animate-up delay-2">
+            <div th:if="${officialJobs == null or officialJobs.isEmpty()}" style="text-align:center; padding: 60px 40px; color:var(--subtext); border: 2px dashed var(--border); border-radius: 30px; background: rgba(255,255,255,0.02);">
+                <div style="font-size: 50px; margin-bottom: 15px;">📭</div>
+                <h3 style="color: var(--text); font-weight: 800; margin-bottom: 5px;">No official circulars available.</h3>
+                <p style="font-size: 14px; font-weight: 500;">Check back later for new opportunities.</p>
+            </div>
+
+            <div class="job-card" th:each="job : ${officialJobs}" th:attr="data-title=${#strings.toLowerCase(job.title)}, data-dept=${#strings.toLowerCase(job.departmentTags)}">
+                <div class="j-header">
+                    <div class="j-company-info">
+                        <div class="c-logo" th:text="${#strings.substring(job.company,0,1).toUpperCase()}">C</div>
+                        <div>
+                            <h2 class="j-title" th:text="${job.title}">Job Title</h2>
+                            <p class="j-company" th:text="${job.company}">Company</p>
+                        </div>
+                    </div>
+                    <span class="badge badge-active" th:text="${job.status}">ACTIVE</span>
+                </div>
+
+                <div class="j-tags">
+                    <span class="tag">💼 <span th:text="${job.type}">Full-time</span></span>
+                    <span class="tag">🎓 <span th:text="${job.departmentTags}">CSE</span></span>
+                    <span class="tag" style="color:#ef4444; border-color:rgba(239,68,68,0.3); background: rgba(239,68,68,0.05);">⏳ Deadline: <span th:text="${job.deadline}">2026-06-15</span></span>
+                </div>
+
+                <p class="j-desc" th:text="${job.description}">Description...</p>
+
+                <div class="j-footer">
+                    <div style="font-size: 13px; color: var(--subtext); font-weight: 700;">
+                        👁️ <span th:text="${job.views}">0</span> Views &nbsp;&nbsp;&nbsp; 📝 <span th:text="${job.applyCount}">0</span> Applied
+                    </div>
+                    <form th:if="${job.status == 'ACTIVE'}" action="/student-jobs/apply" method="POST" class="apply-form" th:id="'form-apply-' + ${job.id}" style="margin:0;">
+                        <input type="hidden" name="jobId" th:value="${job.id}">
+                        <input type="hidden" name="jobTitle" th:value="${job.title}">
+                        <button type="submit" class="btn-apply" th:id="'btn-apply-' + ${job.id}">Apply Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="studentSection" class="job-section" style="display: none;">
+            <div th:if="${studentJobs == null or studentJobs.isEmpty()}" style="text-align:center; padding: 60px 40px; color:var(--subtext); border: 2px dashed var(--border); border-radius: 30px; background: rgba(255,255,255,0.02);">
+                <div style="font-size: 50px; margin-bottom: 15px;">📭</div>
+                <h3 style="color: var(--text); font-weight: 800; margin-bottom: 5px;">No student posted tuitions available.</h3>
+                <p style="font-size: 14px; font-weight: 500;">Be the first to post a new tuition opportunity!</p>
+            </div>
+
+            <div class="job-card student-posted-card animate-up delay-2" th:each="job : ${studentJobs}"
+                 th:attr="data-title=${#strings.toLowerCase(job.title)}, data-dept=${#strings.toLowerCase(job.departmentTags)}, data-author=${job.authorName}">
+                <div class="j-header">
+                    <div class="j-company-info">
+                        <div class="c-logo" style="background: rgba(16, 185, 129, 0.1); color: #10b981;" th:text="${#strings.substring(job.authorName,0,1).toUpperCase()}">S</div>
+                        <div>
+                            <h2 class="j-title" th:text="${job.title}">Job Title</h2>
+                            <p class="j-company" th:text="'Posted by: ' + ${job.authorName}">Student Name</p>
+                        </div>
+                    </div>
+                    <span class="badge badge-active" th:text="${job.status}">ACTIVE</span>
+                </div>
+
+                <div class="j-tags">
+                    <span class="tag">💼 <span th:text="${job.type}">Tuition</span></span>
+                    <span class="tag">🎓 <span th:text="${job.departmentTags}">CSE</span></span>
+                    <span class="tag" style="color:#ef4444; border-color:rgba(239,68,68,0.3); background: rgba(239,68,68,0.05);">⏳ Deadline: <span th:text="${job.deadline}">2026-06-15</span></span>
+                </div>
+
+                <p class="j-desc" th:text="${job.description}">Description...</p>
+
+                <div class="j-footer">
+                    <div style="font-size: 13px; color: var(--subtext); font-weight: 700;">
+                        👁️ <span th:text="${job.views}">0</span> Views &nbsp;&nbsp;&nbsp; 📝 <span th:text="${job.applyCount}">0</span> Applied
+                    </div>
+
+                    <div class="action-container">
+                        <button type="button" class="btn-delete-post custom-del-hook" th:attr="data-id=${job.id}, data-owner=${job.authorName}">🗑️ Delete Post</button>
+
+                        <form action="/student-jobs/apply" method="POST" class="apply-form" th:id="'form-apply-' + ${job.id}" style="margin:0;">
+                            <input type="hidden" name="jobId" th:value="${job.id}">
+                            <input type="hidden" name="jobTitle" th:value="${job.title}">
+                            <button type="submit" class="btn-apply" th:id="'btn-apply-' + ${job.id}">Apply Now</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="stats-sidebar animate-up delay-3">
+        <div class="side-card" style="position: sticky; top: 20px;">
+            <h3>📝 My Applications</h3>
+            <div th:if="${applications == null or applications.isEmpty()}" style="text-align:center; color:var(--subtext); font-size: 14px; font-weight: 500; padding: 30px 0;">
+                You haven't applied to any jobs yet.
+            </div>
+            <div class="app-item" th:each="app : ${applications}">
+                <div class="app-title" th:text="${app.jobTitle}">Job Title</div>
+                <div style="font-size:12px; color:var(--subtext); margin-top:6px; font-weight: 600;" th:text="'Applied on: ' + ${app.dateApplied}">Date</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="postJobModal">
+    <div class="modal-card">
+        <h2 style="margin-bottom:30px; color:var(--text); font-weight: 800; font-size: 26px; border-bottom: 2px dashed var(--border); padding-bottom: 15px; letter-spacing: -0.5px;">✨ Post Job / Tuition</h2>
+
+        <form action="/student-jobs/post" method="POST">
+
+            <div class="input-group">
+                <label>Job Title or Position</label>
+                <input type="text" name="title" class="input-control" placeholder="e.g. Need HSC Math Tutor or Frontend Dev" required>
+            </div>
+
+            <div class="input-group">
+                <label>Location or Company Name</label>
+                <input type="text" name="company" class="input-control" placeholder="e.g. Uttara Sector 10 or CodeAndCoffee" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="input-group">
+                    <label>Job Category</label>
+                    <select name="type" class="input-control" required>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Tuition" selected>Tuition</option>
+                        <option value="Remote">Remote Work</option>
+                        <option value="Internship">Internship</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Application Deadline</label>
+                    <input type="date" name="deadline" class="input-control" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Target Department Requirement</label>
+                <select name="departmentTags" class="input-control" required>
+                    <option value="ALL">Open for All Departments</option>
+                    <option value="CSE">Computer Science (CSE)</option>
+                    <option value="EEE">Electrical (EEE)</option>
+                    <option value="BBA">Business Admin (BBA)</option>
+                    <option value="English">English</option>
+                    <option value="Law">Law</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Civil">Civil Engineering</option>
+                    <option value="Architecture">Architecture</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Requirements & Full Description</label>
+                <textarea name="description" class="input-control" placeholder="Describe the job responsibilities, skills required, salary, and schedule here..." required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="button" onclick="closeModal('postJobModal')" style="flex: 1; padding: 16px; border-radius: 16px; font-weight: 800; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--subtext); transition: 0.3s;" onmouseover="this.style.background='var(--border)'; this.style.color='var(--text)';" onmouseout="this.style.background='var(--surface)'; this.style.color='var(--subtext)';">Cancel</button>
+                <button type="submit" style="flex: 2; background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; padding: 16px; border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 15px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3); transition: 0.3s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">Submit for Approval 🚀</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const currentStudentName = /*[[${student.name}]]*/ 'Unknown';
+
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function switchTab(type) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.job-section').forEach(s => s.style.display = 'none');
+
+        if (type === 'official') {
+            document.getElementById('officialTab').classList.add('active');
+            document.getElementById('officialSection').style.display = 'block';
+        } else {
+            document.getElementById('studentTab').classList.add('active');
+            document.getElementById('studentSection').style.display = 'block';
+            evaluateDeleteButtons();
+        }
+    }
+
+    // 🔥 ABSOLUTE EVALUATOR ENGINE
+    function evaluateDeleteButtons() {
+        document.querySelectorAll('.custom-del-hook').forEach(btn => {
+            const jobId = btn.getAttribute('data-id');
+            if (jobId && jobId.startsWith('ST_')) {
+                btn.style.display = 'inline-block';
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+    }
+
+    function filterJobs() {
+        let keyword = document.getElementById('searchInput').value.toLowerCase();
+        let dept = document.getElementById('deptFilter').value.toLowerCase();
+        document.querySelectorAll('.job-section:not([style*="display: none"]) .job-card').forEach(item => {
+            let matchKey = item.getAttribute('data-title').includes(keyword);
+            let itemDept = item.getAttribute('data-dept');
+            let matchDept = (dept === 'all' || itemDept.includes(dept) || itemDept.includes('all'));
+            item.style.display = (matchKey && matchDept) ? 'block' : 'none';
+        });
+    }
+
+    const myApps = /*[[${applications}]]*/ [];
+    if(myApps && myApps.length > 0) {
+        myApps.forEach(app => {
+            const form = document.getElementById('form-apply-' + app.jobId);
+            if(form) {
+                form.action = '/student-jobs/cancel-apply';
+                form.classList.remove('apply-form');
+
+                const btn = document.getElementById('btn-apply-' + app.jobId);
+                btn.innerHTML = '❌ Cancel Application';
+                btn.style.background = 'rgba(239, 68, 68, 0.15)';
+                btn.style.color = '#ef4444';
+                btn.style.boxShadow = 'none';
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const jobTitle = this.querySelector('input[name="jobTitle"]').value;
+
+                    Swal.fire({
+                        title: 'Withdraw Application?',
+                        text: "Are you sure you want to cancel your application for: " + jobTitle + "?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                        color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                        confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, Withdraw',
+                        borderRadius: '20px'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            btn.innerHTML = '⏳ Canceling...';
+                            btn.disabled = true;
+                            fetch(this.action, { method: this.method, body: new FormData(this) })
+                                .then(() => {
+                                    Swal.fire({ title: 'Withdrawn!', text: 'Your application has been canceled.', icon: 'success', background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff', color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a', showConfirmButton: false, timer: 1500, borderRadius: '20px' })
+                                        .then(() => window.location.reload());
+                                });
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    document.querySelectorAll('.apply-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('.btn-apply');
+            const jobTitle = this.querySelector('input[name="jobTitle"]').value;
+
+            btn.innerHTML = '⏳ Applying...';
+            btn.style.opacity = '0.7';
+            btn.disabled = true;
+
+            fetch(this.action, { method: this.method, body: new FormData(this) })
+                .then(() => {
+                    Swal.fire({
+                        title: 'Application Sent!',
+                        text: 'You have successfully applied for: ' + jobTitle,
+                        icon: 'success',
+                        background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                        color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                        confirmButtonColor: '#6366f1', showConfirmButton: false, timer: 2000, borderRadius: '20px'
+                    }).then(() => window.location.reload());
+                }).catch(() => {
+                Swal.fire('Error', 'Something went wrong.', 'error');
+                btn.innerHTML = 'Apply Now';
+                btn.disabled = false;
+            });
+        });
+    });
+
+    // Dynamic sweetalert engine for post deletion handler
+    document.querySelectorAll('.custom-del-hook').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            Swal.fire({
+                title: 'Delete this post?',
+                text: "Are you sure you want to permanently delete this tuition vacancy?",
+                icon: 'warning',
+                showCancelButton: true,
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete it!',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let f = document.createElement('form');
+                    f.method = 'POST'; f.action = '/student-jobs/cancel-apply'; // Assuming cancel-apply handles deletion
+                    let i = document.createElement('input');
+                    i.type = 'hidden'; i.name = 'jobId'; i.value = id;
+                    f.appendChild(i); document.body.appendChild(f);
+                    f.submit();
+                }
+            });
+        });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.has('success')) {
+        const type = urlParams.get('success');
+        if(type === 'posted') {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            Swal.fire({
+                title: 'Posted Successfully!',
+                text: 'Your job is pending admin approval.',
+                icon: 'success',
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#6366f1',
+                borderRadius: '20px'
+            });
+        }
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        } else {
+            document.body.classList.add('dark-mode');
+            document.getElementById('theme-icon').innerText = '☀️';
+            document.getElementById('theme-text').innerText = 'Day Mode';
+        }
+        evaluateDeleteButtons();
+    };
+</script>
+</body>
+</html>

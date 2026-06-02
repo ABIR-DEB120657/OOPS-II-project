@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Teacher Notifications - Nexus One</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Minimal SaaS Color Palette */
+            --bg-canvas: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --primary-light: #EEF2FF;
+
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+
+            /* Dimensions & Effects */
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --bg-canvas: #0F172A;
+            --bg-surface: #1E293B;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --primary-light: rgba(79, 70, 229, 0.15);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-canvas); color: var(--text-main);
+            min-height: 100vh; display: flex;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+        }
+        .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; }
+        .logo-img { width: 32px; height: 32px; border-radius: 8px; }
+        .logo-text { font-weight: 700; font-size: 15px; line-height: 1.2; letter-spacing: -0.01em; }
+        .logo-sub { color: var(--text-muted); font-size: 11px; font-weight: 500; }
+
+        .menu-section { padding: 0 12px; flex: 1; overflow-y: auto; }
+        .menu-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px 12px; font-weight: 600; }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 4px;
+            border-radius: var(--radius-md); text-decoration: none; color: var(--text-muted);
+            font-size: 14px; font-weight: 500; transition: var(--transition); border-left: 3px solid transparent;
+        }
+        .menu-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .menu-item:hover { background: var(--bg-canvas); color: var(--text-main); }
+        .menu-item.active { background: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+        .badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+
+        .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: var(--bg-canvas); border: 1px solid var(--border); text-decoration: none; transition: var(--transition); }
+        .avatar { width: 36px; height: 36px; border-radius: 8px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; object-fit: cover;}
+        .user-info { flex: 1; overflow: hidden; }
+        .user-name { font-size: 13px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+
+        /* --- MAIN LAYOUT & TOPBAR --- */
+        .main-wrapper { margin-left: 260px; flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        .topbar {
+            height: 70px; padding: 0 40px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; transition: background 0.3s; flex-shrink: 0;
+        }
+        body.dark .topbar { background: rgba(30, 41, 59, 0.8); }
+
+        .search-container { position: relative; width: 320px; }
+        .search-input { width: 100%; padding: 10px 16px 10px 40px; border-radius: 99px; border: 1px solid var(--border); background: var(--bg-canvas); color: var(--text-main); font-size: 13px; outline: none; transition: var(--transition); font-family: inherit;}
+        .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background: var(--bg-surface); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none;}
+
+        .topbar-actions { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+        .icon-btn:hover { color: var(--text-main); background: var(--bg-canvas); }
+
+        .container { padding: 32px 40px; max-width: 1200px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; flex: 1; overflow: hidden; }
+
+        /* --- PAGE HEADER & FILTERS --- */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; flex-shrink: 0; }
+        .page-title h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .page-title p { font-size: 14px; color: var(--text-muted); }
+
+        .header-actions { display: flex; gap: 12px; }
+
+        .btn-primary {
+            background: var(--primary); color: white; border: none; padding: 10px 20px;
+            border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: var(--transition);
+        }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79,70,229,0.2); }
+
+        .btn-secondary {
+            background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); padding: 10px 20px;
+            border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: var(--transition);
+        }
+        .btn-secondary:hover { background: var(--bg-canvas); border-color: var(--text-muted); }
+
+        /* Enhanced Filters */
+        .filter-controls {
+            display: flex; gap: 16px; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); padding-bottom: 16px; flex-wrap: wrap; flex-shrink: 0;
+        }
+
+        .filter-group-left { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+        .filter-tabs { display: flex; gap: 8px; background: var(--bg-canvas); padding: 4px; border-radius: 99px; border: 1px solid var(--border); }
+        .tab {
+            padding: 6px 16px; border-radius: 99px; font-size: 13px; font-weight: 500;
+            color: var(--text-muted); background: transparent; border: none;
+            cursor: pointer; transition: var(--transition);
+        }
+        .tab:hover { color: var(--text-main); }
+        .tab.active { background: var(--bg-surface); color: var(--primary); font-weight: 600; box-shadow: var(--shadow-sm); }
+
+        .divider-vertical { width: 1px; height: 24px; background: var(--border); }
+
+        .custom-select {
+            padding: 8px 16px 8px 16px; border-radius: 99px; border: 1px solid var(--border);
+            background: var(--bg-surface); color: var(--text-main); font-size: 13px; font-weight: 500;
+            outline: none; cursor: pointer; transition: var(--transition); font-family: inherit;
+        }
+        .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+        /* Bulk Actions Bar */
+        .bulk-actions-bar {
+            display: none; align-items: center; justify-content: space-between;
+            background: var(--primary-light); padding: 12px 24px; border-radius: var(--radius-md);
+            border: 1px solid rgba(79, 70, 229, 0.2); flex-shrink: 0; animation: slideDown 0.2s ease-out;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .bulk-left { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; color: var(--primary); }
+        .bulk-right { display: flex; gap: 8px; }
+        .btn-bulk {
+            padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; transition: var(--transition);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-bulk-danger { background: var(--danger); color: white; }
+        .btn-bulk-danger:hover { background: #DC2626; }
+        .btn-bulk-mute { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-bulk-mute:hover { background: var(--bg-canvas); }
+
+        /* --- NOTIFICATION LIST (Optimized for 2K-6K items) --- */
+        .notif-container-wrapper {
+            flex: 1; overflow-y: auto; background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); position: relative;
+        }
+
+        /* Custom Scrollbar for massive lists */
+        .notif-container-wrapper::-webkit-scrollbar { width: 8px; }
+        .notif-container-wrapper::-webkit-scrollbar-track { background: var(--bg-canvas); border-radius: 0 8px 8px 0; }
+        .notif-container-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+        .notif-container-wrapper::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .notif-container { display: flex; flex-direction: column; }
+
+        /* Smart Group Header */
+        .date-group-header {
+            padding: 10px 24px; background: var(--bg-canvas); border-bottom: 1px solid var(--border); border-top: 1px solid var(--border);
+            font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.05em; display: flex; align-items: center; position: sticky; top: 0; z-index: 10;
+        }
+        .date-group-header:first-child { border-top: none; }
+
+        .notif-item {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            padding: 16px 24px; border-bottom: 1px solid var(--border); transition: background 0.2s, opacity 0.3s;
+            position: relative; gap: 16px;
+        }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: var(--bg-canvas); }
+
+        /* Checkbox styling */
+        .item-checkbox-wrap { display: flex; align-items: center; margin-top: 10px; }
+        .custom-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+
+        /* States */
+        .notif-item.unread { background: var(--primary-light); }
+        .notif-item.unread::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 4px; background: var(--primary);
+        }
+        .notif-item.muted { opacity: 0.5; filter: grayscale(100%); }
+        .notif-item.pinned { background: rgba(245, 158, 11, 0.05); }
+        .notif-item.pinned::after {
+            content: ''; position: absolute; right: 0; top: 0; width: 0; height: 0;
+            border-style: solid; border-width: 0 24px 24px 0;
+            border-color: transparent var(--warning) transparent transparent;
+        }
+
+        /* Icon Types */
+        .n-icon-wrap { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .n-icon-wrap svg { width: 18px; height: 18px; }
+        .type-leave { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .type-assignment { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .type-system { background: rgba(59, 130, 246, 0.15); color: #3B82F6; }
+        .type-faculty { background: rgba(139, 92, 246, 0.15); color: #8B5CF6; }
+        .type-default { background: var(--border); color: var(--text-muted); }
+
+        /* Content */
+        .n-content { flex: 1; display: flex; flex-direction: column; gap: 4px; padding-top: 2px; min-width: 0; }
+        .n-title { font-size: 14px; font-weight: 600; color: var(--text-main); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .notif-item.unread .n-title { font-weight: 700; }
+
+        .n-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-muted); font-weight: 500; flex-wrap: wrap; }
+        .n-meta-sender { display: flex; align-items: center; gap: 4px; }
+        .n-meta-sender svg { width: 14px; height: 14px; }
+
+        /* Actions */
+        .n-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; opacity: 0; transition: opacity 0.2s; }
+        .notif-item:hover .n-actions, .notif-item.unread .n-actions, .notif-item.pinned .n-actions { opacity: 1; }
+
+        .btn-icon-action {
+            background: transparent; border: none; width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; color: var(--text-muted);
+            cursor: pointer; transition: var(--transition);
+        }
+        .btn-icon-action svg { width: 16px; height: 16px; stroke-width: 2; }
+        .btn-icon-action:hover { background: var(--border); color: var(--text-main); }
+
+        .btn-action-read:hover { color: var(--primary); background: var(--primary-light); }
+        .btn-action-pin.active { color: var(--warning); opacity: 1;}
+        .btn-action-pin:hover { color: var(--warning); background: rgba(245, 158, 11, 0.1); }
+        .btn-action-archive:hover { color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .btn-action-delete:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+        .icon-mute-on { display: none; }
+        .notif-item.muted .icon-mute-off { display: none; }
+        .notif-item.muted .icon-mute-on { display: block; }
+        .btn-action-mute:hover { background: rgba(100, 116, 139, 0.1); }
+
+        /* --- EMPTY STATE --- */
+        .empty-state { text-align: center; padding: 64px 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; height: 100%; justify-content: center; }
+        .empty-icon { width: 48px; height: 48px; color: var(--border); }
+        .empty-title { font-size: 16px; font-weight: 600; color: var(--text-main); }
+        .empty-desc { font-size: 14px; color: var(--text-muted); max-width: 300px; margin: 0 auto; line-height: 1.5; }
+
+        /* --- CUSTOM CONFIRM MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.2s ease-in-out;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box {
+            background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg);
+            width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px) scale(0.95); transition: all 0.2s ease-out; border: 1px solid var(--border);
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+        .modal-title { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .modal-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; }
+            .topbar { padding: 0 20px; }
+            .container { padding: 20px; }
+            .n-actions { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiM2RDVERkMiIHJ4PSI4Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE2IDZMMjQgMTRMMTYgMjJMOCAxNEwxNiA2WiIvPjwvc3ZnPg=='"/>
+        <div>
+            <div class="logo-text">Nexus One</div>
+            <div class="logo-sub">Teacher Portal</div>
+        </div>
+    </div>
+
+    <div class="menu-section">
+        <div class="menu-label">Overview</div>
+        <a href="/teacher-portal" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Dashboard
+        </a>
+        <a href="/attendance" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Attendance
+        </a>
+        <a href="/teacher-assignment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Assignments
+        </a>
+
+        <div class="menu-label">Management</div>
+        <a href="/teacher-leave" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Leave Requests
+        </a>
+        <a href="/teacher-appointment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Faculty Sync
+        </a>
+        <a href="/teacher-jobs" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Career Hub
+        </a>
+        <a href="/teacher-blood-finder" class="menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> Blood Finder
+        </a>
+
+        <div class="menu-label">Updates</div>
+        <a href="/notifications/teacher" class="menu-item active">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg> Notifications
+            <span class="badge" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}"></span>
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card">
+            <img th:src="${session.teacherId != null ? '/teachers/' + session.teacherId + '.jpg' : '/teachers/0.jpg'}" class="avatar" onerror="this.style.display='none'; document.getElementById('sbFallback').style.display='flex';"/>
+            <div class="avatar" id="sbFallback" style="display:none;" th:text="${session.loggedIn != null ? #strings.substring(session.loggedIn,0,2).toUpperCase() : 'TR'}">TR</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${session.loggedIn != null ? session.loggedIn : 'Teacher'}">Teacher</div>
+                <div class="user-role">Faculty Member</div>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<main class="main-wrapper">
+    <header class="topbar">
+        <div class="search-container">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search notifications..." onkeyup="filterNotifications()">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+            <a href="/logout" class="icon-btn" title="Logout" style="color: var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Notifications</h1>
+                <p>Manage your assignments, sync requests, leaves, and system alerts.</p>
+            </div>
+
+            <div class="header-actions">
+                <button type="button" class="btn-secondary" onclick="muteAllVisible()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:16px;height:16px;stroke-width:2;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                    Mute All
+                </button>
+                <button type="button" class="btn-secondary" onclick="unmuteAllVisible()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:16px;height:16px;stroke-width:2;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    Unmute All
+                </button>
+                <button th:if="${notifications != null and !#lists.isEmpty(notifications)}"
+                        type="button" class="btn-primary"
+                        onclick="submitWithoutRedirect('/notifications/read-all')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Mark all read
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-controls">
+            <div class="filter-group-left">
+                <div class="filter-tabs">
+                    <button class="tab active" onclick="switchTab('ALL', this)">All</button>
+                    <button class="tab" onclick="switchTab('UNREAD', this)">Unread</button>
+                    <button class="tab" onclick="switchTab('ARCHIVED', this)">Archived</button>
+                </div>
+                <div class="divider-vertical"></div>
+                <select id="categoryFilter" class="custom-select" onchange="filterNotifications()">
+                    <option value="ALL">All Categories</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="leave">Leave Request</option>
+                    <option value="appointment">Faculty Sync</option>
+                    <option value="system">System Updates</option>
+                </select>
+                <select id="dateFilter" class="custom-select" onchange="filterNotifications()">
+                    <option value="ALL">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="7days">Last 7 Days</option>
+                    <option value="30days">Last 30 Days</option>
+                </select>
+            </div>
+
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; font-weight:500; color:var(--text-muted);">
+                <input type="checkbox" id="selectAllCheckbox" class="custom-checkbox" onchange="toggleSelectAll(this)">
+                Select All
+            </label>
+        </div>
+
+        <div class="bulk-actions-bar" id="bulkActionBar">
+            <div class="bulk-left">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:16px;height:16px;stroke-width:2;"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                <span id="selectedCountText">0 items selected</span>
+            </div>
+            <div class="bulk-right">
+                <button class="btn-bulk btn-bulk-mute" onclick="muteSelected()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg> Mute
+                </button>
+                <button class="btn-bulk btn-bulk-mute" onclick="unmuteSelected()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Unmute
+                </button>
+                <button class="btn-bulk btn-bulk-danger" onclick="deleteSelected()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;stroke-width:2;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Delete
+                </button>
+            </div>
+        </div>
+
+        <div class="notif-container-wrapper">
+            <div class="notif-container" id="notifContainer">
+
+                <div id="emptyState" class="empty-state" th:if="${notifications == null or #lists.isEmpty(notifications)}">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path><line x1="18" y1="8" x2="22" y2="4"></line><line x1="2" y1="4" x2="6" y2="8"></line></svg>
+                    <div>
+                        <div class="empty-title">All clear!</div>
+                        <div class="empty-desc">No notifications found for the current filters.</div>
+                    </div>
+                </div>
+
+                <th:block th:each="n : ${notifications}">
+                    <div class="notif-item n-row"
+                         th:id="'notif-' + ${n.id}"
+                         th:classappend="${!n.isRead} ? 'unread' : ''"
+                         th:attr="data-id=${n.id}, data-read=${n.isRead}, data-msg=${#strings.toLowerCase(n.message)}, data-date=${n.date}, data-type=${n.type != null ? #strings.toLowerCase(n.type) : ''}, data-pinned='false', data-archived='false'">
+
+                        <div class="item-checkbox-wrap">
+                            <input type="checkbox" class="custom-checkbox item-check" onchange="updateBulkUI()">
+                        </div>
+
+                        <div class="n-icon-wrap"
+                             th:classappend="${#strings.containsIgnoreCase(n.message, 'leave') or (n.type != null and #strings.containsIgnoreCase(n.type, 'leave'))} ? 'type-leave' :
+                                            (${#strings.containsIgnoreCase(n.message, 'assignment') or (n.type != null and #strings.containsIgnoreCase(n.type, 'assignment'))} ? 'type-assignment' :
+                                            (${#strings.containsIgnoreCase(n.message, 'sync') or (n.type != null and #strings.containsIgnoreCase(n.type, 'appointment'))} ? 'type-faculty' : 'type-system'))">
+
+                            <th:block th:if="${#strings.containsIgnoreCase(n.message, 'leave') or (n.type != null and #strings.containsIgnoreCase(n.type, 'leave'))}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            </th:block>
+                            <th:block th:if="${#strings.containsIgnoreCase(n.message, 'assignment') or (n.type != null and #strings.containsIgnoreCase(n.type, 'assignment'))}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            </th:block>
+                            <th:block th:if="${#strings.containsIgnoreCase(n.message, 'sync') or (n.type != null and #strings.containsIgnoreCase(n.type, 'appointment'))}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </th:block>
+                            <th:block th:if="${!#strings.containsIgnoreCase(n.message, 'leave') and !#strings.containsIgnoreCase(n.message, 'assignment') and !#strings.containsIgnoreCase(n.message, 'sync') and (n.type == null or (!#strings.containsIgnoreCase(n.type, 'leave') and !#strings.containsIgnoreCase(n.type, 'assignment') and !#strings.containsIgnoreCase(n.type, 'appointment')))}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </th:block>
+                        </div>
+
+                        <div class="n-content">
+                            <div class="n-title" th:text="${n.title != null ? n.title : n.message}" th:title="${n.title != null ? n.title : n.message}">Notification Title</div>
+                            <div class="n-meta" style="margin-top: 4px;">
+                                <span class="n-meta-sender">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <th:block th:text="${n.sender}">System</th:block>
+                                </span>
+                                <span>•</span>
+                                <span th:text="${n.date}">Time</span>
+                            </div>
+                            <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px; line-height: 1.5;" th:if="${n.title != null}" th:text="${n.message}"></div>
+                        </div>
+
+                        <div class="n-actions">
+                            <button th:if="${!n.isRead}" type="button" class="btn-icon-action btn-action-read" title="Mark Read" th:onclick="'submitWithoutRedirect(\'/notifications/read/' + ${n.id} + '\', this.closest(\'.notif-item\'))'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </button>
+                            <button type="button" class="btn-icon-action btn-action-mute" title="Toggle Mute" onclick="toggleMute(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon-mute-off"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="icon-mute-on"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                            </button>
+                            <button type="button" class="btn-icon-action btn-action-pin" title="Pin Notification" onclick="togglePin(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                            </button>
+                            <button type="button" class="btn-icon-action btn-action-archive" title="Archive" onclick="toggleArchive(this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+                            </button>
+                            <button type="button" class="btn-icon-action btn-action-delete" title="Delete" th:onclick="'deleteNotification(' + ${n.id} + ', this.closest(\'.notif-item\'))'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+
+                    </div>
+                </th:block>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="customConfirmModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:20px;height:20px;stroke-width:2;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Confirm Action
+        </div>
+        <div class="modal-desc" id="customConfirmDesc">Are you sure you want to proceed?</div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+            <button class="btn-primary" id="customConfirmBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme logic
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    // Custom Modal Logic
+    let confirmCallback = null;
+
+    function confirmAction(message, btnText, btnColor, callback) {
+        document.getElementById('customConfirmDesc').innerText = message;
+
+        const confirmBtn = document.getElementById('customConfirmBtn');
+        confirmBtn.innerText = btnText || 'Confirm';
+        confirmBtn.style.backgroundColor = btnColor || 'var(--primary)';
+
+        confirmCallback = callback;
+        document.getElementById('customConfirmModal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('customConfirmModal').classList.remove('active');
+        confirmCallback = null;
+    }
+
+    document.getElementById('customConfirmBtn').addEventListener('click', () => {
+        if (confirmCallback) confirmCallback();
+        closeConfirmModal();
+    });
+
+    // API Simulation / Ajax Wrapper
+    function submitWithoutRedirect(url, itemNode = null) {
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'back=/notifications/teacher' })
+            .then(() => {
+                if (itemNode && url.includes('/read/')) {
+                    itemNode.classList.remove('unread');
+                    itemNode.setAttribute('data-read', 'true');
+                    const readBtn = itemNode.querySelector('.btn-action-read');
+                    if(readBtn) readBtn.remove();
+                } else {
+                    window.location.reload();
+                }
+            });
+    }
+
+    function deleteNotification(id, itemNode) {
+        confirmAction('Are you sure you want to delete this notification permanently?', 'Delete', 'var(--danger)', () => {
+            itemNode.remove();
+            fetch('/notifications/delete/' + id, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'back=/notifications/teacher' });
+            filterNotifications();
+            updateBulkUI();
+        });
+    }
+
+    // Advanced Filtering Logic
+    let currentTab = 'ALL';
+
+    function switchTab(status, btn) {
+        currentTab = status;
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterNotifications();
+    }
+
+    function isDateInRange(dateStr, range) {
+        if (range === 'ALL') return true;
+        if (!dateStr) return false;
+
+        const itemDate = new Date(dateStr);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        itemDate.setHours(0,0,0,0);
+
+        const diffDays = Math.ceil(Math.abs(today - itemDate) / (1000 * 60 * 60 * 24));
+
+        if (range === 'today') return diffDays === 0;
+        if (range === '7days') return diffDays <= 7;
+        if (range === '30days') return diffDays <= 30;
+        return true;
+    }
+
+    function filterNotifications() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        const categoryTerm = document.getElementById('categoryFilter').value;
+        const dateTerm = document.getElementById('dateFilter').value;
+        const items = document.querySelectorAll('.n-row');
+
+        document.querySelectorAll('.date-group-header').forEach(header => header.remove());
+
+        let visibleCount = 0;
+        let pinnedItems = [];
+        let regularItems = [];
+
+        items.forEach(item => {
+            const isRead = item.getAttribute('data-read') === 'true';
+            const isArchived = item.getAttribute('data-archived') === 'true';
+            const isPinned = item.getAttribute('data-pinned') === 'true';
+            const msg = item.getAttribute('data-msg');
+            const typeAttr = item.getAttribute('data-type');
+            const dateVal = item.getAttribute('data-date');
+
+            // Category logic
+            let itemCategory = 'system';
+            if (msg.includes('assignment') || typeAttr.includes('assignment')) itemCategory = 'assignment';
+            else if (msg.includes('leave') || typeAttr.includes('leave')) itemCategory = 'leave';
+            else if (msg.includes('sync') || msg.includes('faculty') || typeAttr.includes('appointment')) itemCategory = 'appointment';
+
+            // Status match
+            let matchesTab = false;
+            if (currentTab === 'ALL') matchesTab = !isArchived;
+            else if (currentTab === 'UNREAD') matchesTab = !isRead && !isArchived;
+            else if (currentTab === 'ARCHIVED') matchesTab = isArchived;
+
+            const matchesSearch = msg.includes(searchTerm);
+            const matchesCategory = (categoryTerm === 'ALL') || (itemCategory === categoryTerm);
+            const matchesDate = isDateInRange(dateVal, dateTerm);
+
+            if (matchesTab && matchesSearch && matchesCategory && matchesDate) {
+                item.style.display = 'flex';
+                visibleCount++;
+                if (isPinned) pinnedItems.push(item);
+                else regularItems.push(item);
+            } else {
+                item.style.display = 'none';
+                item.querySelector('.item-check').checked = false;
+            }
+        });
+
+        const container = document.getElementById('notifContainer');
+
+        // Render Pinned items
+        if (pinnedItems.length > 0) {
+            const pinHeader = document.createElement('div');
+            pinHeader.className = 'date-group-header';
+            pinHeader.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;margin-right:6px;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg> Pinned';
+            container.appendChild(pinHeader);
+            pinnedItems.forEach(item => container.appendChild(item));
+        }
+
+        // Render Regular items grouped by date
+        if (regularItems.length > 0) {
+            const todayStr = new Date().toISOString().split('T')[0];
+            let yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+            let currentGroup = null;
+
+            regularItems.forEach(item => {
+                const dateVal = item.getAttribute('data-date');
+                let targetGroup = "Older Notifications";
+
+                if(dateVal && dateVal.includes(todayStr)) targetGroup = "Today";
+                else if (dateVal && dateVal.includes(yesterdayStr)) targetGroup = "Yesterday";
+
+                if (targetGroup !== currentGroup) {
+                    currentGroup = targetGroup;
+                    const header = document.createElement('div');
+                    header.className = 'date-group-header';
+                    header.innerHTML = targetGroup;
+                    container.appendChild(header);
+                }
+                container.appendChild(item);
+            });
+        }
+
+        const emptyState = document.getElementById('emptyState');
+        if (emptyState) emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+
+        updateBulkUI();
+    }
+
+    // Actions: Pin & Archive & Mute
+    function togglePin(btn) {
+        const item = btn.closest('.notif-item');
+        const isPinned = item.getAttribute('data-pinned') === 'true';
+        item.setAttribute('data-pinned', !isPinned);
+        if(!isPinned) {
+            item.classList.add('pinned');
+            btn.classList.add('active');
+        } else {
+            item.classList.remove('pinned');
+            btn.classList.remove('active');
+        }
+        filterNotifications();
+    }
+
+    function toggleArchive(btn) {
+        const item = btn.closest('.notif-item');
+        const isArchived = item.getAttribute('data-archived') === 'true';
+        item.setAttribute('data-archived', !isArchived);
+        filterNotifications();
+    }
+
+    function toggleMute(btn) {
+        const item = btn.closest('.notif-item');
+        item.classList.toggle('muted');
+    }
+
+    // Bulk Actions UI logic
+    function toggleSelectAll(checkbox) {
+        const visibleItems = Array.from(document.querySelectorAll('.n-row')).filter(i => i.style.display !== 'none');
+        visibleItems.forEach(item => {
+            item.querySelector('.item-check').checked = checkbox.checked;
+        });
+        updateBulkUI();
+    }
+
+    function updateBulkUI() {
+        const checkedBoxes = document.querySelectorAll('.item-check:checked');
+        const bar = document.getElementById('bulkActionBar');
+        const countTxt = document.getElementById('selectedCountText');
+        const selectAllCb = document.getElementById('selectAllCheckbox');
+
+        const visibleItemsCount = Array.from(document.querySelectorAll('.n-row')).filter(i => i.style.display !== 'none').length;
+
+        if (checkedBoxes.length > 0) {
+            bar.style.display = 'flex';
+            countTxt.innerText = `${checkedBoxes.length} notification${checkedBoxes.length > 1 ? 's' : ''} selected`;
+            selectAllCb.checked = (checkedBoxes.length === visibleItemsCount) && visibleItemsCount > 0;
+        } else {
+            bar.style.display = 'none';
+            selectAllCb.checked = false;
+        }
+    }
+
+    // Mute & Unmute Logic (Bulk & All)
+    function muteSelected() {
+        const checkedBoxes = document.querySelectorAll('.item-check:checked');
+        checkedBoxes.forEach(cb => {
+            const item = cb.closest('.notif-item');
+            item.classList.add('muted');
+            cb.checked = false;
+        });
+        updateBulkUI();
+    }
+
+    function unmuteSelected() {
+        const checkedBoxes = document.querySelectorAll('.item-check:checked');
+        checkedBoxes.forEach(cb => {
+            const item = cb.closest('.notif-item');
+            item.classList.remove('muted');
+            cb.checked = false;
+        });
+        updateBulkUI();
+    }
+
+    function muteAllVisible() {
+        confirmAction('Are you sure you want to mute all currently visible notifications?', 'Mute All', 'var(--warning)', () => {
+            const visibleItems = Array.from(document.querySelectorAll('.n-row')).filter(i => i.style.display !== 'none');
+            visibleItems.forEach(item => item.classList.add('muted'));
+        });
+    }
+
+    function unmuteAllVisible() {
+        confirmAction('Are you sure you want to unmute all currently visible notifications?', 'Unmute All', 'var(--primary)', () => {
+            const visibleItems = Array.from(document.querySelectorAll('.n-row')).filter(i => i.style.display !== 'none');
+            visibleItems.forEach(item => item.classList.remove('muted'));
+        });
+    }
+
+    function deleteSelected() {
+        confirmAction('Delete all selected notifications permanently?', 'Delete All', 'var(--danger)', () => {
+            const checkedBoxes = document.querySelectorAll('.item-check:checked');
+            checkedBoxes.forEach(cb => {
+                const item = cb.closest('.notif-item');
+                const id = item.getAttribute('data-id');
+                item.remove();
+                fetch('/notifications/delete/' + id, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'back=/notifications/teacher' });
+            });
+            document.getElementById('selectAllCheckbox').checked = false;
+            filterNotifications();
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+        filterNotifications();
+    });
+</script>
+
+</body>
+</html>

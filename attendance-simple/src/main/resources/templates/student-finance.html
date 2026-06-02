@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Finance & Fees | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);}
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px;
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+        /* 🧱 Main Layout */
+        .main-wrapper { margin-left: 320px; flex: 1; padding: 40px; max-width: 1200px; }
+
+        .topbar { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 32px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
+
+        /* 🔥 PREMIUM THEME TOGGLE BUTTON */
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; color: var(--text);
+            font-weight: 700; font-size: 13px; transition: var(--transition); outline: none; box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); border-color: var(--accent); }
+
+        /* 💳 Premium Finance Card */
+        .finance-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 35px; padding: 40px; margin-bottom: 30px; transition: var(--transition);
+            box-shadow: var(--card-shadow); position: relative; overflow: hidden;
+        }
+        .finance-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+        }
+        .finance-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; color: var(--text); letter-spacing: -0.5px;}
+
+        /* 🚨 Notice Box */
+        .notice-box {
+            background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444;
+            padding: 18px 25px; border-radius: 16px; font-size: 14px; color: #ef4444;
+            margin-bottom: 35px; line-height: 1.6; font-weight: 500;
+        }
+        body.dark-mode .notice-box { color: #fca5a5; }
+
+        .section-title { font-size: 12px; font-weight: 800; color: var(--subtext); margin-bottom: 18px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+        /* ☑️ Month Checkboxes */
+        .months-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 18px; margin-bottom: 40px; }
+        .month-label {
+            display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+            border: 1px solid var(--border); border-radius: 16px; cursor: pointer;
+            font-size: 14px; font-weight: 600; color: var(--subtext); transition: var(--transition); background: var(--surface); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .month-label:hover:not(.disabled) { border-color: var(--accent); color: var(--text); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.1);}
+        .month-label.disabled { opacity: 0.4; cursor: not-allowed; }
+        .month-checkbox { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+
+        /* 📄 Iframe Box */
+        .iframe-container {
+            background: var(--surface); border-radius: 20px; padding: 15px; height: 500px;
+            overflow: hidden; margin-bottom: 35px; border: 1px solid var(--border);
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05); transition: var(--transition);
+        }
+        iframe { width: 100%; height: 100%; border: none; border-radius: 12px; background: white; } /* Keep iframe white for PDF preview */
+
+        /* 🚀 Premium Generate Button */
+        .btn-generate {
+            background: linear-gradient(135deg, #10b981, #3b82f6); color: white; border: none;
+            padding: 18px 35px; border-radius: 18px; font-size: 16px; font-weight: 800; letter-spacing: 0.5px;
+            cursor: pointer; width: 100%; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 12px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+        .btn-generate:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4); }
+        .btn-generate:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-finance" class="active">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Career Hub</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${initials}">AD</div>
+            <div class="user-info">
+                <span class="u-name" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Student</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main-wrapper">
+    <div class="topbar animate-up">
+        <h1>Finance & <span style="font-weight: 300; color: var(--subtext);">Payments</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div class="finance-card animate-up delay-1">
+        <h2>🖨️ Generate Payment Slip</h2>
+
+        <div class="notice-box">
+            <strong>Notice:</strong> Voucher Slip ডাউনলোডের পূর্বে সকল তথ্য যথাযথভাবে যাচাই করা আবশ্যক। মাসগুলো অবশ্যই ক্রমানুসারে (Sequentially) সিলেক্ট করতে হবে।
+        </div>
+
+        <div class="section-title">SELECT DUE MONTHS</div>
+        <div class="months-grid">
+            <label class="month-label"><input type="checkbox" class="month-checkbox" value="January"> January</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="February" disabled> February</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="March" disabled> March</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="April" disabled> April</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="May" disabled> May</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="June" disabled> June</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="July" disabled> July</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="August" disabled> August</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="September" disabled> September</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="October" disabled> October</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="November" disabled> November</label>
+            <label class="month-label disabled"><input type="checkbox" class="month-checkbox" value="December" disabled> December</label>
+        </div>
+
+        <div class="section-title">📄 LIVE SLIP PREVIEW</div>
+        <div class="iframe-container animate-up delay-2">
+            <iframe id="slip-iframe" src="/student-finance/preview-slip"></iframe>
+        </div>
+
+        <button class="btn-generate animate-up delay-3" id="generate-btn" onclick="generateSlip()">🚀 Generate & Notify Email</button>
+    </div>
+</div>
+
+<script>
+    // 🔥 DYNAMIC THEME TOGGLE LOGIC
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+        updateCheckboxStyles();
+    }
+
+    const checkboxes = document.querySelectorAll('.month-checkbox');
+    const iframe = document.getElementById('slip-iframe');
+
+    // ✅ Sequential Logic + Live Preview Update
+    checkboxes.forEach((cb, index) => {
+        cb.addEventListener('change', function() {
+            updateCheckboxStyles();
+            updatePreview();
+        });
+    });
+
+    function updateCheckboxStyles() {
+        checkboxes.forEach((cb, index) => {
+            if(cb.checked) {
+                cb.parentElement.style.borderColor = 'var(--accent)';
+                cb.parentElement.style.color = document.body.classList.contains('dark-mode') ? '#f8fafc' : '#ffffff';
+                cb.parentElement.style.background = 'var(--accent)';
+                cb.parentElement.style.transform = 'translateY(-2px)';
+                cb.parentElement.style.boxShadow = '0 5px 15px rgba(99, 102, 241, 0.2)';
+
+                if (index < checkboxes.length - 1) {
+                    checkboxes[index + 1].disabled = false;
+                    checkboxes[index + 1].parentElement.classList.remove('disabled');
+                }
+            } else {
+                // If unchecked, clean styling
+                if (!cb.disabled) {
+                    cb.parentElement.style.borderColor = 'var(--border)';
+                    cb.parentElement.style.color = 'var(--subtext)';
+                    cb.parentElement.style.background = 'var(--surface)';
+                    cb.parentElement.style.transform = 'none';
+                    cb.parentElement.style.boxShadow = 'inset 0 2px 5px rgba(0,0,0,0.02)';
+                }
+
+                // Uncheck and disable subsequent checkboxes cascadingly
+                for (let i = index + 1; i < checkboxes.length; i++) {
+                    if(checkboxes[index].checked === false) {
+                        checkboxes[i].checked = false;
+                        checkboxes[i].disabled = true;
+                        checkboxes[i].parentElement.classList.add('disabled');
+                        checkboxes[i].parentElement.style.borderColor = 'var(--border)';
+                        checkboxes[i].parentElement.style.color = 'var(--subtext)';
+                        checkboxes[i].parentElement.style.background = 'var(--surface)';
+                        checkboxes[i].parentElement.style.transform = 'none';
+                        checkboxes[i].parentElement.style.boxShadow = 'none';
+                    }
+                }
+            }
+        });
+    }
+
+    function updatePreview() {
+        const selectedMonths = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value).join(', ');
+        if (selectedMonths.length > 0) {
+            iframe.src = '/student-finance/preview-slip?months=' + encodeURIComponent(selectedMonths);
+        } else {
+            iframe.src = '/student-finance/preview-slip';
+        }
+    }
+
+    // ✅ PDF Generation & Backend Email Trigger
+    function generateSlip() {
+        const selectedCBs = Array.from(checkboxes).filter(cb => cb.checked);
+        if (selectedCBs.length === 0) {
+            Swal.fire({
+                title: 'No Months Selected',
+                text: 'Please select at least one month sequentially.',
+                icon: 'warning',
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#6366f1',
+                borderRadius: '20px'
+            });
+            return;
+        }
+
+        const selectedMonths = selectedCBs.map(cb => cb.value).join(', ');
+        const btn = document.getElementById('generate-btn');
+        const originalText = btn.innerHTML;
+
+        // Show Loading State
+        btn.innerHTML = '⏳ Generating PDF & Sending Email...';
+        btn.disabled = true;
+
+        const targetElement = document.getElementById('slip-iframe').contentWindow.document.documentElement;
+
+        const opt = {
+            margin:       0.2,
+            filename:     'Nexus_One_Payment_Slip.pdf',
+            image:        { type: 'jpeg', quality: 1.0 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+        };
+
+        // Step 1: Download Locally
+        html2pdf().set(opt).from(targetElement).save().then(() => {
+
+            // Step 2: Create Blob & Send to Backend
+            html2pdf().set(opt).from(targetElement).output('blob').then(function(pdfBlob) {
+                const formData = new FormData();
+                formData.append('months', selectedMonths);
+                formData.append('pdfFile', pdfBlob, 'Payment_Slip.pdf');
+
+                fetch('/student-finance/generate-slip', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+
+                        if (data === 'Success') {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'PDF downloaded locally & sent to your email successfully.',
+                                icon: 'success',
+                                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                                confirmButtonColor: '#10b981',
+                                borderRadius: '20px'
+                            });
+                        } else {
+                            Swal.fire('Error', 'Failed to send email. Please check your backend connection.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        Swal.fire('Error', 'Network Error.', 'error');
+                    });
+            });
+        });
+    }
+
+    // Load Local Storage Theme Settings
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        } else {
+            document.body.classList.add('dark-mode');
+            document.getElementById('theme-icon').innerText = '☀️';
+            document.getElementById('theme-text').innerText = 'Day Mode';
+        }
+        updateCheckboxStyles();
+    };
+</script>
+</body>
+</html>

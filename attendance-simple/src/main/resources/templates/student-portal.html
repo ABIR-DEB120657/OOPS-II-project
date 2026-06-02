@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Nexus One | Premium Experience</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Theme Variables (Light Mode Default) */
+        :root {
+            --bg: #f8fafc;
+            --sidebar-bg: rgba(255, 255, 255, 0.95);
+            --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08);
+            --text: #0f172a;
+            --subtext: #64748b;
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ✅ Dark Mode Variables */
+        body.dark-mode {
+            --bg: #050508;
+            --sidebar-bg: rgba(15, 15, 25, 0.85);
+            --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --subtext: #94a3b8;
+            --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            transition: background 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        /* ✨ Premium Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-up {
+            animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.2s; opacity: 0; }
+        .delay-3 { animation-delay: 0.3s; opacity: 0; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            margin: 20px; border-radius: 30px;
+            padding: 30px 20px; position: fixed;
+            display: flex; flex-direction: column; z-index: 1000;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px; }
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover {
+            background: var(--surface); color: var(--text);
+            transform: translateX(5px);
+        }
+        .menu a.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* ✅ Theme Toggle Button */
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 13px;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); }
+
+        /* 🧱 Main Content */
+        .main { margin-left: 320px; flex: 1; padding: 40px; max-width: 1400px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+
+        /* 💎 Premium Banner */
+        .premium-banner {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 35px; padding: 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; box-shadow: var(--card-shadow);
+            position: relative; overflow: hidden;
+        }
+        .premium-banner::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+        }
+
+        .profile-main { display: flex; align-items: center; gap: 30px; z-index: 1; }
+        .p-avatar {
+            width: 100px; height: 110px; border-radius: 32px;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; font-weight: 800; color: white;
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+            overflow: hidden; /* Added to keep image inside borders */
+        }
+
+        /* 🔥 NEW: THE VIEW PROFILE BUTTON */
+        .btn-view-profile {
+            background: rgba(99, 102, 241, 0.1); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 8px 20px; border-radius: 12px; font-size: 13px; font-weight: 800; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; transition: var(--transition);
+            margin-top: 15px;
+        }
+        .btn-view-profile:hover { background: var(--accent); color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .cgpa-circle {
+            width: 130px; height: 130px; border-radius: 50%;
+            background: conic-gradient(var(--accent) 85%, var(--border) 0%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.25);
+            z-index: 1;
+        }
+        .cgpa-inner {
+            width: 110px; height: 110px; background: var(--bg);
+            border-radius: 50%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+
+        /* 📊 Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .lux-card {
+            background: var(--surface); padding: 30px; border-radius: 28px;
+            border: 1px solid var(--border); transition: var(--transition);
+            box-shadow: var(--card-shadow); position: relative;
+            overflow: hidden;
+        }
+        .lux-card::after {
+            content: ''; position: absolute; top: 0; right: 0;
+            width: 50px; height: 50px; background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            opacity: 0.1; border-radius: 50%;
+        }
+        .lux-card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+
+        /* ✅ FIXED: Sidebar Bottom Layout Cleanup */
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3); overflow: hidden; padding: 0;}
+        .user-info { display: flex; flex-direction: column; overflow: hidden; }
+
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px; gap: 10px;
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2); }
+
+        /* 🔥 LATEST NOTICES DESIGN (As per screenshot) */
+        .notices-container {
+            background: var(--glass-bg); border-radius: 35px;
+            padding: 40px; border: 1px solid var(--border);
+            box-shadow: var(--card-shadow); margin-bottom: 40px;
+        }
+        .notice-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 25px;
+        }
+        .notice-header-left h3 {
+            font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-bottom: 5px;
+        }
+        .notice-header-left p {
+            font-size: 13px; color: var(--subtext); font-weight: 500;
+        }
+        .notice-badge {
+            background: #2563eb; color: white; padding: 6px 14px;
+            border-radius: 20px; font-size: 12px; font-weight: 800; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .notice-list { display: flex; flex-direction: column; gap: 15px; }
+        .notice-item {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 20px 25px; border-radius: 12px; font-size: 15px; font-weight: 600;
+            color: var(--text); line-height: 1.6; transition: var(--transition);
+            border-top: 4px solid var(--accent); /* Default Blue top border */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .notice-item:hover { transform: translateX(5px); box-shadow: 0 8px 25px rgba(0,0,0,0.05); }
+
+        /* For dynamic colors based on content */
+        .notice-item.urgent { border-top-color: #ef4444; color: #ef4444; }
+        .notice-item.success { border-top-color: #10b981; color: #10b981; }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+
+    <div class="menu">
+        <a href="/student-portal" class="active">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-results">📊 Academic Results</a>
+        <a href="/student-finance">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Career Hub</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar">
+                <img th:if="${hasProfilePic}" th:src="@{${profileImagePath}}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                <span th:unless="${hasProfilePic}" th:text="${initials}">AD</span>
+            </div>
+            <div class="user-info">
+                <span style="font-size:14px; font-weight:800; color:var(--text); display:block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Student</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar animate-up">
+        <h1>Dashboard <span style="font-weight: 300; color: var(--subtext);">Experience</span></h1>
+
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span>
+            <span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div class="premium-banner animate-up delay-1">
+        <div class="profile-main">
+            <div class="p-avatar">
+                <img th:if="${hasProfilePic}" th:src="@{${profileImagePath}}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                <span th:unless="${hasProfilePic}" th:text="${initials}">AD</span>
+            </div>
+            <div>
+                <h2 style="font-size: 34px; font-weight: 800; letter-spacing: -0.5px;" th:text="${student.name}">Abir Deb</h2>
+                <p style="color: var(--subtext); margin-top: 6px; font-size: 15px; font-weight: 500;">
+                    ID: <span style="color: var(--text); font-weight: 700;" th:text="${student.studentId}">0622...</span> |
+                    Batch: <span style="color: var(--text); font-weight: 700;" th:text="${student.batch}">CSE 18th</span>
+                </p>
+                <a href="/student-profile" class="btn-view-profile">⚙️ View & Edit Profile</a>
+            </div>
+        </div>
+        <div class="cgpa-circle">
+            <div class="cgpa-inner">
+                <h2 style="font-size: 30px; font-weight: 800;" th:text="${cgpa}">2.42</h2>
+                <span style="font-size: 11px; color: var(--accent); font-weight: 800; letter-spacing: 1px;">CGPA</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="animate-up delay-1" style="margin-bottom: 30px;">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--subtext); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">🧠 Nexus Intelligence</h3>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div th:each="insight, iterStat : ${aiInsights}"
+                 style="padding: 16px 20px; border-radius: 16px; display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 600; box-shadow: var(--card-shadow); border: 1px solid var(--border);"
+                 th:styleappend="${aiInsights != null and insightTypes[iterStat.index] == 'danger'} ? 'background: rgba(239, 68, 68, 0.1); color: #ef4444; border-left: 4px solid #ef4444;' :
+                                 (${aiInsights != null and insightTypes[iterStat.index] == 'warning'} ? 'background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-left: 4px solid #f59e0b;' :
+                                 (${aiInsights != null and insightTypes[iterStat.index] == 'success'} ? 'background: rgba(16, 185, 129, 0.1); color: #10b981; border-left: 4px solid #10b981;' :
+                                 'background: rgba(99, 102, 241, 0.1); color: var(--accent); border-left: 4px solid var(--accent);'))">
+
+                <span th:if="${insightTypes[iterStat.index] == 'danger'}" style="font-size: 20px;">🚨</span>
+                <span th:if="${insightTypes[iterStat.index] == 'warning'}" style="font-size: 20px;">⚠️</span>
+                <span th:if="${insightTypes[iterStat.index] == 'success'}" style="font-size: 20px;">✨</span>
+                <span th:if="${insightTypes[iterStat.index] == 'info'}" style="font-size: 20px;">💡</span>
+
+                <span th:text="${insight}">AI Insight goes here...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid animate-up delay-2">
+        <div class="lux-card">
+            <p style="font-size: 13px; color: var(--subtext); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Attendance</p>
+            <div style="font-size: 32px; font-weight: 800; margin-top: 12px; color: var(--text);" th:text="${attendance} + '%'">100.0%</div>
+        </div>
+        <div class="lux-card">
+            <p style="font-size: 13px; color: var(--subtext); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Standing</p>
+            <div style="font-size: 32px; font-weight: 800; margin-top: 12px; color: #10b981;">Good</div>
+        </div>
+        <div class="lux-card">
+            <p style="font-size: 13px; color: var(--subtext); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Courses</p>
+            <div style="font-size: 32px; font-weight: 800; margin-top: 12px; color: var(--text);">12 <span style="font-size: 18px; font-weight: 600; color: var(--subtext);">Done</span></div>
+        </div>
+    </div>
+
+    <div class="notices-container animate-up delay-3">
+        <div class="notice-header">
+            <div class="notice-header-left">
+                <h3>Latest Notices</h3>
+                <p>Important notices and announcements from authority</p>
+            </div>
+            <div class="notice-badge" th:text="${latestNotices != null ? latestNotices.size() + ' Notices' : '0 Notices'}">4 Notices</div>
+        </div>
+
+        <div class="notice-list">
+            <div th:if="${latestNotices == null or latestNotices.isEmpty()}" style="text-align: center; color: var(--subtext); padding: 20px; font-style: italic;">
+                No notices available at the moment.
+            </div>
+
+            <div th:each="notice : ${latestNotices}"
+                 class="notice-item"
+                 th:classappend="${#strings.containsIgnoreCase(notice, 'red') or #strings.containsIgnoreCase(notice, 'urgent') ? 'urgent' : (#strings.containsIgnoreCase(notice, 'green') or #strings.containsIgnoreCase(notice, 'success') ? 'success' : '')}"
+                 th:text="${notice}">
+                This is a sample notice text.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️';
+            text.innerText = 'Day Mode';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙';
+            text.innerText = 'Night Mode';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        }
+    };
+</script>
+
+</body>
+</html>

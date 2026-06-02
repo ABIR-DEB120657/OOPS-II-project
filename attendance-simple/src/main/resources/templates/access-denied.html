@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Access Denied - Nexus One</title>
+    <meta charset="UTF-8"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e1b4b, #4f46e5);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card {
+            background: white; border-radius: 24px;
+            padding: 56px 48px; text-align: center;
+            max-width: 460px; width: 100%;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+        }
+        .icon { font-size: 72px; margin-bottom: 20px; }
+        h1 { font-size: 26px; font-weight: 700; color: #1e1b4b; margin-bottom: 12px; }
+        p  { color: #888; font-size: 15px; line-height: 1.7; margin-bottom: 8px; }
+
+        .role-badge {
+            display: inline-block;
+            background: #eef2ff; color: #4f46e5;
+            border-radius: 20px; padding: 6px 20px;
+            font-size: 13px; font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            display: inline-block; padding: 14px 36px;
+            background: #4f46e5; color: white; border-radius: 12px;
+            text-decoration: none; font-size: 15px; font-weight: 700;
+            transition: 0.2s; margin: 6px;
+        }
+        .btn:hover { background: #4338ca; }
+
+        .btn-outline {
+            display: inline-block; padding: 14px 36px;
+            border: 2px solid #e2e8f0; color: #888; border-radius: 12px;
+            text-decoration: none; font-size: 15px; font-weight: 600;
+            transition: 0.2s; margin: 6px;
+        }
+        .btn-outline:hover { border-color: #4f46e5; color: #4f46e5; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">🔒</div>
+    <h1>Access Denied!</h1>
+    <p>You do not have permission to access this page.<br>
+        Only authorized users are permitted to view this section.</p>
+
+    <div class="role-badge" th:text="'Current Role: ' + ${role}">Current Role: UNKNOWN</div>
+
+    <br>
+
+    <a th:if="${role == 'ADMIN'}"    href="/dashboard"      class="btn">🏠 Dashboard</a>
+    <a th:if="${role == 'TEACHER'}"  href="/teacher-portal" class="btn">🏠 Teacher Portal</a>
+    <a th:if="${role == 'STUDENT'}"  href="/student-portal" class="btn">🏠 Student Portal</a>
+    <a th:if="${role == null or role == 'UNKNOWN'}" href="/login" class="btn">🔑 Login</a>
+
+    <a href="/logout" class="btn-outline">🚪 Logout</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Leave Request | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.2s; opacity: 0; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .main { margin-left: 320px; flex: 1; padding: 40px; max-width: 1200px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px;}
+
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border); padding: 10px 20px;
+            border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            color: var(--text); font-weight: 700; font-size: 13px; transition: var(--transition); box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); }
+
+        /* 📝 Premium Form Card */
+        .lux-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 35px; padding: 40px; box-shadow: var(--card-shadow); margin-bottom: 35px;
+            position: relative; overflow: hidden;
+        }
+        .lux-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+        }
+        .lux-card h3 { font-size: 22px; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--subtext); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;}
+        .input-control {
+            width: 100%; padding: 16px 20px; border-radius: 16px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px;
+            font-weight: 500; outline: none; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .input-control:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); background: var(--bg);}
+
+        select.input-control { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat: no-repeat; background-position: right 15px center; }
+        ::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none;
+            padding: 18px; width: 100%; border-radius: 16px; font-weight: 800; cursor: pointer;
+            transition: var(--transition); font-size: 15px; margin-top: 15px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4); }
+
+        /* 📊 Premium Table */
+        table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+        th { padding: 0 20px 10px; text-align: left; font-size: 12px; font-weight: 700; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px;}
+        td { padding: 22px 20px; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; transition: var(--transition);}
+        td:first-child { border-left: 1px solid var(--border); border-radius: 20px 0 0 20px; }
+        td:last-child { border-right: 1px solid var(--border); border-radius: 0 20px 20px 0; }
+
+        tbody tr { transition: var(--transition); }
+        tbody tr:hover td { background: var(--glass-bg); transform: scale(1.01); border-color: rgba(99, 102, 241, 0.3); }
+
+        .status-badge { padding: 8px 16px; border-radius: 12px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px;}
+        .status-APPROVED { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .status-REJECTED { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .status-PENDING { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+
+        /* 🔥 Premium Action Buttons */
+        .btn-action { padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-edit { background: rgba(99, 102, 241, 0.1); color: var(--accent); }
+        .btn-edit:hover { background: var(--accent); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99,102,241,0.3);}
+        .btn-cancel { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .btn-cancel:hover { background: #ef4444; color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239,68,68,0.3);}
+
+        /* 🪟 Animated Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none;
+            align-items: center; justify-content: center; z-index: 2000; opacity: 0; transition: 0.3s;
+        }
+        .modal-card {
+            background: var(--surface); padding: 40px; border-radius: 30px; width: 100%;
+            max-width: 600px; border: 1px solid var(--border); box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            transform: scale(0.9); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-overlay.active .modal-card { transform: scale(1); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; }
+        .user-card { background: var(--surface); border-radius: 20px; padding: 15px; border: 1px solid var(--border); margin-bottom: 15px; box-shadow: var(--card-shadow);}
+        .logout-btn {
+            width: 100%; padding: 15px; border-radius: 18px; background: rgba(239, 68, 68, 0.1);
+            color: #f87171; text-decoration: none; font-size: 14px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center; gap: 10px; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+        .logout-btn:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="sidebar-menus">
+        <div class="menu">
+            <a href="/student-portal">💠 Dashboard</a>
+            <a href="/student-profile">👤 My Profile</a>
+            <a href="/student-finance">💎 Finance & Fees</a>
+            <a href="/student-leave" class="active">📅 Leave Request</a>
+            <a href="/student-assignments">📚 Assignments</a>
+
+            <a href="/student-outlines">📑 Course Outlines</a>
+
+            <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+            <a href="/student-jobs">💼 Career Hub</a>
+            <a href="/student-blood-finder">🩸 Blood Finder</a>
+            <a href="/my-notifications">🔔 Notifications</a>
+        </div>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="user-card">
+            <p style="font-size: 15px; font-weight: 800; text-align: center;" th:text="${student.name}">Abir Deb</p>
+        </div>
+        <a href="/logout" class="logout-btn">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar animate-up">
+        <h1>Leave <span style="font-weight: 300; color: var(--subtext);">Application</span></h1>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span><span id="theme-text">Day Mode</span>
+        </button>
+    </div>
+
+    <div class="lux-card animate-up delay-1">
+        <h3>📝 Submit New Request</h3>
+
+        <form action="/student-leave/submit" method="POST">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>From Date</label>
+                    <input type="date" name="fromDate" id="fromDate" class="input-control" required>
+                </div>
+                <div class="input-group">
+                    <label>To Date</label>
+                    <input type="date" name="toDate" id="toDate" class="input-control" required>
+                </div>
+            </div>
+
+            <div class="input-grid" style="margin-bottom: 25px;">
+                <div class="input-group">
+                    <label>Your Department</label>
+                    <select name="department" class="input-control" required>
+                        <option value="" disabled selected>— Select Department —</option>
+                        <option value="CSE">Computer Science (CSE)</option>
+                        <option value="EEE">Electrical (EEE)</option>
+                        <option value="BBA">Business Admin (BBA)</option>
+                        <option value="English">English</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Civil">Civil Engineering</option>
+                        <option value="Law">Law</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Authorize Teacher</label>
+                    <select name="teacherId" class="input-control" required>
+                        <option value="" disabled selected>— Select Faculty Member —</option>
+                        <option th:each="t : ${teachers}" th:value="${t.teacherId}" th:text="${t.name}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Reason for Leave</label>
+                <textarea name="reason" class="input-control" rows="3" placeholder="Explain your reason clearly..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" onclick="this.innerHTML='⏳ Dispatching Application...';">Dispatch Application 🚀</button>
+        </form>
+    </div>
+
+    <div class="history-section animate-up delay-2">
+        <h3 style="margin-bottom: 25px; font-weight: 800; font-size: 22px;">Application History</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Duration</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${leaves == null or leaves.isEmpty()}">
+                <td colspan="4" style="text-align: center; color: var(--subtext); padding: 50px; background: none; border: 2px dashed var(--border); border-radius: 20px;">
+                    <div style="font-size: 30px; margin-bottom: 10px;">📜</div>
+                    No leave history found.
+                </td>
+            </tr>
+            <tr th:each="l : ${leaves}">
+                <td>
+                    <div style="font-weight: 800; color: var(--accent);" th:text="${l.fromDate} + ' to'"></div>
+                    <div style="font-size: 13px; color: var(--subtext); font-weight: 600; margin-top: 4px;" th:text="${l.toDate}"></div>
+                </td>
+                <td th:text="${l.reason}" style="max-width: 300px; color: var(--subtext); line-height: 1.5;">Reason</td>
+                <td>
+                    <span class="status-badge" th:classappend="'status-' + ${l.status}" th:text="${l.status}">PENDING</span>
+                </td>
+                <td>
+                    <div th:if="${l.status == 'PENDING'}" style="display: flex; gap: 12px;">
+                        <button type="button" class="btn-action btn-edit" title="Edit Request"
+                                th:attr="data-id=${l.leaveId}, data-from=${l.fromDate}, data-to=${l.toDate}, data-dept=${l.department}, data-tid=${l.teacherId}, data-reason=${l.reason}">
+                            ✏️ Edit
+                        </button>
+
+                        <button type="button" class="btn-action btn-cancel" title="Cancel Request"
+                                th:attr="data-id=${l.leaveId}">
+                            ❌ Cancel
+                        </button>
+                    </div>
+                    <div th:if="${l.status != 'PENDING'}" style="color: var(--subtext); font-size: 13px; font-weight: 800; text-align: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px;">
+                        🔒 Locked
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+        <h2 style="margin-bottom:25px; color:var(--text); font-weight: 800;">✏️ Edit Leave Request</h2>
+        <form action="/student-leave/edit" method="POST">
+            <input type="hidden" name="leaveId" id="editLeaveId">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>From Date</label><input type="date" name="fromDate" id="editFromDate" class="input-control" required>
+                </div>
+                <div class="input-group">
+                    <label>To Date</label><input type="date" name="toDate" id="editToDate" class="input-control" required>
+                </div>
+            </div>
+            <div class="input-grid" style="margin-bottom: 20px;">
+                <div class="input-group">
+                    <label>Department</label>
+                    <select name="department" id="editDepartment" class="input-control" required>
+                        <option value="CSE">Computer Science (CSE)</option>
+                        <option value="EEE">Electrical (EEE)</option>
+                        <option value="BBA">Business Admin (BBA)</option>
+                        <option value="English">English</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Civil">Civil Engineering</option>
+                        <option value="Law">Law</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Teacher</label>
+                    <select name="teacherId" id="editTeacherId" class="input-control" required>
+                        <option th:each="t : ${teachers}" th:value="${t.teacherId}" th:text="${t.name}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Reason</label>
+                <textarea name="reason" id="editReason" class="input-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn-submit" onclick="this.innerHTML='⏳ Updating...';">Update Application 🚀</button>
+            <button type="button" onclick="closeEditModal()" style="margin-top:20px; width:100%; border:none; background:none; color:var(--subtext); cursor:pointer; font-weight: 800; font-size: 14px; transition: 0.3s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--subtext)'">Cancel Modification</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body; const icon = document.getElementById('theme-icon'); const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) { icon.innerText = '☀️'; text.innerText = 'Day Mode'; localStorage.setItem('theme', 'dark'); }
+        else { icon.innerText = '🌙'; text.innerText = 'Night Mode'; localStorage.setItem('theme', 'light'); }
+    }
+
+    function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+    // Event Listeners for Custom Data Attributes (Maintains 100% original logic)
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // 1. EDIT BUTTONS
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('editLeaveId').value = this.getAttribute('data-id');
+                document.getElementById('editFromDate').value = this.getAttribute('data-from');
+                document.getElementById('editToDate').value = this.getAttribute('data-to');
+                document.getElementById('editDepartment').value = this.getAttribute('data-dept');
+                document.getElementById('editTeacherId').value = this.getAttribute('data-tid');
+                document.getElementById('editReason').value = this.getAttribute('data-reason');
+
+                document.getElementById('editToDate').setAttribute('min', this.getAttribute('data-from'));
+                document.getElementById('editModal').classList.add('active');
+            });
+        });
+
+        // 2. CANCEL BUTTONS
+        document.querySelectorAll('.btn-cancel').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const leaveId = this.getAttribute('data-id');
+                Swal.fire({
+                    title: 'Cancel Request?',
+                    text: "Are you sure you want to cancel this leave request? The teacher will be notified.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                    color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                    confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Yes, Cancel it!',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let f = document.createElement('form');
+                        f.method = 'POST'; f.action = '/student-leave/cancel';
+                        let i = document.createElement('input');
+                        i.type = 'hidden'; i.name = 'leaveId'; i.value = leaveId;
+                        f.appendChild(i); document.body.appendChild(f);
+                        f.submit();
+                    }
+                });
+            });
+        });
+
+        // 3. DATE VALIDATION
+        const fromDate = document.getElementById('fromDate');
+        const toDate = document.getElementById('toDate');
+        const today = new Date().toISOString().split('T')[0];
+
+        fromDate.setAttribute('min', today);
+        fromDate.addEventListener('change', function() {
+            toDate.setAttribute('min', this.value);
+            if(toDate.value && toDate.value < this.value) toDate.value = this.value;
+        });
+
+        // 4. THEME & SWEETALERT NOTIFICATIONS (URL CLEANUP)
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') { document.body.classList.remove('dark-mode'); document.getElementById('theme-icon').innerText = '🌙'; document.getElementById('theme-text').innerText = 'Night Mode'; }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            let msg = 'Operation successful!';
+            let type = urlParams.get('success');
+            if (type === 'submitted') msg = 'Your leave application has been sent.';
+            if (type === 'edited') msg = 'Your leave application has been updated.';
+            if (type === 'canceled') msg = 'Your leave request has been canceled.';
+
+            // ✅ URL CLEANUP BEFORE SHOWING ALERT
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            Swal.fire({
+                title: 'Success!',
+                text: msg,
+                icon: 'success',
+                background: document.body.classList.contains('dark-mode') ? '#1e293b' : '#ffffff',
+                color: document.body.classList.contains('dark-mode') ? '#f8fafc' : '#0f172a',
+                confirmButtonColor: '#6366f1',
+                borderRadius: '20px'
+            });
+        }
+    });
+</script>
+</body>
+</html>

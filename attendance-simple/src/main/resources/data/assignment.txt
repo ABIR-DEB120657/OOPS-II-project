@@ -1,0 +1,5 @@
+1|CSE-2104|Data Structure Lab|abir deb|aaaaaaaaaa|18th|2026-05-18|2026-05-19||0|TEMPLATE|
+1|CSE-2104|Data Structure Lab|abir deb|aaaaaaaaaa|18th|2026-05-18|2026-05-19|1_06224205101029_1_recursion_basic_theory.docx|28|REJECTED|18 May, 01:42 PM
+1|CSE-2104|Data Structure Lab|abir deb|aaaaaaaaaa|18th|2026-05-18|2026-05-19|1_06224205101024_1_recursion_basic_theory.docx|22|APPROVED|19 May, 12:57 PM
+2|CSE-1202|Structure Programming Language Lab|abir deb|hasbdhasbhdhasbh|18th|2026-05-24|2026-05-30||0|TEMPLATE|
+3|CSE-1202|Structure Programming Language Lab|abir deb|ydyuqgaydaw|18th|2026-05-24|2026-05-30||0|TEMPLATE|

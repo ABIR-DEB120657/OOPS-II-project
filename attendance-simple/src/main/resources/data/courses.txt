@@ -1,0 +1,66 @@
+CSE-1101|Computer Fundamentals|1st Year - 1st Semester|T001
+CSE-1103|Electrical Circuit|1st Year - 1st Semester|T001
+CSE-1104|Electrical Circuit Lab.|1st Year - 1st Semester|T001
+PHY-1102|Physics-I Lab.|1st Year - 1st Semester|T001
+MATH-1101|Differential and Integral Calculus|1st Year - 1st Semester|T001
+ENG-1101|English-I|1st Year - 1st Semester|T001
+HUM-1101|Emergence of Bangladesh|1st Year - 1st Semester|T001
+CSE-1201|Structure Programming Language|1st Year - 2nd Semester|T002
+CSE-1202|Structure Programming Language Lab|1st Year - 2nd Semester|T002
+CSE-1203|Discrete Mathematics|1st Year - 2nd Semester|T002
+CSE-1205|Electronics|1st Year - 2nd Semester|T002
+CSE-1206|Electronics Lab|1st Year - 2nd Semester|T002
+CSE-1208|Engineering Drawing and Auto CAD Lab|1st Year - 2nd Semester|T002
+PHY-1201|Physics-II|1st Year - 2nd Semester|T002
+ENG-1201|English-II|1st Year - 2nd Semester|T002
+MATH-1201|Co-ordinate Geometry and Vector Analysis|1st Year - 2nd Semester|T002
+CSE-2101|Object Oriented Programming-I|2nd Year - 1st Semester|T003
+CSE-2102|Object Oriented Programming-I Lab|2nd Year - 1st Semester|T003
+CSE-2103|Data Structure|2nd Year - 1st Semester|T003
+CSE-2104|Data Structure Lab|2nd Year - 1st Semester|T003
+CSE-2105|Computer Architecture and Organization|2nd Year - 1st Semester|T003
+CSE-2107|Digital Logic Design|2nd Year - 1st Semester|T003
+CSE-2108|Digital Logic Design Lab|2nd Year - 1st Semester|T003
+MATH-2101|Linear Algebra and Matrix Analysis|2nd Year - 1st Semester|T003
+ECO-2101|Economics|2nd Year - 1st Semester|T003
+ACC-2101|Financial, Cost and Managerial Accounting|2nd Year - 1st Semester|T003
+CSE-2201|Object Oriented Programming-II|2nd Year - 2nd Semester|T004
+CSE-2202|Object Oriented Programming-II Lab|2nd Year - 2nd Semester|T004
+CSE-2203|Design and Analysis of Algorithm|2nd Year - 2nd Semester|T004
+CSE-2204|Design and Analysis of Algorithm Lab|2nd Year - 2nd Semester|T004
+CSE-2205|Numerical Methods|2nd Year - 2nd Semester|T004
+CSE-2207|Digital System Design|2nd Year - 2nd Semester|T004
+CSE-2208|Digital System Design Lab.|2nd Year - 2nd Semester|T004
+MATH-2201|Complex Variable, Laplace, Fourier and Z-Transformation|2nd Year - 2nd Semester|T004
+CSE-3101|Database Management System|3rd Year - 1st Semester|T005
+CSE-3102|Database Management System Lab.|3rd Year - 1st Semester|T005
+CSE-3103|Operating System|3rd Year - 1st Semester|T005
+CSE-3104|Operating System Lab.|3rd Year - 1st Semester|T005
+CSE-3105|Theory of Computation|3rd Year - 1st Semester|T005
+CSE-3107|Microprocessor, Micro Controller and Embedded Systems|3rd Year - 1st Semester|T005
+CSE-3108|Microprocessor, Micro Controller and Embedded Systems Lab.|3rd Year - 1st Semester|T005
+CSE-3109|System Analysis and Design|3rd Year - 1st Semester|T005
+CSE-3111|Data Communication|3rd Year - 1st Semester|T005
+CSE-3201|Compiler Design|3rd Year - 2nd Semester|T006
+CSE-3202|Compiler Design Lab.|3rd Year - 2nd Semester|T006
+CSE-3203|Software Engineering|3rd Year - 2nd Semester|T006
+CSE-3204|Software Engineering Lab.|3rd Year - 2nd Semester|T006
+CSE-3205|Computer Peripheral and Interfacing|3rd Year - 2nd Semester|T006
+CSE-3206|Computer Peripheral and Interfacing Lab.|3rd Year - 2nd Semester|T006
+CSE-3207|Web Engineering|3rd Year - 2nd Semester|T006
+CSE-3208|Web Engineering Lab.|3rd Year - 2nd Semester|T006
+CSE-3209|Computer Networks|3rd Year - 2nd Semester|T006
+CSE-3210|Computer Networks Lab.|3rd Year - 2nd Semester|T006
+CSE-3299|Project Development|3rd Year - 2nd Semester|T006
+CSE-4101|Artificial Intelligence|4th Year - 1st Semester|T007
+CSE-4102|Artificial Intelligence Lab.|4th Year - 1st Semester|7
+CSE-4103|Computer Graphics and Animation|4th Year - 1st Semester|T007
+CSE-4104|Computer Graphics and Animation Lab.|4th Year - 1st Semester|T007
+CSE-4105|Digital Signal Processing|4th Year - 1st Semester|T007
+CSE-4106|Digital Signal Processing Lab.|4th Year - 1st Semester|T007
+CSE-4107|Data Mining|4th Year - 1st Semester|T007
+CSE-4100|Option-I|4th Year - 1st Semester|T007
+CSE-410|Option-I Lab.|4th Year - 1st Semester|T007
+CSE-4201|Neural Network and Fuzzy Systems|4th Year - 2nd Semester|T008
+CSE-4202|Neural Network and Fuzzy Systems Lab.|4th Year - 2nd Semester|T008
+CSE-4203|Final Year Project (Nexus One)|4th Year - 2nd Semester|T012

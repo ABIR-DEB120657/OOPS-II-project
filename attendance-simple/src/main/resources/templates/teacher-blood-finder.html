@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Blood Finder - Teacher Portal</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --primary: #EF4444;
+            --primary-hover: #DC2626;
+            --primary-light: #FEF2F2;
+            --secondary: #6366F1;
+            --secondary-light: #EEF2FF;
+            --success: #10B981;
+            --success-bg: #ECFDF5;
+            --warning: #F59E0B;
+            --warning-bg: #FFFBEB;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-float: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        body.dark {
+            --bg: #0F172A;
+            --surface: #1E293B;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --primary-light: rgba(239,68,68,0.15);
+            --secondary-light: rgba(99,102,241,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text-main); min-height:100vh; display:flex; -webkit-font-smoothing:antialiased; }
+
+        /* SIDEBAR */
+        .sidebar { width:260px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+        .sidebar-header { padding:24px 20px; display:flex; align-items:center; gap:12px; }
+        .logo-img { width:36px; height:36px; border-radius:var(--radius-sm); }
+        .logo-text { font-weight:700; font-size:15px; line-height:1.2; letter-spacing:-0.01em; }
+        .logo-sub { color:var(--text-muted); font-size:11px; font-weight:500; }
+        .menu-section { padding:0 12px; flex:1; overflow-y:auto; }
+        .menu-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:16px 0 8px 12px; font-weight:600; }
+        .menu-item { display:flex; align-items:center; gap:12px; padding:10px 12px; margin-bottom:4px; border-radius:var(--radius-md); text-decoration:none; color:var(--text-muted); font-size:14px; font-weight:500; transition:var(--transition); border-left:3px solid transparent; }
+        .menu-item svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
+        .menu-item:hover { background:var(--bg); color:var(--text-main); }
+        .menu-item.active { background:var(--primary-light); color:var(--primary); border-left-color:var(--primary); font-weight:600; }
+        .sidebar-footer { padding:16px; border-top:1px solid var(--border); }
+        .user-card { display:flex; align-items:center; gap:12px; padding:12px; border-radius:var(--radius-md); background:var(--bg); border:1px solid var(--border); text-decoration:none; transition:var(--transition); }
+        .user-card:hover { border-color:var(--secondary); }
+        .avatar-wrap { position:relative; width:36px; height:36px; }
+        .avatar { width:100%; height:100%; border-radius:10px; object-fit:cover; background:var(--secondary); color:white; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; }
+        .status-dot { position:absolute; bottom:-2px; right:-2px; width:12px; height:12px; background:var(--success); border:2px solid var(--bg); border-radius:50%; }
+        .user-info { flex:1; overflow:hidden; }
+        .user-name { font-size:13px; font-weight:600; color:var(--text-main); white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+        .user-role { font-size:11px; color:var(--text-muted); }
+
+        /* MAIN */
+        .main-wrapper { margin-left:260px; flex:1; display:flex; flex-direction:column; }
+        .topbar { height:70px; padding:0 32px; display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.8); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50; }
+        body.dark .topbar { background:rgba(30,41,59,0.8); }
+        .search-bar { position:relative; width:320px; }
+        .search-bar input { width:100%; padding:10px 16px 10px 40px; border-radius:99px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); font-size:13px; outline:none; transition:var(--transition); }
+        .search-bar input:focus { border-color:var(--secondary); box-shadow:0 0 0 3px var(--secondary-light); background:var(--surface); }
+        .search-bar svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--text-muted); }
+        .topbar-actions { display:flex; align-items:center; gap:16px; }
+        .icon-btn { width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition); position:relative; }
+        .icon-btn:hover { color:var(--text-main); border-color:var(--text-muted); }
+        .container { padding:32px; max-width:1200px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:32px; }
+
+        /* PAGE HEADER */
+        .page-header { display:flex; justify-content:space-between; align-items:flex-end; }
+        .page-title h1 { font-size:24px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; display:flex; align-items:center; gap:8px; color:var(--text-main); }
+        .page-title p { font-size:14px; color:var(--text-muted); }
+        .btn-primary { background:var(--primary); color:white; padding:10px 20px; border-radius:var(--radius-md); font-size:14px; font-weight:600; cursor:pointer; border:none; display:flex; align-items:center; gap:8px; transition:var(--transition); box-shadow:0 4px 10px rgba(239,68,68,0.2); }
+        .btn-primary:hover { background:var(--primary-hover); transform:translateY(-1px); box-shadow:0 6px 15px rgba(239,68,68,0.3); }
+
+        /* STATS */
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+        .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-sm); transition:var(--transition); }
+        .stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:#cbd5e1; }
+        .stat-header { display:flex; justify-content:space-between; align-items:flex-start; }
+        .stat-title { font-size:13px; font-weight:600; color:var(--text-muted); }
+        .stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+        .stat-icon svg { width:18px; height:18px; }
+        .stat-value { font-size:28px; font-weight:800; letter-spacing:-0.02em; color:var(--text-main); }
+        .ic-indigo { color:var(--secondary); background:var(--secondary-light); }
+        .ic-red { color:var(--primary); background:var(--primary-light); }
+        .ic-green { color:var(--success); background:var(--success-bg); }
+
+        /* LAYOUT */
+        .layout-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; align-items:start; }
+        .feed-section { display:flex; flex-direction:column; gap:16px; }
+
+        /* FILTER CHIPS */
+        .filter-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .filter-chips { display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+        .chip { padding:5px 14px; border-radius:99px; border:1px solid var(--border); background:var(--surface); font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:var(--transition); }
+        .chip:hover { border-color:var(--secondary); color:var(--secondary); }
+        .chip.active { background:var(--primary); color:white; border-color:var(--primary); box-shadow:0 2px 8px rgba(239,68,68,0.25); }
+
+        /* RESULT COUNT */
+        .result-info { font-size:12px; color:var(--text-muted); font-weight:500; white-space:nowrap; }
+        .result-info strong { color:var(--text-main); font-weight:700; }
+
+        /* =============================================
+           NEW: COMPACT TABLE-STYLE DONOR LIST
+        ============================================= */
+
+        .donor-table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Table header */
+        .dt-header {
+            display: grid;
+            grid-template-columns: 36px 1fr 100px 160px 90px 80px;
+            gap: 0;
+            padding: 0 16px;
+            height: 40px;
+            align-items: center;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+        .dt-th {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .dt-th.right { text-align: right; }
+        .dt-th.center { text-align: center; }
+
+        /* Donor rows */
+        .dt-body { }
+
+        .dt-row {
+            display: grid;
+            grid-template-columns: 36px 1fr 100px 160px 90px 80px;
+            gap: 0;
+            padding: 0 16px;
+            height: 52px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s ease;
+            cursor: default;
+        }
+        .dt-row:last-child { border-bottom: none; }
+        .dt-row:hover { background: var(--bg); }
+        .dt-row.emergency-row { border-left: 3px solid var(--success); }
+        .dt-row.emergency-row:hover { background: rgba(16,185,129,0.04); }
+
+        /* Col: Index */
+        .dt-idx {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Col: Name + status */
+        .dt-name-wrap { display:flex; align-items:center; gap:10px; min-width:0; }
+        .dt-mini-avatar {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: flex; align-items:center; justify-content:center;
+            font-size: 12px; font-weight: 700; color: white;
+            flex-shrink: 0;
+        }
+        .av-indigo-grad { background: linear-gradient(135deg,var(--secondary),#818CF8); }
+        .av-red-grad    { background: linear-gradient(135deg,var(--primary),#F87171); }
+
+        .dt-name-text {
+            display: flex; flex-direction: column; gap: 1px; min-width:0;
+        }
+        .dt-name {
+            font-size: 13px; font-weight: 600; color: var(--text-main);
+            white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .dt-avail-tag {
+            display: inline-flex; align-items:center; gap:3px;
+            font-size: 10px; font-weight: 700; color: var(--success);
+            letter-spacing: 0.02em;
+        }
+        .dt-avail-dot {
+            width: 5px; height:5px; border-radius:50%;
+            background: var(--success);
+            box-shadow: 0 0 5px var(--success);
+        }
+
+        /* Col: Blood */
+        .dt-blood { text-align:center; }
+        .blood-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px; font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+        .blood-pill.type-emg { background:var(--primary-light); color:var(--primary); border:1px solid rgba(239,68,68,0.2); }
+        .blood-pill.type-gen { background:var(--secondary-light); color:var(--secondary); border:1px solid rgba(99,102,241,0.15); }
+
+        /* Col: Phone */
+        .dt-phone {
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        /* Col: Location */
+        .dt-loc {
+            font-size: 12px; color: var(--text-muted); font-weight:500;
+            white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        /* Col: Action */
+        .dt-action { display:flex; justify-content:flex-end; }
+        .call-btn {
+            display: inline-flex; align-items:center; gap:5px;
+            padding: 5px 12px; border-radius:99px;
+            border: 1px solid var(--border); background: var(--surface);
+            font-size: 11px; font-weight: 600; color: var(--text-muted);
+            text-decoration: none; transition: var(--transition);
+            white-space: nowrap;
+        }
+        .call-btn svg { width:12px; height:12px; }
+        .call-btn:hover { background: var(--success-bg); border-color: var(--success); color: var(--success); transform:translateY(-1px); }
+
+        /* VIRTUAL SCROLL CONTAINER */
+        .donor-list-scroll {
+            max-height: 540px;
+            overflow-y: auto;
+            /* Custom scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .donor-list-scroll::-webkit-scrollbar { width: 6px; }
+        .donor-list-scroll::-webkit-scrollbar-track { background: transparent; }
+        .donor-list-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+        .donor-list-scroll::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        /* PAGINATION BAR */
+        .pagination-bar {
+            display: flex; align-items:center; justify-content:space-between;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .pg-info { font-size: 12px; color: var(--text-muted); font-weight:500; }
+        .pg-info strong { color: var(--text-main); }
+        .pg-controls { display:flex; gap:4px; }
+        .pg-btn {
+            min-width: 32px; height: 32px; padding: 0 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border); background: var(--surface);
+            font-size: 12px; font-weight: 600; color: var(--text-muted);
+            cursor: pointer; transition: var(--transition);
+            display:flex; align-items:center; justify-content:center;
+        }
+        .pg-btn:hover:not(:disabled) { border-color:var(--secondary); color:var(--secondary); }
+        .pg-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
+        .pg-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+        /* Empty State */
+        .empty-state { text-align:center; padding:64px 20px; background:var(--surface); border-radius:var(--radius-lg); border:1px dashed var(--border); display:flex; flex-direction:column; align-items:center; gap:16px; }
+        .empty-state svg { color:var(--text-muted); opacity:0.5; }
+        .empty-state h3 { font-size:16px; font-weight:700; color:var(--text-main); }
+        .empty-state p { font-size:14px; color:var(--text-muted); max-width:300px; margin:0 auto; line-height:1.5; }
+
+        /* RIGHT PANEL */
+        .right-panel { display:flex; flex-direction:column; gap:24px; }
+        .panel-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow-sm); }
+        .panel-title { font-size:15px; font-weight:700; color:var(--text-main); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+        .status-widget { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; }
+        .status-widget p { font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.4; }
+        .btn-outline { width:100%; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--surface); font-size:13px; font-weight:600; color:var(--text-main); cursor:pointer; transition:var(--transition); text-align:center; }
+        .btn-outline:hover { background:var(--bg); border-color:var(--text-muted); }
+        .urgent-list { display:flex; flex-direction:column; gap:12px; }
+        .urgent-card { background:var(--primary-light); border:1px solid rgba(239,68,68,0.2); border-left:4px solid var(--primary); border-radius:var(--radius-md); padding:16px; transition:var(--transition); }
+        .urgent-card:hover { transform:translateX(-2px); box-shadow:0 4px 12px rgba(239,68,68,0.1); }
+        .u-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+        .u-blood { font-size:14px; font-weight:800; color:var(--primary); }
+        .u-time { font-size:11px; font-weight:600; color:var(--primary); opacity:0.8; }
+        .u-detail { font-size:12px; color:var(--text-main); font-weight:500; margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+        .u-btn { width:100%; padding:8px; margin-top:12px; background:var(--primary); color:white; border:none; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; transition:var(--transition); }
+        .u-btn:hover { background:var(--primary-hover); }
+
+        /* MODALS */
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:2000; opacity:0; transition:opacity 0.3s; }
+        .modal-card { background:var(--surface); padding:32px; border-radius:var(--radius-lg); width:100%; max-width:480px; box-shadow:0 25px 50px rgba(0,0,0,0.25); transform:scale(0.95); transition:transform 0.3s; }
+        .modal-overlay.active { display:flex; opacity:1; }
+        .modal-overlay.active .modal-card { transform:scale(1); }
+        .modal-header { margin-bottom:24px; }
+        .modal-header h2 { font-size:20px; font-weight:800; color:var(--text-main); margin-bottom:4px; }
+        .modal-header p { font-size:13px; color:var(--text-muted); }
+        .form-control { width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:var(--radius-md); font-size:14px; background:var(--bg); color:var(--text-main); margin-bottom:16px; outline:none; transition:var(--transition); font-family:inherit; }
+        .form-control:focus { border-color:var(--secondary); box-shadow:0 0 0 3px var(--secondary-light); background:var(--surface); }
+        .form-select { appearance:none; background-image:url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat:no-repeat; background-position-x:96%; background-position-y:center; }
+
+        @media (max-width:1024px) {
+            .sidebar { transform:translateX(-100%); }
+            .main-wrapper { margin-left:0; }
+            .layout-grid { grid-template-columns:1fr; }
+            .stats-grid { grid-template-columns:repeat(3,1fr); }
+            .dt-header, .dt-row { grid-template-columns:28px 1fr 80px 50px; }
+            .dt-th.hide-mobile, .dt-cell-loc, .dt-cell-phone { display:none; }
+        }
+        @media (max-width:768px) {
+            .stats-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiM2RDVERkMiIHJ4PSI4Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE2IDZMMjQgMTRMMTYgMjJMOCAxNEwxNiA2WiIvPjwvc3ZnPg=='"/>
+        <div>
+            <div class="logo-text">Nexus One</div>
+            <div class="logo-sub">Teacher Portal</div>
+        </div>
+    </div>
+    <div class="menu-section">
+        <div class="menu-label">Overview</div>
+        <a href="/teacher-portal" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            Dashboard
+        </a>
+        <a href="/attendance" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Attendance
+        </a>
+        <a href="/teacher-assignment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Assignments
+        </a>
+        <div class="menu-label">Management</div>
+        <a href="/teacher-leave" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Leave Requests
+        </a>
+        <a href="/teacher-appointment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Faculty Sync
+        </a>
+        <a href="/teacher-jobs" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            Career Hub
+        </a>
+        <a href="/teacher-blood-finder" class="menu-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            Blood Finder
+        </a>
+        <div class="menu-label">Updates</div>
+        <a href="/notifications/teacher" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifications
+        </a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;">
+            <div class="avatar-wrap">
+                <img th:src="${session.teacherId != null ? '/teachers/' + session.teacherId + '.jpg' : '/teachers/0.jpg'}" class="avatar" onerror="this.style.display='none'; document.getElementById('sbFallback').style.display='flex';"/>
+                <div class="avatar" id="sbFallback" style="display:none;" th:text="${username != null and username.length() >= 2 ? #strings.substring(username,0,2).toUpperCase() : 'TR'}">TR</div>
+                <div class="status-dot"></div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" th:text="${username != null ? username : 'Teacher'}">Teacher</div>
+                <div class="user-role">Faculty Member</div>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<main class="main-wrapper">
+    <header class="topbar">
+        <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Search donors by name or location..." oninput="applyFilters()">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+            <a href="/logout" class="icon-btn" title="Logout" style="color:var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="page-header">
+            <div class="page-title">
+                <h1>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    Blood Finder Directory
+                </h1>
+                <p>Connect with donors and manage urgent blood requirements.</p>
+            </div>
+            <button class="btn-primary" onclick="openModal('broadcastModal')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                Broadcast Emergency
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Donors</div>
+                    <div class="stat-icon ic-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                </div>
+                <div class="stat-value" th:text="${generalDonors != null ? generalDonors.size() : 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Available Today</div>
+                    <div class="stat-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                </div>
+                <div class="stat-value" th:text="${emergencyDonors != null ? emergencyDonors.size() : 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Urgent Requests</div>
+                    <div class="stat-icon ic-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                </div>
+                <div class="stat-value" th:text="${broadcasts != null ? broadcasts.size() : 0}">0</div>
+            </div>
+        </div>
+
+        <div class="layout-grid">
+
+            <!-- LEFT: DONOR TABLE FEED -->
+            <div class="feed-section">
+
+                <div class="filter-bar">
+                    <div class="filter-chips" id="bloodChips">
+                        <button class="chip active" onclick="setBloodFilter('ALL', this)">All</button>
+                        <button class="chip" onclick="setBloodFilter('A+', this)">A+</button>
+                        <button class="chip" onclick="setBloodFilter('A-', this)">A-</button>
+                        <button class="chip" onclick="setBloodFilter('B+', this)">B+</button>
+                        <button class="chip" onclick="setBloodFilter('B-', this)">B-</button>
+                        <button class="chip" onclick="setBloodFilter('O+', this)">O+</button>
+                        <button class="chip" onclick="setBloodFilter('O-', this)">O-</button>
+                        <button class="chip" onclick="setBloodFilter('AB+', this)">AB+</button>
+                        <button class="chip" onclick="setBloodFilter('AB-', this)">AB-</button>
+                    </div>
+                    <div class="result-info" id="resultInfo"><strong>–</strong> donors</div>
+                </div>
+
+                <!-- EMPTY STATE (Thymeleaf conditional) -->
+                <div id="emptyState" class="empty-state"
+                     th:if="${(generalDonors == null or #lists.isEmpty(generalDonors)) and (emergencyDonors == null or #lists.isEmpty(emergencyDonors))}">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    <h3>No Donors Found</h3>
+                    <p>There are no registered blood donors matching your criteria at the moment.</p>
+                </div>
+
+                <!-- TABLE (shown only when donors exist) -->
+                <div class="donor-table-wrap"
+                     th:if="${(generalDonors != null and not #lists.isEmpty(generalDonors)) or (emergencyDonors != null and not #lists.isEmpty(emergencyDonors))}">
+
+                    <!-- Table Header -->
+                    <div class="dt-header">
+                        <div class="dt-th">#</div>
+                        <div class="dt-th">Donor</div>
+                        <div class="dt-th center">Blood</div>
+                        <div class="dt-th hide-mobile">Phone</div>
+                        <div class="dt-th hide-mobile">Location</div>
+                        <div class="dt-th right">Action</div>
+                    </div>
+
+                    <!-- Scrollable Body -->
+                    <div class="donor-list-scroll dt-body" id="donorTableBody">
+
+                        <!-- Emergency Donors (Available Today) -->
+                        <th:block th:each="d, stat : ${emergencyDonors}">
+                            <div class="dt-row emergency-row donor-item"
+                                 th:attr="data-blood=${d.bloodGroup},data-name=${#strings.toLowerCase(d.name)},data-loc=${#strings.toLowerCase(d.address)},data-phone=${d.phone}">
+                                <div class="dt-idx dt-row-num">–</div>
+                                <div class="dt-name-wrap">
+                                    <div class="dt-mini-avatar av-red-grad" th:text="${#strings.substring(d.name,0,1).toUpperCase()}">A</div>
+                                    <div class="dt-name-text">
+                                        <div class="dt-name" th:text="${d.name}">Donor Name</div>
+                                        <div class="dt-avail-tag"><span class="dt-avail-dot"></span> Available Today</div>
+                                    </div>
+                                </div>
+                                <div class="dt-blood">
+                                    <span class="blood-pill type-emg" th:text="${d.bloodGroup}">A+</span>
+                                </div>
+                                <div class="dt-phone dt-cell-phone" th:text="${d.phone}">017...</div>
+                                <div class="dt-loc dt-cell-loc" th:text="${d.address}">Location</div>
+                                <div class="dt-action">
+                                    <a th:href="'tel:' + ${d.phone}" class="call-btn" title="Call Donor">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                        Call
+                                    </a>
+                                </div>
+                            </div>
+                        </th:block>
+
+                        <!-- General Donors -->
+                        <th:block th:each="d, stat : ${generalDonors}">
+                            <div class="dt-row donor-item"
+                                 th:attr="data-blood=${d.bloodGroup},data-name=${#strings.toLowerCase(d.name)},data-loc=${#strings.toLowerCase(d.address)},data-phone=${d.phone}">
+                                <div class="dt-idx dt-row-num">–</div>
+                                <div class="dt-name-wrap">
+                                    <div class="dt-mini-avatar av-indigo-grad" th:text="${#strings.substring(d.name,0,1).toUpperCase()}">A</div>
+                                    <div class="dt-name-text">
+                                        <div class="dt-name" th:text="${d.name}">Donor Name</div>
+                                    </div>
+                                </div>
+                                <div class="dt-blood">
+                                    <span class="blood-pill type-gen" th:text="${d.bloodGroup}">B+</span>
+                                </div>
+                                <div class="dt-phone dt-cell-phone" th:text="${d.phone}">017...</div>
+                                <div class="dt-loc dt-cell-loc" th:text="${d.address}">Location</div>
+                                <div class="dt-action">
+                                    <a th:href="'tel:' + ${d.phone}" class="call-btn" title="Call Donor">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                        Call
+                                    </a>
+                                </div>
+                            </div>
+                        </th:block>
+
+                    </div>
+
+                    <!-- Pagination Bar -->
+                    <div class="pagination-bar" id="paginationBar">
+                        <div class="pg-info" id="pgInfo">Showing <strong id="pgFrom">1</strong>–<strong id="pgTo">50</strong> of <strong id="pgTotal">0</strong></div>
+                        <div class="pg-controls" id="pgControls"></div>
+                    </div>
+
+                </div>
+                <!-- end donor-table-wrap -->
+
+            </div>
+            <!-- end feed-section -->
+
+            <!-- RIGHT PANEL (unchanged) -->
+            <div class="right-panel">
+                <div class="panel-card">
+                    <div class="panel-title">My Availability
+                        <span style="width:8px;height:8px;background:var(--success);border-radius:50%;box-shadow:0 0 8px var(--success);"></span>
+                    </div>
+                    <div class="status-widget">
+                        <p>Mark yourself as available today for emergency blood donations.</p>
+                        <button class="btn-outline" onclick="openModal('availableModal')">Update Status</button>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-title">Quick Actions</div>
+                    <button class="btn-outline" style="margin-bottom:12px;" onclick="openModal('registerModal')">Join Directory (Permanent)</button>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-title" style="color:var(--primary);">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Urgent Requests
+                        </span>
+                    </div>
+                    <div class="urgent-list">
+                        <div th:if="${broadcasts == null or #lists.isEmpty(broadcasts)}" style="text-align:center;color:var(--text-muted);font-size:13px;padding:20px 0;">
+                            No active emergency requests.
+                        </div>
+                        <div class="urgent-card" th:each="b : ${broadcasts}">
+                            <div class="u-header">
+                                <span class="u-blood" th:text="${b.bloodGroup} + ' Needed'">A+ Needed</span>
+                                <span class="u-time" th:text="${b.bags} + ' Bags'">2 Bags</span>
+                            </div>
+                            <div class="u-detail">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
+                                <span th:text="${b.hospital}">Hospital Name</span>
+                            </div>
+                            <div class="u-detail">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span th:text="${b.time}">Time Required</span>
+                            </div>
+                            <a th:href="'tel:' + ${b.contact}" style="text-decoration:none;"><button class="u-btn">Respond Now</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- MODALS (unchanged) -->
+<div class="modal-overlay" id="broadcastModal">
+    <div class="modal-card">
+        <div class="modal-header"><h2>Broadcast Emergency</h2><p>Send an urgent alert to all registered students and teachers.</p></div>
+        <form action="/teacher-blood-finder/broadcast" method="POST">
+            <select name="bloodGroup" class="form-control form-select" required>
+                <option value="" disabled selected>Blood Group Needed</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+            <input type="text" name="bags" class="form-control" placeholder="Bags Needed (e.g., 2 Bags)" required>
+            <input type="text" name="time" class="form-control" placeholder="Time Requirements (e.g., Today by 5 PM)" required>
+            <input type="text" name="hospital" class="form-control" placeholder="Hospital Name & Area" required>
+            <input type="text" name="contact" class="form-control" placeholder="Emergency Contact Number" required>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="button" class="btn-outline" style="flex:1;" onclick="closeModal('broadcastModal')">Cancel</button>
+                <button type="submit" class="btn-primary" style="flex:1;justify-content:center;background:var(--primary);">Send Alert</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="availableModal">
+    <div class="modal-card">
+        <div class="modal-header"><h2>Mark Available Today</h2><p>Let others know you are ready to donate blood today.</p></div>
+        <form action="/teacher-blood-finder/active-today" method="POST">
+            <select name="bloodGroup" class="form-control form-select" required>
+                <option value="" disabled selected>Your Blood Group</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+            <input type="text" name="phone" class="form-control" placeholder="Contact Number" required>
+            <input type="text" name="location" class="form-control" placeholder="Current Location (e.g., Campus)" required>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="button" class="btn-outline" style="flex:1;" onclick="closeModal('availableModal')">Cancel</button>
+                <button type="submit" class="btn-primary" style="flex:1;justify-content:center;background:var(--success);border:none;box-shadow:none;">Set Available</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="registerModal">
+    <div class="modal-card">
+        <div class="modal-header"><h2>Join Directory</h2><p>Register as a permanent donor in the university database.</p></div>
+        <form action="/teacher-blood-finder/register" method="POST">
+            <select name="bloodGroup" class="form-control form-select" required>
+                <option value="" disabled selected>Your Blood Group</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            </select>
+            <input type="text" name="phone" class="form-control" placeholder="Contact Number" required>
+            <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+            <input type="text" name="address" class="form-control" placeholder="Permanent Address" required>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="button" class="btn-outline" style="flex:1;" onclick="closeModal('registerModal')">Cancel</button>
+                <button type="submit" class="btn-primary" style="flex:1;justify-content:center;background:var(--secondary);border:none;box-shadow:none;">Register Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       THEME
+    ============================================================ */
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    (function(){ if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark'); })();
+
+    /* ============================================================
+       MODALS
+    ============================================================ */
+    function openModal(id)  { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if(e.target === m) m.classList.remove('active'); });
+    });
+
+    /* ============================================================
+       PAGINATION + FILTER ENGINE
+       Handles 2000–4000 rows client-side with no lag
+    ============================================================ */
+    const PAGE_SIZE = 50;
+
+    let allRows   = [];   // all .donor-item elements
+    let filtered  = [];   // after blood + search filter
+    let currentPage = 1;
+    let activeBloodFilter = 'ALL';
+
+    function init() {
+        allRows = Array.from(document.querySelectorAll('.donor-item'));
+        // number rows in DOM order
+        allRows.forEach((r, i) => {
+            const numEl = r.querySelector('.dt-row-num');
+            if(numEl) numEl.textContent = i + 1;
+        });
+        applyFilters();
+    }
+
+    function setBloodFilter(group, btn) {
+        activeBloodFilter = group;
+        document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        currentPage = 1;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const term = document.getElementById('searchInput').value.toLowerCase().trim();
+
+        filtered = allRows.filter(row => {
+            const blood = row.getAttribute('data-blood') || '';
+            const name  = row.getAttribute('data-name')  || '';
+            const loc   = row.getAttribute('data-loc')   || '';
+            const phone = row.getAttribute('data-phone') || '';
+
+            const bloodOk = activeBloodFilter === 'ALL' || blood === activeBloodFilter;
+            const searchOk = !term ||
+                name.includes(term) ||
+                loc.includes(term)  ||
+                phone.includes(term)||
+                blood.toLowerCase().includes(term);
+
+            return bloodOk && searchOk;
+        });
+
+        renderPage(currentPage);
+    }
+
+    function renderPage(page) {
+        const total = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        page = Math.min(Math.max(1, page), totalPages);
+        currentPage = page;
+
+        const start = (page - 1) * PAGE_SIZE;
+        const end   = Math.min(start + PAGE_SIZE, total);
+
+        // hide all, show only current page slice
+        allRows.forEach(r => { r.style.display = 'none'; });
+        filtered.slice(start, end).forEach((r, i) => {
+            r.style.display = '';
+            // re-number visible rows with display index
+            const numEl = r.querySelector('.dt-row-num');
+            if(numEl) numEl.textContent = start + i + 1;
+        });
+
+        // update result info
+        document.getElementById('resultInfo').innerHTML =
+            `<strong>${total}</strong> donor${total !== 1 ? 's' : ''}`;
+
+        // update pagination bar info
+        document.getElementById('pgFrom').textContent  = total === 0 ? 0 : start + 1;
+        document.getElementById('pgTo').textContent    = end;
+        document.getElementById('pgTotal').textContent = total;
+
+        renderPagination(page, totalPages);
+    }
+
+    function renderPagination(current, total) {
+        const ctrl = document.getElementById('pgControls');
+        ctrl.innerHTML = '';
+
+        if(total <= 1) return;
+
+        // build page window: prev, [pages], next
+        const pages = pagesToShow(current, total);
+
+        // Prev
+        const prev = mkBtn('‹', current === 1, () => renderPage(current - 1));
+        ctrl.appendChild(prev);
+
+        let lastWas = null;
+        pages.forEach(p => {
+            if(p === '...') {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '…';
+                ellipsis.style.cssText = 'padding:0 4px;color:var(--text-muted);font-size:12px;line-height:32px;';
+                ctrl.appendChild(ellipsis);
+            } else {
+                const btn = mkBtn(p, false, () => renderPage(p));
+                if(p === current) btn.classList.add('active');
+                ctrl.appendChild(btn);
+            }
+            lastWas = p;
+        });
+
+        // Next
+        const next = mkBtn('›', current === total, () => renderPage(current + 1));
+        ctrl.appendChild(next);
+    }
+
+    function pagesToShow(cur, total) {
+        if(total <= 7) return Array.from({length: total}, (_, i) => i+1);
+        const pages = [];
+        pages.push(1);
+        if(cur > 3) pages.push('...');
+        for(let i = Math.max(2, cur-1); i <= Math.min(total-1, cur+1); i++) pages.push(i);
+        if(cur < total - 2) pages.push('...');
+        pages.push(total);
+        return pages;
+    }
+
+    function mkBtn(label, disabled, onClick) {
+        const b = document.createElement('button');
+        b.className = 'pg-btn';
+        b.textContent = label;
+        b.disabled = disabled;
+        b.addEventListener('click', onClick);
+        return b;
+    }
+
+    // Init on DOM ready
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

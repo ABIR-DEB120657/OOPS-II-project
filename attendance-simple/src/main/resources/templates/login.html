@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Nexus One</title>
+    <meta charset="UTF-8"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%);
+            display: flex; align-items: center; justify-content: center; min-height: 100vh;
+        }
+        .wrapper {
+            display: flex; width: 860px; background: white;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+        }
+
+        /* ── LEFT PANEL ── */
+        .left {
+            width: 380px; position: relative;
+            display: flex; flex-direction: column;
+            overflow: hidden; flex-shrink: 0;
+        }
+
+        /* University image — full cover */
+        .univ-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            position: absolute; top: 0; left: 0;
+            z-index: 0;
+        }
+
+        /* Dark overlay on top of image */
+        .img-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(
+                    to bottom,
+                    rgba(15, 10, 60, 0.55) 0%,
+                    rgba(30, 20, 100, 0.70) 50%,
+                    rgba(10, 5, 40, 0.85) 100%
+            );
+            z-index: 1;
+        }
+
+        /* Content on top of overlay */
+        .left-content {
+            position: relative; z-index: 2;
+            padding: 36px 32px;
+            display: flex; flex-direction: column;
+            height: 100%; min-height: 480px;
+            justify-content: space-between;
+            color: white;
+        }
+
+        /* Logo */
+        .left-logo { display: flex; align-items: center; gap: 12px; }
+
+        /* ✅ 'K' আইকনের জায়গায় লোগো ইমেজের জন্য নতুন স্টাইল */
+        .logo-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: white; /* লোগোর ব্যাকগ্রাউন্ড পরিষ্কার দেখানোর জন্য */
+            padding: 2px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .left-logo-text { font-size: 16px; font-weight: 700; line-height: 1.2; }
+        .left-logo-text span { display: block; font-size: 11px; opacity: 0.75; font-weight: 400; margin-top: 2px; }
+
+        /* University name center */
+        .univ-name-box { text-align: center; }
+        .univ-name-box h2 {
+            font-size: 20px; font-weight: 800;
+            line-height: 1.4; letter-spacing: -0.3px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            margin-bottom: 8px;
+        }
+        .univ-name-box .divider {
+            width: 48px; height: 3px;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            border-radius: 4px; margin: 0 auto 10px;
+        }
+        .univ-name-box p {
+            font-size: 12px; opacity: 0.8; line-height: 1.6;
+        }
+
+        /* Portal badge */
+        .portal-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 20px; padding: 8px 16px;
+            font-size: 13px; font-weight: 600;
+            backdrop-filter: blur(8px);
+            margin: 0 auto;
+        }
+
+        .left-footer { font-size: 11px; opacity: 0.5; text-align: center; }
+
+        /* ── RIGHT PANEL ── */
+        .right {
+            flex: 1; padding: 48px 44px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .right h2 { font-size: 26px; font-weight: 700; color: #1e1b4b; margin-bottom: 6px; }
+        .right p   { font-size: 14px; color: #888; margin-bottom: 32px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 8px; }
+
+        .label-row {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 8px;
+        }
+        .label-row label { margin-bottom: 0; }
+        .forgot-link {
+            font-size: 12px; font-weight: 600; color: #4f46e5;
+            text-decoration: none; transition: 0.2s;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .forgot-link:hover { color: #7c3aed; }
+
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute; left: 14px; top: 50%;
+            transform: translateY(-50%); font-size: 16px; opacity: 0.5;
+        }
+        input {
+            width: 100%; padding: 13px 16px 13px 42px;
+            border: 1.5px solid #e2e8f0; border-radius: 12px;
+            font-size: 14px; color: #1e1b4b; outline: none;
+            transition: 0.2s; background: #f8f9ff;
+        }
+        input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+            background: white;
+        }
+
+        .btn-login {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white; border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            margin-top: 8px; transition: 0.2s;
+        }
+        .btn-login:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        /* Forgot banner */
+        .forgot-banner {
+            margin-top: 16px;
+            background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+            border: 1.5px solid #c7d2fe;
+            border-radius: 12px; padding: 14px 18px;
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; transition: 0.2s;
+        }
+        .forgot-banner:hover {
+            background: linear-gradient(135deg, #e0e7ff, #ede9fe);
+            border-color: #a5b4fc;
+            transform: translateY(-1px);
+        }
+        .fb-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .fb-text { flex: 1; }
+        .fb-title { font-size: 13px; font-weight: 700; color: #1e1b4b; }
+        .fb-sub   { font-size: 11px; color: #6366f1; margin-top: 2px; }
+        .fb-arrow { font-size: 16px; color: #4f46e5; }
+
+        .error-box {
+            background: #fef2f2; color: #dc2626;
+            border: 1.5px solid #fecaca; border-radius: 10px;
+            padding: 12px 16px; margin-bottom: 20px;
+            font-size: 13px; font-weight: 500;
+        }
+
+        @media (max-width: 700px) {
+            .wrapper { flex-direction: column; width: 95%; }
+            .left { width: 100%; min-height: 220px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <div class="left">
+
+        <img src="/university.jpg" alt="Khwaja Yunus Ali University" class="univ-img"/>
+
+        <div class="img-overlay"></div>
+
+        <div class="left-content">
+
+            <div class="left-logo">
+                <img src="/images/kyau_logo.png" alt="KYAU Logo" class="logo-img"/>
+                <div class="left-logo-text">
+                    Nexus One
+                    <span>KYAU University</span>
+                </div>
+            </div>
+
+            <div class="univ-name-box">
+                <h2>Khwaja Yunus Ali<br>University</h2>
+                <div class="divider"></div>
+                <p>Intelligent Attendance Management System</p>
+                <br/>
+                <div class="portal-badge">🎓 University Admin Portal</div>
+            </div>
+
+            <div class="left-footer">© 2026 Nexus One · Khwaja Yunus Ali University</div>
+
+        </div>
+    </div>
+
+    <div class="right">
+        <h2>Welcome back! 👋</h2>
+        <p>Please log in according to your designated role</p>
+
+        <div class="error-box" th:if="${error}">
+            ⚠️ <span th:text="${error}"></span>
+        </div>
+
+        <form method="post" action="/login">
+
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrap">
+                    <span class="input-icon">👤</span>
+                    <input type="text" name="username"
+                           placeholder="Enter your username"
+                           required autofocus/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="label-row">
+                    <label>Password</label>
+                    <a href="/forgot-password" class="forgot-link">🔑 Forgot Password?</a>
+                </div>
+                <div class="input-wrap">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="password"
+                           placeholder="••••••••" required/>
+                </div>
+            </div>
+
+            <button class="btn-login" type="submit">Sign In →</button>
+
+        </form>
+
+        <a href="/forgot-password" class="forgot-banner">
+            <div class="fb-icon">🔐</div>
+            <div class="fb-text">
+                <div class="fb-title">Forgot Password?</div>
+                <div class="fb-sub">Reset safely using your security questions</div>
+            </div>
+            <div class="fb-arrow">→</div>
+        </a>
+
+    </div>
+</div>
+</body>
+</html>

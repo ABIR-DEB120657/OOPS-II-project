@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Faculty Sync - Teacher Portal</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F0F4FF;
+            --surface: #FFFFFF;
+            --surface2: #F8FAFF;
+            --border: #E0E8FF;
+            --text-main: #0D1B40;
+            --text-muted: #6478A8;
+            --primary: #3B5BDB;
+            --primary-hover: #2F4AC4;
+            --primary-light: #EEF2FF;
+            --indigo: #4C6EF5;
+            --violet: #7950F2;
+            --success: #12B886;
+            --success-bg: #EBFBF0;
+            --danger: #FA5252;
+            --danger-bg: #FFF5F5;
+            --warning: #FD7E14;
+            --warning-bg: #FFF4E6;
+            --priority-high: #E03131;
+            --priority-high-bg: #FFF5F5;
+            --priority-med: #F59F00;
+            --priority-med-bg: #FFF9DB;
+            --priority-low: #12B886;
+            --priority-low-bg: #EBFBF0;
+            --shadow-sm: 0 1px 3px rgba(59,91,219,0.06), 0 1px 2px rgba(59,91,219,0.04);
+            --shadow-md: 0 4px 12px rgba(59,91,219,0.10), 0 2px 6px rgba(59,91,219,0.06);
+            --shadow-float: 0 12px 28px rgba(59,91,219,0.14), 0 4px 8px rgba(59,91,219,0.08);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background: var(--bg); color: var(--text-main);
+            min-height: 100vh; display: flex;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── SIDEBAR ─── */
+        .sidebar {
+            width: 260px; background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+        }
+        .sidebar-header { padding: 24px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+        .logo-img { width: 36px; height: 36px; border-radius: 8px; }
+        .logo-text { font-weight: 800; font-size: 15px; letter-spacing: -0.02em; }
+        .logo-sub { color: var(--text-muted); font-size: 11px; font-weight: 500; }
+        .menu-section { padding: 12px; flex: 1; overflow-y: auto; }
+        .menu-label { font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin: 14px 0 6px 10px; font-weight: 700; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 3px; border-radius: var(--radius-sm); text-decoration: none; color: var(--text-muted); font-size: 13.5px; font-weight: 500; transition: var(--transition); }
+        .menu-item svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+        .menu-item:hover { background: var(--primary-light); color: var(--primary); }
+        .menu-item.active { background: var(--primary); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(59,91,219,0.3); }
+        .menu-item.active svg { stroke: #fff; }
+        .sidebar-footer { padding: 14px; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius-md); background: var(--surface2); border: 1px solid var(--border); text-decoration: none; transition: var(--transition); }
+        .user-card:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+        .avatar { width: 36px; height: 36px; border-radius: 10px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+        .user-info { flex: 1; overflow: hidden; }
+        .user-name { font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+
+        /* ─── MAIN ─── */
+        .main-wrapper { margin-left: 260px; flex: 1; display: flex; flex-direction: column; }
+        .topbar { height: 66px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+        .search-bar { position: relative; width: 300px; }
+        .search-bar input { width: 100%; padding: 9px 16px 9px 38px; border-radius: 99px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-main); font-size: 13px; font-family: inherit; outline: none; transition: var(--transition); }
+        .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,91,219,0.12); background: var(--surface); }
+        .search-bar svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); }
+        .topbar-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+        .icon-btn:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-light); }
+        .icon-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .tab-pill { padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: var(--transition); font-family: inherit; display: flex; align-items: center; gap: 6px; }
+        .tab-pill:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-light); }
+        .tab-pill.active-tab { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(59,91,219,0.25); }
+        .container { padding: 28px 30px; max-width: 1280px; margin: 0 auto; width: 100%; }
+
+        /* ─── PAGE HEADER ─── */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 22px; }
+        .page-title h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 3px; display: flex; align-items: center; gap: 10px; }
+        .page-title p { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .header-actions { display: flex; gap: 10px; }
+        .btn-primary { padding: 10px 18px; border-radius: var(--radius-sm); background: var(--primary); color: #fff; border: none; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 12px rgba(59,91,219,0.3); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-outline { padding: 10px 16px; border-radius: var(--radius-sm); background: var(--surface); color: var(--primary); border: 1.5px solid var(--primary); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 7px; }
+        .btn-outline:hover { background: var(--primary-light); }
+        .btn-outline svg, .btn-primary svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+        /* ─── STATS ─── */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-sm); transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .stat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .stat-body { flex: 1; }
+        .stat-title { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-main); line-height: 1; }
+        .ic-blue { color: var(--primary); background: var(--primary-light); }
+        .ic-orange { color: var(--warning); background: var(--warning-bg); }
+        .ic-green { color: var(--success); background: var(--success-bg); }
+        .ic-red { color: var(--danger); background: var(--danger-bg); }
+
+        /* ─── MAIN LAYOUT: VIEW TOGGLE ─── */
+        .view-area { display: flex; flex-direction: column; gap: 20px; }
+        .filter-bar { display: flex; justify-content: space-between; align-items: center; }
+        .tabs { display: flex; gap: 8px; }
+        .view-toggle { display: flex; gap: 6px; }
+
+        /* ─── OFFICE HOURS BANNER ─── */
+        .office-hours-card { background: linear-gradient(135deg, #3B5BDB 0%, #6741D9 100%); border-radius: var(--radius-md); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; box-shadow: 0 8px 24px rgba(59,91,219,0.25); margin-bottom: 4px; }
+        .oh-left { display: flex; align-items: center; gap: 16px; }
+        .oh-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); flex-shrink: 0; }
+        .oh-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; }
+        .oh-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+        .oh-subtitle { font-size: 12.5px; color: rgba(255,255,255,0.75); font-weight: 500; }
+        .oh-slots { display: flex; gap: 10px; flex-wrap: wrap; }
+        .oh-slot { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 8px 14px; text-align: center; backdrop-filter: blur(4px); cursor: pointer; transition: var(--transition); }
+        .oh-slot:hover { background: rgba(255,255,255,0.25); }
+        .oh-slot-day { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.06em; }
+        .oh-slot-time { font-size: 13px; font-weight: 700; color: #fff; }
+        .btn-edit-hours { padding: 9px 16px; border-radius: 8px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--transition); backdrop-filter: blur(4px); white-space: nowrap; }
+        .btn-edit-hours:hover { background: rgba(255,255,255,0.25); }
+        .btn-edit-hours svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* ─── CALENDAR VIEW ─── */
+        .calendar-view { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+        .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+        .cal-month { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+        .cal-nav { display: flex; gap: 8px; }
+        .cal-nav-btn { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); color: var(--text-muted); }
+        .cal-nav-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .cal-nav-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+        .cal-day-label { padding: 10px; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); background: var(--surface2); }
+        .cal-cell { min-height: 90px; padding: 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); position: relative; transition: var(--transition); cursor: pointer; }
+        .cal-cell:hover { background: var(--primary-light); }
+        .cal-cell.today { background: linear-gradient(135deg, #EEF2FF 0%, #F3F0FF 100%); }
+        .cal-cell.other-month { opacity: 0.4; }
+        .cal-cell:nth-child(7n) { border-right: none; }
+        .cal-date { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+        .cal-cell.today .cal-date { color: var(--primary); background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+        .cal-appt { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .cal-appt.pending { background: var(--warning-bg); color: var(--warning); }
+        .cal-appt.approved { background: var(--success-bg); color: var(--success); }
+        .cal-appt.rejected { background: var(--danger-bg); color: var(--danger); }
+
+        /* ─── LIST VIEW: APPOINTMENT CARDS ─── */
+        .appt-list { display: flex; flex-direction: column; gap: 14px; }
+
+        .appt-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+            padding: 18px 22px; display: flex; align-items: stretch; gap: 0;
+            box-shadow: var(--shadow-sm); transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .appt-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--border); border-radius: 0; }
+        .appt-card.priority-high::before { background: var(--priority-high); }
+        .appt-card.priority-medium::before { background: var(--priority-med); }
+        .appt-card.priority-low::before { background: var(--priority-low); }
+        .appt-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-float); border-color: #C0CFFF; }
+        .appt-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex: 1; padding-left: 16px; width: 100%; }
+
+        .a-user { display: flex; align-items: center; gap: 14px; width: 240px; flex-shrink: 0; }
+        .a-avatar { width: 42px; height: 42px; border-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+        .a-info { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+        .a-name { font-size: 14.5px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .a-topic { font-size: 11.5px; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 5px; display: inline-block; width: fit-content; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .a-meta-row { display: flex; align-items: center; gap: 18px; flex: 1; }
+        .a-meta { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+        .a-meta svg { width: 14px; height: 14px; flex-shrink: 0; }
+        .a-meta strong { color: var(--text-main); font-weight: 600; }
+
+        /* Priority tag */
+        .priority-tag { padding: 3px 9px; border-radius: 6px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .priority-tag::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+        .pt-high { background: var(--priority-high-bg); color: var(--priority-high); }
+        .pt-high::before { background: var(--priority-high); }
+        .pt-medium { background: var(--priority-med-bg); color: var(--priority-med); }
+        .pt-medium::before { background: var(--priority-med); }
+        .pt-low { background: var(--priority-low-bg); color: var(--priority-low); }
+        .pt-low::before { background: var(--priority-low); }
+
+        .a-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .btn-action { padding: 8px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 5px; border: 1.5px solid transparent; font-family: inherit; }
+        .btn-action svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+        .btn-approve { background: var(--success); color: white; box-shadow: 0 2px 8px rgba(18,184,134,0.25); }
+        .btn-approve:hover { background: #0CA678; transform: translateY(-1px); }
+        .btn-reject { background: var(--surface); color: var(--danger); border-color: var(--border); }
+        .btn-reject:hover { border-color: var(--danger); background: var(--danger-bg); }
+        .btn-chat { background: var(--primary-light); color: var(--primary); border-color: var(--border); }
+        .btn-chat:hover { border-color: var(--primary); background: var(--primary); color: #fff; }
+        .btn-meet { background: #fff; color: #1a73e8; border-color: #c5d4f5; }
+        .btn-meet:hover { background: #e8f0fe; border-color: #1a73e8; }
+        .btn-zoom { background: #fff; color: #2D8CFF; border-color: #c5dcff; }
+        .btn-zoom:hover { background: #e8f3ff; border-color: #2D8CFF; }
+
+        .status-badge { padding: 6px 14px; border-radius: 99px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .s-pending { background: var(--warning-bg); color: var(--warning); border: 1.5px solid rgba(253,126,20,0.2); }
+        .s-pending::before { background: var(--warning); }
+        .s-approved { background: var(--success-bg); color: var(--success); border: 1.5px solid rgba(18,184,134,0.2); }
+        .s-approved::before { background: var(--success); }
+        .s-completed { background: var(--primary-light); color: var(--primary); border: 1.5px solid rgba(59,91,219,0.2); }
+        .s-completed::before { background: var(--primary); }
+        .s-rejected { background: var(--danger-bg); color: var(--danger); border: 1.5px solid rgba(250,82,82,0.2); }
+        .s-rejected::before { background: var(--danger); }
+
+        /* ─── CHAT PANEL (inline) ─── */
+        .chat-panel { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 14px; display: none; flex-direction: column; gap: 10px; }
+        .chat-panel.open { display: flex; }
+        .chat-msgs { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 4px; }
+        .chat-msg { display: flex; gap: 8px; align-items: flex-start; }
+        .chat-msg.teacher { flex-direction: row-reverse; }
+        .chat-bubble { padding: 8px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 500; max-width: 280px; line-height: 1.45; }
+        .chat-msg.student .chat-bubble { background: var(--surface2); border: 1px solid var(--border); color: var(--text-main); border-top-left-radius: 3px; }
+        .chat-msg.teacher .chat-bubble { background: var(--primary); color: #fff; border-top-right-radius: 3px; }
+        .chat-avatar { width: 26px; height: 26px; border-radius: 8px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+        .chat-time { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+        .chat-msg.teacher .chat-time { text-align: right; }
+        .chat-input-row { display: flex; gap: 8px; }
+        .chat-input { flex: 1; padding: 9px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface2); font-family: inherit; font-size: 12.5px; color: var(--text-main); outline: none; transition: var(--transition); }
+        .chat-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,91,219,0.1); background: var(--surface); }
+        .chat-send { padding: 9px 16px; border-radius: 8px; background: var(--primary); color: #fff; border: none; font-family: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 5px; }
+        .chat-send:hover { background: var(--primary-hover); }
+        .chat-send svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+        /* ─── MEET LINK ROW ─── */
+        .meet-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; display: none; }
+        .meet-row.open { display: flex; }
+        .meet-row svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .meet-label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-right: 4px; }
+        .meet-link-input { flex: 1; padding: 7px 12px; border-radius: 7px; border: 1.5px solid var(--border); font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--text-main); background: var(--surface); outline: none; }
+        .meet-link-input:focus { border-color: var(--primary); }
+        .copy-link-btn { padding: 7px 12px; border-radius: 7px; background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--border); font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .copy-link-btn:hover { background: var(--primary); color: #fff; }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state { text-align: center; padding: 56px 20px; background: var(--surface); border-radius: var(--radius-md); border: 1.5px dashed var(--border); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .empty-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--surface2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 6px; color: var(--text-muted); }
+        .empty-state h3 { font-size: 15px; font-weight: 700; }
+        .empty-state p { font-size: 13px; color: var(--text-muted); }
+
+        /* ─── MODAL ─── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(13,27,64,0.5); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+        .modal-overlay.open { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal { background: var(--surface); border-radius: var(--radius-lg); width: 480px; max-width: 95vw; box-shadow: var(--shadow-float); animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1); }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { padding: 22px 24px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); transition: var(--transition); }
+        .modal-close:hover { color: var(--danger); border-color: var(--danger); }
+        .modal-close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+        .modal-body { padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-input, .form-select { padding: 10px 14px; border-radius: 9px; border: 1.5px solid var(--border); font-family: inherit; font-size: 13.5px; color: var(--text-main); background: var(--surface2); outline: none; transition: var(--transition); }
+        .form-input:focus, .form-select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px rgba(59,91,219,0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .modal-footer { padding: 16px 24px 22px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-cancel { padding: 10px 18px; border-radius: 9px; background: var(--surface2); color: var(--text-muted); border: 1.5px solid var(--border); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .btn-cancel:hover { border-color: var(--text-muted); color: var(--text-main); }
+        .oh-slots-edit { display: flex; flex-direction: column; gap: 8px; }
+        .oh-slot-edit-row { display: flex; align-items: center; gap: 8px; }
+        .oh-slot-edit-row .form-select { flex: 1.2; }
+        .oh-slot-edit-row .form-input { flex: 1; }
+        .add-slot-btn { padding: 8px 12px; border-radius: 8px; background: var(--primary-light); color: var(--primary); border: 1.5px dashed var(--primary); font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: var(--transition); }
+        .add-slot-btn:hover { background: var(--primary); color: #fff; }
+
+        /* ─── TOAST ─── */
+        .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text-main); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(13,27,64,0.25); }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .appt-inner { flex-direction: column; align-items: flex-start; }
+            .a-user { width: 100%; }
+            .a-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 12px; }
+            .cal-grid { font-size: 11px; }
+            .office-hours-card { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"></div>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"
+             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMzQjVCREIiIHJ4PSI4Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE2IDZMMjQgMTRMMTYgMjJMOCAxNEwxNiA2WiIvPjwvc3ZnPg=='"/>
+        <div>
+            <div class="logo-text">Nexus One</div>
+            <div class="logo-sub">Teacher Portal</div>
+        </div>
+    </div>
+    <div class="menu-section">
+        <div class="menu-label">Menu</div>
+        <a href="/teacher-portal" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Dashboard
+        </a>
+        <a href="/attendance" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Mark Attendance
+        </a>
+        <a href="/teacher-assignment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Assignments
+        </a>
+        <a href="/teacher-leave" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Leave Requests
+        </a>
+        <div class="menu-label">Apps</div>
+        <a href="/teacher-appointment" class="menu-item active">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Faculty Sync
+        </a>
+        <a href="/teacher-jobs" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Career Hub
+        </a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card">
+            <div class="avatar-wrap">
+                <img th:src="${session.teacherId != null ? '/teachers/' + session.teacherId + '.jpg' : '/teachers/0.jpg'}" class="avatar" style="object-fit:cover;border-radius:10px;"
+                     onerror="this.style.display='none'; document.getElementById('sbFallback1').style.display='flex';"/>
+                <div class="avatar" id="sbFallback1" style="display:none;" th:text="${session.loggedIn != null ? #strings.substring(session.loggedIn,0,2).toUpperCase() : 'TR'}">TR</div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" th:text="${session.loggedIn != null ? session.loggedIn : 'Teacher'}">Teacher</div>
+                <div class="user-role">Faculty Member</div>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<main class="main-wrapper">
+    <header class="topbar">
+        <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search student name or topic…" onkeyup="filterAppointments()">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" title="Refresh" onclick="showToast('✅ Synced!', 'success')">
+                <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            </button>
+            <button class="icon-btn" title="Settings">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="24" height="24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Faculty Sync
+                </h1>
+                <p>Manage consultation appointments, office hours, and student meetings.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" onclick="openModal('officeHoursModal')">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Office Hours
+                </button>
+                <button class="btn-primary" onclick="openModal('addAppointmentModal')">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    New Slot
+                </button>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon ic-blue"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                <div class="stat-body"><div class="stat-title">Total</div><div class="stat-value" id="stat-total">0</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon ic-orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="stat-body"><div class="stat-title">Pending</div><div class="stat-value" id="stat-pending">0</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon ic-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                <div class="stat-body"><div class="stat-title">Approved</div><div class="stat-value" id="stat-approved">0</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon ic-red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+                <div class="stat-body"><div class="stat-title">Cancelled</div><div class="stat-value" id="stat-rejected">0</div></div>
+            </div>
+        </div>
+
+        <!-- OFFICE HOURS BANNER -->
+        <div class="office-hours-card" style="margin-bottom:24px;">
+            <div class="oh-left">
+                <div class="oh-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div>
+                    <div class="oh-title">📌 Your Office Hours</div>
+                    <div class="oh-subtitle">Students can book within these slots</div>
+                </div>
+            </div>
+            <div class="oh-slots" id="officeHoursBanner">
+                <div class="oh-slot"><div class="oh-slot-day">Sun</div><div class="oh-slot-time">10:00 – 12:00</div></div>
+                <div class="oh-slot"><div class="oh-slot-day">Tue</div><div class="oh-slot-time">2:00 – 4:00 PM</div></div>
+                <div class="oh-slot"><div class="oh-slot-day">Thu</div><div class="oh-slot-time">11:00 – 1:00 PM</div></div>
+            </div>
+            <button class="btn-edit-hours" onclick="openModal('officeHoursModal')">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit Hours
+            </button>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar" style="margin-bottom:20px;">
+            <div class="tabs" id="tabsBar">
+                <button class="tab-pill active-tab" onclick="switchTab('PENDING', this)">⏳ Pending</button>
+                <button class="tab-pill" onclick="switchTab('APPROVED', this)">✅ Approved</button>
+                <button class="tab-pill" onclick="switchTab('ALL', this)">📋 All</button>
+            </div>
+            <div class="view-toggle">
+                <button class="icon-btn active-tab" id="btnListView" title="List View" onclick="switchView('list')" style="border-radius:8px;width:36px;height:36px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </button>
+                <button class="icon-btn" id="btnCalView" title="Calendar View" onclick="switchView('calendar')" style="border-radius:8px;width:36px;height:36px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- LIST VIEW -->
+        <div id="listView" class="view-area">
+            <div class="appt-list" id="appointmentsContainer">
+
+                <div id="emptyState" class="empty-state" th:if="${appointments == null or #lists.isEmpty(appointments)}">
+                    <div class="empty-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                    <h3>No Appointments Found</h3>
+                    <p>No consultation requests match the current filter.</p>
+                </div>
+
+                <!-- THYMELEAF LOOP -->
+                <th:block th:each="app, s : ${appointments}">
+                    <div class="appt-card appt-item priority-medium"
+                         th:attr="data-status=${app.status}, data-id=${app.id}, data-student=${app.studentName}">
+
+                        <!-- priority left-bar handled by class above -->
+                        <div class="appt-inner">
+
+                            <!-- USER -->
+                            <div class="a-user">
+                                <div class="a-avatar"
+                                     th:text="${#strings.substring(app.studentName,0,2).toUpperCase()}"
+                                     th:attr="style='background:' + ${colors != null ? colors[s.index % 7] : '#3B5BDB'}">AB</div>
+                                <div class="a-info">
+                                    <div class="a-name student-name-val" th:text="${app.studentName}">Student Name</div>
+                                    <div class="a-topic topic-val" th:text="${app.topic}">Project Discussion</div>
+                                </div>
+                            </div>
+
+                            <!-- META -->
+                            <div class="a-meta-row">
+                                <div class="a-meta">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    <strong th:text="${app.date}">2026-05-19</strong>
+                                </div>
+                                <div class="a-meta">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    <strong th:text="${app.duration}">15 Minutes</strong>
+                                </div>
+                                <!-- Priority -->
+                                <div class="priority-tag pt-medium">Medium</div>
+                            </div>
+
+                            <!-- ACTIONS -->
+                            <div class="a-actions">
+                                <!-- Chat toggle -->
+                                <button class="btn-action btn-chat" onclick="toggleChat(this)" title="Chat with student">
+                                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    Chat
+                                </button>
+                                <!-- Meet -->
+                                <button class="btn-action btn-meet" onclick="toggleMeet(this)" title="Add Meeting Link">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                                    Meet
+                                </button>
+
+                                <th:block th:if="${app.status == 'PENDING'}">
+                                    <button type="button" class="btn-action btn-approve"
+                                            th:attr="data-id=${app.id}, data-student=${app.studentName}"
+                                            onclick="handleApprove(this)">
+                                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Accept
+                                    </button>
+                                    <button type="button" class="btn-action btn-reject"
+                                            th:attr="data-id=${app.id}, data-student=${app.studentName}"
+                                            onclick="handleReject(this)">
+                                        Decline
+                                    </button>
+                                </th:block>
+
+                                <th:block th:if="${app.status != 'PENDING'}">
+                                    <div class="status-badge"
+                                         th:classappend="${app.status == 'APPROVED'} ? 's-approved' : (${app.status == 'COMPLETED'} ? 's-completed' : 's-rejected')"
+                                         th:text="${app.status}">APPROVED</div>
+                                </th:block>
+                            </div>
+                        </div>
+
+                        <!-- CHAT PANEL (inline) -->
+                        <div class="chat-panel">
+                            <div class="chat-msgs">
+                                <div class="chat-msg student">
+                                    <div class="chat-avatar" style="background:#3B5BDB;" th:text="${#strings.substring(app.studentName,0,1)}">A</div>
+                                    <div>
+                                        <div class="chat-bubble" th:text="'Hi, I wanted to discuss ' + ${app.topic}">Hi, I wanted to discuss...</div>
+                                        <div class="chat-time" th:text="${app.date}">Today</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-input-row">
+                                <input type="text" class="chat-input" placeholder="Type a message…" onkeydown="sendChatMsg(event, this)">
+                                <button class="chat-send" onclick="sendChatMsgBtn(this)">
+                                    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- MEET LINK ROW -->
+                        <div class="meet-row">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                            <span class="meet-label">Meeting Link:</span>
+                            <input type="text" class="meet-link-input" placeholder="https://meet.google.com/xxx-xxxx or zoom.us/j/...">
+                            <button class="copy-link-btn" onclick="copyMeetLink(this)">Copy</button>
+                            <button class="copy-link-btn" onclick="sendMeetLink(this)" style="background:var(--primary-light);color:var(--primary);">Send to Student</button>
+                        </div>
+                    </div>
+                </th:block>
+
+            </div>
+        </div>
+
+        <!-- CALENDAR VIEW (hidden by default) -->
+        <div id="calendarView" style="display:none;">
+            <div class="calendar-view">
+                <div class="cal-header">
+                    <div class="cal-month" id="calMonthLabel">May 2026</div>
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" onclick="changeMonth(-1)">
+                            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button class="cal-nav-btn" onclick="changeMonth(1)">
+                            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="cal-grid" id="calDayLabels">
+                    <div class="cal-day-label">Sun</div>
+                    <div class="cal-day-label">Mon</div>
+                    <div class="cal-day-label">Tue</div>
+                    <div class="cal-day-label">Wed</div>
+                    <div class="cal-day-label">Thu</div>
+                    <div class="cal-day-label">Fri</div>
+                    <div class="cal-day-label">Sat</div>
+                </div>
+                <div class="cal-grid" id="calBody"></div>
+            </div>
+        </div>
+
+    </div><!-- /container -->
+</main>
+
+<!-- ─── OFFICE HOURS MODAL ─── -->
+<div class="modal-overlay" id="officeHoursModal" onclick="closeModalOutside(event,'officeHoursModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">📌 Edit Office Hours</div>
+            <button class="modal-close" onclick="closeModal('officeHoursModal')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:13px;color:var(--text-muted);">Set the days and time ranges when students can request appointments.</p>
+            <div class="oh-slots-edit" id="ohSlotsEdit">
+                <div class="oh-slot-edit-row">
+                    <select class="form-select"><option>Sunday</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option></select>
+                    <input type="time" class="form-input" value="10:00">
+                    <span style="color:var(--text-muted);font-size:13px;font-weight:600;">to</span>
+                    <input type="time" class="form-input" value="12:00">
+                    <button onclick="removeSlotRow(this)" style="color:var(--danger);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;">×</button>
+                </div>
+                <div class="oh-slot-edit-row">
+                    <select class="form-select"><option>Sunday</option><option>Monday</option><option selected>Tuesday</option><option>Wednesday</option><option>Thursday</option></select>
+                    <input type="time" class="form-input" value="14:00">
+                    <span style="color:var(--text-muted);font-size:13px;font-weight:600;">to</span>
+                    <input type="time" class="form-input" value="16:00">
+                    <button onclick="removeSlotRow(this)" style="color:var(--danger);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;">×</button>
+                </div>
+            </div>
+            <button class="add-slot-btn" onclick="addOHSlot()">+ Add Another Slot</button>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('officeHoursModal')">Cancel</button>
+            <button class="btn-primary" onclick="saveOfficeHours()">
+                <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save Hours
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── ADD APPOINTMENT MODAL ─── -->
+<div class="modal-overlay" id="addAppointmentModal" onclick="closeModalOutside(event,'addAppointmentModal')">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">➕ Block a New Slot</div>
+            <button class="modal-close" onclick="closeModal('addAppointmentModal')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Student Name</label>
+                <input type="text" class="form-input" id="newStudentName" placeholder="e.g. Abir Deb">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Topic</label>
+                <input type="text" class="form-input" id="newTopic" placeholder="e.g. Thesis Review">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-input" id="newDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration</label>
+                    <select class="form-select" id="newDuration">
+                        <option>15 Minutes</option>
+                        <option>30 Minutes</option>
+                        <option selected>45 Minutes</option>
+                        <option>60 Minutes</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select class="form-select" id="newPriority">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meeting Platform</label>
+                    <select class="form-select" id="newPlatform">
+                        <option value="none">In-person</option>
+                        <option value="meet">Google Meet</option>
+                        <option value="zoom">Zoom</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Meeting Link (optional)</label>
+                <input type="text" class="form-input" id="newMeetLink" placeholder="https://meet.google.com/…">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('addAppointmentModal')">Cancel</button>
+            <button class="btn-primary" onclick="addNewAppointment()">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Create Slot
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── SCRIPTS ─── -->
+<script>
+    let currentTab = 'PENDING';
+    let currentView = 'list';
+    let calYear, calMonth;
+
+    /* ─ TAB ─ */
+    function switchTab(status, btn) {
+        currentTab = status;
+        document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active-tab'));
+        btn.classList.add('active-tab');
+        filterAppointments();
+    }
+
+    /* ─ FILTER ─ */
+    function filterAppointments() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const items = document.querySelectorAll('.appt-item');
+        let vis = 0;
+        items.forEach(item => {
+            const status = item.getAttribute('data-status');
+            const name = item.querySelector('.student-name-val').textContent.toLowerCase();
+            const topic = item.querySelector('.topic-val').textContent.toLowerCase();
+            const matchTab = currentTab === 'ALL' || status === currentTab;
+            const matchQ = name.includes(q) || topic.includes(q);
+            item.style.display = matchTab && matchQ ? 'block' : 'none';
+            if (matchTab && matchQ) vis++;
+        });
+        const es = document.getElementById('emptyState');
+        if (es) es.style.display = vis === 0 ? 'flex' : 'none';
+    }
+
+    /* ─ STATS ─ */
+    function updateStats() {
+        const items = document.querySelectorAll('.appt-item');
+        let p=0, a=0, r=0;
+        items.forEach(i => {
+            const s = i.getAttribute('data-status');
+            if (s==='PENDING') p++;
+            else if (s==='APPROVED') a++;
+            else if (s==='REJECTED'||s==='CANCELLED') r++;
+        });
+        document.getElementById('stat-total').textContent = items.length;
+        document.getElementById('stat-pending').textContent = p;
+        document.getElementById('stat-approved').textContent = a;
+        document.getElementById('stat-rejected').textContent = r;
+    }
+
+    /* ─ VIEW TOGGLE ─ */
+    function switchView(v) {
+        currentView = v;
+        document.getElementById('listView').style.display = v === 'list' ? '' : 'none';
+        document.getElementById('calendarView').style.display = v === 'calendar' ? '' : 'none';
+        document.getElementById('btnListView').classList.toggle('active-tab', v==='list');
+        document.getElementById('btnCalView').classList.toggle('active-tab', v==='calendar');
+        if (v === 'calendar') renderCalendar();
+    }
+
+    /* ─ CHAT ─ */
+    function toggleChat(btn) {
+        const card = btn.closest('.appt-card');
+        const panel = card.querySelector('.chat-panel');
+        const open = panel.classList.toggle('open');
+        btn.style.background = open ? 'var(--primary)' : '';
+        btn.style.color = open ? '#fff' : '';
+        btn.style.borderColor = open ? 'var(--primary)' : '';
+    }
+    function sendChatMsg(e, input) { if (e.key === 'Enter') _doSend(input); }
+    function sendChatMsgBtn(btn) { _doSend(btn.previousElementSibling); }
+    function _doSend(input) {
+        const msg = input.value.trim();
+        if (!msg) return;
+        const panel = input.closest('.chat-panel');
+        const msgs = panel.querySelector('.chat-msgs');
+        const div = document.createElement('div');
+        div.className = 'chat-msg teacher';
+        div.innerHTML = `<div class="chat-avatar" style="background:var(--primary);">T</div><div><div class="chat-bubble">${escHtml(msg)}</div><div class="chat-time">Just now</div></div>`;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+        input.value = '';
+        showToast('💬 Message sent!', 'success');
+    }
+    function escHtml(t) { const d = document.createElement('div'); d.appendChild(document.createTextNode(t)); return d.innerHTML; }
+
+    /* ─ MEET LINK ─ */
+    function toggleMeet(btn) {
+        const card = btn.closest('.appt-card');
+        const row = card.querySelector('.meet-row');
+        const open = row.classList.toggle('open');
+        btn.style.background = open ? '#e8f0fe' : '';
+    }
+    function copyMeetLink(btn) {
+        const inp = btn.closest('.meet-row').querySelector('.meet-link-input');
+        if (!inp.value) { showToast('⚠️ Paste a link first', ''); return; }
+        navigator.clipboard.writeText(inp.value).then(() => showToast('🔗 Link copied!', 'success'));
+    }
+    function sendMeetLink(btn) {
+        const inp = btn.closest('.meet-row').querySelector('.meet-link-input');
+        if (!inp.value) { showToast('⚠️ Enter a meeting link first', ''); return; }
+        showToast('✅ Link sent to student!', 'success');
+    }
+
+    /* ─ APPROVE / REJECT ─ */
+    function handleApprove(btn) {
+        const card = btn.closest('.appt-card');
+        card.setAttribute('data-status', 'APPROVED');
+        const actDiv = btn.closest('.a-actions');
+        actDiv.innerHTML = '<div class="status-badge s-approved">APPROVED</div>';
+        card.classList.remove('priority-high','priority-medium','priority-low');
+        card.querySelector('.appt-inner .priority-tag') && (card.querySelector('.priority-tag').className = 'priority-tag pt-low');
+        updateStats();
+        filterAppointments();
+        showToast('✅ Appointment approved!', 'success');
+    }
+    function handleReject(btn) {
+        const card = btn.closest('.appt-card');
+        card.setAttribute('data-status', 'REJECTED');
+        const actDiv = btn.closest('.a-actions');
+        actDiv.innerHTML = '<div class="status-badge s-rejected">REJECTED</div>';
+        updateStats();
+        filterAppointments();
+        showToast('❌ Appointment declined.', 'error');
+    }
+
+    /* ─ ADD APPOINTMENT ─ */
+    function addNewAppointment() {
+        const name = document.getElementById('newStudentName').value.trim();
+        const topic = document.getElementById('newTopic').value.trim();
+        const date = document.getElementById('newDate').value;
+        const duration = document.getElementById('newDuration').value;
+        const priority = document.getElementById('newPriority').value;
+        if (!name || !topic || !date) { showToast('⚠️ Please fill in all required fields.', ''); return; }
+
+        const ptClass = priority === 'high' ? 'pt-high' : priority === 'low' ? 'pt-low' : 'pt-medium';
+        const ptLabel = priority.charAt(0).toUpperCase() + priority.slice(1);
+        const initials = name.substring(0,2).toUpperCase();
+        const colors = ['#3B5BDB','#6741D9','#0CA678','#E67700','#C92A2A','#2188FF','#099268'];
+        const bg = colors[Math.floor(Math.random()*colors.length)];
+
+        const card = document.createElement('div');
+        card.className = `appt-card appt-item priority-${priority}`;
+        card.setAttribute('data-status', 'PENDING');
+        card.innerHTML = `
+        <div class="appt-inner">
+            <div class="a-user">
+                <div class="a-avatar" style="background:${bg}">${initials}</div>
+                <div class="a-info">
+                    <div class="a-name student-name-val">${escHtml(name)}</div>
+                    <div class="a-topic topic-val">${escHtml(topic)}</div>
+                </div>
+            </div>
+            <div class="a-meta-row">
+                <div class="a-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><strong>${date}</strong></div>
+                <div class="a-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><strong>${duration}</strong></div>
+                <div class="priority-tag ${ptClass}">${ptLabel}</div>
+            </div>
+            <div class="a-actions">
+                <button class="btn-action btn-chat" onclick="toggleChat(this)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat</button>
+                <button class="btn-action btn-meet" onclick="toggleMeet(this)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#1a73e8" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg> Meet</button>
+                <button type="button" class="btn-action btn-approve" onclick="handleApprove(this)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Accept</button>
+                <button type="button" class="btn-action btn-reject" onclick="handleReject(this)">Decline</button>
+            </div>
+        </div>
+        <div class="chat-panel"><div class="chat-msgs"></div><div class="chat-input-row"><input type="text" class="chat-input" placeholder="Type a message…" onkeydown="sendChatMsg(event,this)"><button class="chat-send" onclick="sendChatMsgBtn(this)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button></div></div>
+        <div class="meet-row"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#1a73e8" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg><span class="meet-label">Meeting Link:</span><input type="text" class="meet-link-input" placeholder="https://meet.google.com/…"><button class="copy-link-btn" onclick="copyMeetLink(this)">Copy</button><button class="copy-link-btn" onclick="sendMeetLink(this)">Send</button></div>
+    `;
+        document.getElementById('appointmentsContainer').prepend(card);
+        closeModal('addAppointmentModal');
+        updateStats();
+        filterAppointments();
+        showToast('✅ Appointment slot created!', 'success');
+        document.getElementById('newStudentName').value='';
+        document.getElementById('newTopic').value='';
+        document.getElementById('newDate').value='';
+    }
+
+    /* ─ OFFICE HOURS ─ */
+    function addOHSlot() {
+        const container = document.getElementById('ohSlotsEdit');
+        const row = document.createElement('div');
+        row.className = 'oh-slot-edit-row';
+        row.innerHTML = `
+        <select class="form-select"><option>Sunday</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option></select>
+        <input type="time" class="form-input" value="09:00">
+        <span style="color:var(--text-muted);font-size:13px;font-weight:600;">to</span>
+        <input type="time" class="form-input" value="11:00">
+        <button onclick="removeSlotRow(this)" style="color:var(--danger);background:none;border:none;cursor:pointer;font-size:18px;line-height:1;">×</button>
+    `;
+        container.appendChild(row);
+    }
+    function removeSlotRow(btn) {
+        const rows = document.querySelectorAll('.oh-slot-edit-row');
+        if (rows.length <= 1) { showToast('⚠️ Need at least one slot.', ''); return; }
+        btn.parentElement.remove();
+    }
+    function saveOfficeHours() {
+        const rows = document.querySelectorAll('.oh-slot-edit-row');
+        const banner = document.getElementById('officeHoursBanner');
+        banner.innerHTML = '';
+        const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        rows.forEach(row => {
+            const sel = row.querySelector('select');
+            const times = row.querySelectorAll('input[type=time]');
+            const day = sel.options[sel.selectedIndex].text.substring(0,3);
+            const from = times[0].value;
+            const to = times[1].value;
+            const slot = document.createElement('div');
+            slot.className = 'oh-slot';
+            slot.innerHTML = `<div class="oh-slot-day">${day}</div><div class="oh-slot-time">${from} – ${to}</div>`;
+            banner.appendChild(slot);
+        });
+        closeModal('officeHoursModal');
+        showToast('📌 Office hours saved!', 'success');
+    }
+
+    /* ─ CALENDAR ─ */
+    function renderCalendar() {
+        const now = new Date();
+        if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
+
+        const body = document.getElementById('calBody');
+        body.innerHTML = '';
+
+        const firstDay = new Date(calYear, calMonth, 1).getDay();
+        const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+        const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Collect appointments by date
+        const apptMap = {};
+        document.querySelectorAll('.appt-item').forEach(item => {
+            const dateEl = item.querySelector('.a-meta strong');
+            if (!dateEl) return;
+            const d = dateEl.textContent.trim();
+            if (!apptMap[d]) apptMap[d] = [];
+            apptMap[d].push({ name: item.querySelector('.student-name-val').textContent, status: item.getAttribute('data-status').toLowerCase() });
+        });
+
+        // Prev month padding
+        for (let i=0; i<firstDay; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cal-cell other-month';
+            cell.innerHTML = `<div class="cal-date">${daysInPrev - firstDay + 1 + i}</div>`;
+            body.appendChild(cell);
+        }
+
+        // Current month
+        for (let d=1; d<=daysInMonth; d++) {
+            const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const cell = document.createElement('div');
+            cell.className = 'cal-cell' + (dateStr===todayStr?' today':'');
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'cal-date';
+            dateDiv.textContent = d;
+            cell.appendChild(dateDiv);
+
+            if (apptMap[dateStr]) {
+                apptMap[dateStr].forEach(a => {
+                    const tag = document.createElement('div');
+                    tag.className = `cal-appt ${a.status}`;
+                    tag.textContent = a.name;
+                    tag.title = a.name;
+                    cell.appendChild(tag);
+                });
+            }
+            cell.addEventListener('click', () => {
+                showToast(`📅 ${dateStr}`, '');
+            });
+            body.appendChild(cell);
+        }
+
+        // Next month padding
+        const total = firstDay + daysInMonth;
+        const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+        for (let i=1; i<=remaining; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cal-cell other-month';
+            cell.innerHTML = `<div class="cal-date">${i}</div>`;
+            body.appendChild(cell);
+        }
+    }
+    function changeMonth(delta) {
+        calMonth += delta;
+        if (calMonth < 0) { calMonth = 11; calYear--; }
+        if (calMonth > 11) { calMonth = 0; calYear++; }
+        renderCalendar();
+    }
+
+    /* ─ MODAL ─ */
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function closeModalOutside(e, id) { if (e.target.id === id) closeModal(id); }
+
+    /* ─ TOAST ─ */
+    function showToast(msg, type) {
+        const t = document.getElementById('toastEl');
+        t.textContent = msg;
+        t.className = 'toast show' + (type ? ' ' + type : '');
+        setTimeout(() => t.className = 'toast', 3200);
+    }
+
+    /* ─ INIT ─ */
+    window.addEventListener('DOMContentLoaded', () => {
+        updateStats();
+        const pending = parseInt(document.getElementById('stat-pending').textContent);
+        if (pending === 0 && document.querySelectorAll('.appt-item').length > 0) {
+            const allBtn = document.querySelectorAll('.tab-pill')[2];
+            switchTab('ALL', allBtn);
+        } else {
+            filterAppointments();
+        }
+        // set today as default date in modal
+        const today = new Date().toISOString().split('T')[0];
+        const dateInput = document.getElementById('newDate');
+        if (dateInput) dateInput.value = today;
+    });
+</script>
+</body>
+</html>

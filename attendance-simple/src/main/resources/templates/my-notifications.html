@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Notifications | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* ✅ Premium Theme Variables */
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255, 255, 255, 0.95); --surface: #ffffff;
+            --border: rgba(0, 0, 0, 0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255, 255, 255, 0.6);
+            --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15, 15, 25, 0.85); --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03); --card-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ✨ Smooth Entry Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* 🚀 Floating Sidebar */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px;}
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;}
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow);}
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);}
+
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px; gap: 10px;
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);}
+
+        /* 🧱 Main Area */
+        .main { margin-left: 320px; flex: 1; padding: 40px; max-width: 1200px; }
+
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+
+        /* PREMIUM THEME TOGGLE BUTTON */
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 12px 20px; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; color: var(--text);
+            font-weight: 700; font-size: 14px; transition: var(--transition); outline: none; box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); border-color: var(--accent); }
+
+        .btn-mark-all {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; border: none;
+            padding: 12px 25px; border-radius: 50px; font-weight: 800; letter-spacing: 0.5px;
+            font-size: 13px; cursor: pointer; transition: var(--transition); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+        }
+        .btn-mark-all:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(99, 102, 241, 0.35); }
+
+        /* 📊 Analytics Bar Luxury */
+        .analytics-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        .stat-box {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            padding: 30px; border-radius: 30px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 25px; transition: var(--transition);
+            box-shadow: var(--card-shadow); position: relative; overflow: hidden;
+        }
+        .stat-box:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 15px 35px rgba(99,102,241,0.1); }
+        .stat-icon { font-size: 32px; width: 65px; height: 65px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);}
+        .stat-val { font-size: 28px; font-weight: 800; color: var(--text); margin-top: 5px;}
+        .stat-label { font-size: 12px; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+
+        /* 🔍 PREMIUM SEARCH & FILTER CONTROLS BAR */
+        .filter-bar {
+            background: var(--glass-bg); backdrop-filter: blur(20px); padding: 20px; border-radius: 25px;
+            border: 1px solid var(--border); margin-bottom: 30px; display: flex; gap: 20px; align-items: center; box-shadow: var(--card-shadow);
+        }
+        .filter-bar input {
+            flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 16px;
+            background: var(--surface); color: var(--text); outline: none; font-family: inherit; font-size: 14px; font-weight: 500; transition: 0.3s;
+        }
+        .filter-bar input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+
+        .filter-bar select {
+            width: 240px; padding: 15px 20px; border-radius: 16px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px; font-weight: 600; outline: none; transition: 0.3s;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat; background-position: right 20px center;
+        }
+        .filter-bar select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .filter-bar select option { background: #1e293b; color: #f8fafc; font-weight: 500; }
+
+        /* 🧩 Luxury Notification Card */
+        .notif-container { display: flex; flex-direction: column; gap: 20px; }
+        .notif-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            padding: 25px 35px; border-radius: 30px; border: 1px solid var(--border);
+            display: flex; flex-direction: column; gap: 15px; transition: var(--transition);
+            position: relative; overflow: hidden; box-shadow: var(--card-shadow);
+        }
+        .notif-card:hover { transform: translateX(8px); border-color: var(--accent); box-shadow: 0 15px 35px rgba(99, 102, 241, 0.1); }
+
+        .notif-card.urgent-border { border-left: 5px solid #ef4444; }
+        .notif-card.urgent-border:hover { border-color: #ef4444; box-shadow: 0 15px 35px rgba(239, 68, 68, 0.15); }
+
+        .notif-main-content { display: flex; align-items: center; gap: 25px; width: 100%; }
+
+        /* 🔔 Icons with Gradient */
+        .n-icon {
+            width: 60px; height: 60px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0;
+            background: linear-gradient(135deg, #6366f1, #a855f7); color: white;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        .n-icon.blood { background: linear-gradient(135deg, #ef4444, #f97316); box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); }
+        .n-icon.job { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+
+        .n-body { flex: 1; }
+        .n-header { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; }
+        .n-title { font-weight: 800; color: var(--text); font-size: 18px; letter-spacing: -0.5px;}
+
+        .badge-urgent {
+            background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 6px 14px;
+            border-radius: 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .n-msg { color: var(--subtext); font-size: 14px; line-height: 1.6; font-weight: 500; }
+        .n-time { font-size: 12px; color: var(--subtext); margin-top: 10px; font-weight: 700; display: block; opacity: 0.8;}
+
+        /* 🔥 NEW INTERACTIVE ACTION FOOTER BAR */
+        .notif-action-footer {
+            display: flex; justify-content: flex-start; gap: 12px; width: 100%;
+            padding-top: 15px; border-top: 1px dashed var(--border); margin-top: 5px;
+        }
+        .btn-context-action {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 800;
+            text-decoration: none; transition: var(--transition); border: none; cursor: pointer;
+        }
+        .btn-context-view { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2); }
+        .btn-context-view:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3); }
+
+        .btn-context-submit { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .btn-context-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3); }
+
+        .btn-context-pay { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
+        .btn-context-pay:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(245, 158, 11, 0.3); }
+
+        .btn-context-done { background: rgba(255, 255, 255, 0.05); color: var(--subtext); border: 1px solid var(--border); }
+        .btn-context-done:hover { background: var(--border); color: var(--text); }
+
+        /* Actions styling */
+        .actions { display: flex; gap: 12px; }
+        .btn-action {
+            width: 45px; height: 45px; border-radius: 14px; border: none;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+            cursor: pointer; transition: var(--transition); background: var(--surface); color: var(--subtext);
+            border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .btn-action:hover { transform: scale(1.1) translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .btn-delete:hover { background: #ef4444; color: white; border-color: #ef4444; }
+        .btn-read { color: #10b981; }
+        .btn-read:hover { background: #10b981; color: white; border-color: #10b981; }
+
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--subtext); background: var(--glass-bg); border-radius: 40px; border: 2px dashed var(--border); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-finance">💎 Finance & Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Career Hub</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications" class="active">🔔 Notifications</a>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${initials}">AD</div>
+            <div class="user-info">
+                <span style="font-size:14px; font-weight:800; color:var(--text); display:block;" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px; color:var(--subtext); font-weight: 500;">Student</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar">
+        <h1>Recent <span style="font-weight: 300; color: var(--subtext);">Alerts</span></h1>
+        <div class="header-actions">
+            <form action="/my-notifications/read-all" method="POST" style="margin: 0;" th:if="${notifications != null and !notifications.isEmpty()}">
+                <button type="submit" class="btn-mark-all">✨ Mark All as Read</button>
+            </form>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">☀️</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="analytics-bar animate-up delay-1">
+        <div class="stat-box">
+            <div class="stat-icon">📬</div>
+            <div>
+                <div class="stat-label">Total Inbox</div>
+                <div class="stat-val" th:text="${notifications != null ? notifications.size() : '0'}">0</div>
+            </div>
+        </div>
+        <div class="stat-box" style="border-bottom: 4px solid #ef4444;">
+            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1);">🔥</div>
+            <div>
+                <div class="stat-label">Unread Messages</div>
+                <div class="stat-val" th:text="${unreadNotifCount != null ? unreadNotifCount : '0'}">0</div>
+            </div>
+        </div>
+        <div class="stat-box" style="border-bottom: 4px solid #10b981;">
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1);">✅</div>
+            <div>
+                <div class="stat-label">Read History</div>
+                <div class="stat-val" th:text="${(notifications != null ? notifications.size() : 0) - (unreadNotifCount != null ? unreadNotifCount : 0)}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-bar animate-up delay-1">
+        <input type="text" id="notifSearchInput" placeholder="🔍 Search alert title, text message, content details..." onkeyup="filterNotifications()">
+        <select id="notifTypeSelect" onchange="filterNotifications()">
+            <option value="ALL">All Categories</option>
+            <option value="BLOOD">🩸 Blood Banks & Alerts</option>
+            <option value="ASSIGNMENT">📚 Assignments Feed</option>
+            <option value="APPOINTMENT">👨‍🏫 Faculty appointments</option>
+            <option value="LEAVE">📅 Leave Application Status</option>
+            <option value="FINANCE">💎 Finance & Payments</option>
+            <option value="GENERAL">🔔 General System Alerts</option>
+        </select>
+    </div>
+
+    <div class="notif-container animate-up delay-2" id="notificationsContainer">
+        <div th:if="${notifications == null or notifications.isEmpty()}" class="empty-state">
+            <div style="font-size: 70px; margin-bottom: 25px;">🎉</div>
+            <h3 style="font-weight: 800; color: var(--text);">No notifications found</h3>
+            <p style="font-size: 15px;">You're all caught up for now! Enjoy your day.</p>
+        </div>
+
+        <div class="notif-card" th:each="n : ${notifications}"
+             th:attr="data-title=${#strings.toLowerCase(n.title)}, data-message=${#strings.toLowerCase(n.message)}, data-type=${n.type}"
+             th:classappend="${#strings.contains(n.title, 'Urgent') or #strings.contains(n.message, 'Urgent')} ? 'urgent-border' : ''">
+
+            <div style="display: flex; align-items: flex-start; gap: 25px; width: 100%;">
+                <div class="n-icon" th:classappend="${n.type == 'BLOOD' ? 'blood' : (n.type == 'ASSIGNMENT' ? 'job' : '')}"
+                     th:text="${n.type == 'BLOOD' ? '🩸' : (n.type == 'ASSIGNMENT' ? '📚' : '🔔')}">🔔</div>
+
+                <div class="n-body">
+                    <div class="n-header">
+                        <span class="n-title" th:text="${n.title}">Notification Title</span>
+                        <span class="badge-urgent" th:if="${#strings.contains(n.title, 'Urgent') or #strings.contains(n.message, 'Urgent')}">Urgent</span>
+                    </div>
+                    <p class="n-msg" th:text="${n.message}">Details of the notification go here...</p>
+                    <span class="n-time">🕒 <span th:text="${n.date}">Today at 10:00 AM</span></span>
+
+                    <div class="notif-action-footer">
+                        <a th:if="${n.type == 'ASSIGNMENT'}" href="/student-assignments" class="btn-context-action btn-context-view">🔍 View Brief</a>
+                        <a th:if="${n.type == 'ASSIGNMENT'}" href="/student-assignments" class="btn-context-action btn-context-submit">🚀 Submit Code</a>
+
+                        <a th:if="${n.type == 'BLOOD'}" href="/student-blood-finder" class="btn-context-action btn-context-submit" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">🩸 Donate Blood</a>
+
+                        <a th:if="${n.type == 'APPOINTMENT'}" href="/student-appointment" class="btn-context-action btn-context-view" style="background: linear-gradient(135deg, #a855f7, #6366f1);">📅 View Slot</a>
+
+                        <a th:if="${n.type == 'LEAVE'}" href="/student-leave" class="btn-context-action btn-context-view">📋 Track Status</a>
+
+                        <a th:if="${n.type == 'FINANCE'}" href="/student-finance" class="btn-context-action btn-context-pay">💳 Pay Now</a>
+
+                        <button type="button" class="btn-context-action btn-context-done" onclick="markCardAsCompleted(this)">Mark as Done</button>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <form th:if="${n.status == 'unread'}" th:action="@{/my-notifications/read/{id}(id=${n.id})}" method="POST" style="margin:0;">
+                        <button type="submit" class="btn-action btn-read" title="Mark Read">✔️</button>
+                    </form>
+                    <form th:action="@{/my-notifications/delete/{id}(id=${n.id})}" method="POST" style="margin:0;">
+                        <button type="submit" class="btn-action btn-delete" title="Delete Notification">🗑️</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="noMatchState" class="empty-state" style="display: none;">
+            <div style="font-size: 60px; margin-bottom: 20px;">🔍</div>
+            <h3 style="font-weight: 800; color: var(--text);">No matching alerts found</h3>
+            <p style="font-size: 15px;">Try refining your keywords or selected category filter.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙';
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Interactive Client-Side Dismiss Engine
+    function markCardAsCompleted(btn) {
+        const parentCard = btn.closest('.notif-card');
+        if(parentCard) {
+            parentCard.style.opacity = '0.5';
+            parentCard.style.transform = 'scale(0.98)';
+            btn.innerHTML = '✓ Handled';
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.6';
+        }
+    }
+
+    // Real-time Client-side Filter Engine
+    function filterNotifications() {
+        const keyword = document.getElementById('notifSearchInput').value.toLowerCase().trim();
+        const selectedType = document.getElementById('notifTypeSelect').value;
+
+        const cards = document.querySelectorAll('.notif-card');
+        const noMatchBox = document.getElementById('noMatchState');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title') || '';
+            const message = card.getAttribute('data-message') || '';
+            let type = card.getAttribute('data-type') || 'GENERAL';
+
+            // Normalize standard fallbacks if type mismatch happens
+            if (type !== 'BLOOD' && type !== 'ASSIGNMENT' && type !== 'APPOINTMENT' && type !== 'LEAVE' && type !== 'FINANCE') {
+                type = 'GENERAL';
+            }
+
+            const matchKeyword = title.includes(keyword) || message.includes(keyword);
+            const matchType = (selectedType === 'ALL' || type === selectedType);
+
+            if (matchKeyword && matchType) {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (cards.length > 0) {
+            noMatchBox.style.display = (visibleCount === 0) ? 'block' : 'none';
+        }
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+        }
+    };
+</script>
+</body>
+</html>

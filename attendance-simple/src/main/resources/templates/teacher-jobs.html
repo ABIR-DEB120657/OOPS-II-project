@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Career Hub - Teacher Portal</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --primary-light: #EEF2FF;
+            --purple: #8B5CF6;
+            --purple-light: #F3E8FF;
+            --success: #10B981;
+            --success-bg: #ECFDF5;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-float: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        body.dark {
+            --bg: #0F172A;
+            --surface: #1E293B;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --primary-light: rgba(79,70,229,0.15);
+            --purple-light: rgba(139,92,246,0.15);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text-main); min-height:100vh; display:flex; -webkit-font-smoothing:antialiased; }
+
+        /* SIDEBAR */
+        .sidebar { width:260px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; }
+        .sidebar-header { padding:24px 20px; display:flex; align-items:center; gap:12px; }
+        .logo-img { width:36px; height:36px; border-radius:var(--radius-sm); }
+        .logo-text { font-weight:700; font-size:15px; line-height:1.2; letter-spacing:-0.01em; }
+        .logo-sub { color:var(--text-muted); font-size:11px; font-weight:500; }
+        .menu-section { padding:0 12px; flex:1; overflow-y:auto; }
+        .menu-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:16px 0 8px 12px; font-weight:600; }
+        .menu-item { display:flex; align-items:center; gap:12px; padding:10px 12px; margin-bottom:4px; border-radius:var(--radius-md); text-decoration:none; color:var(--text-muted); font-size:14px; font-weight:500; transition:var(--transition); border-left:3px solid transparent; }
+        .menu-item svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
+        .menu-item:hover { background:var(--bg); color:var(--text-main); }
+        .menu-item.active { background:var(--primary-light); color:var(--primary); border-left-color:var(--primary); font-weight:600; }
+        .sidebar-footer { padding:16px; border-top:1px solid var(--border); }
+        .user-card { display:flex; align-items:center; gap:12px; padding:12px; border-radius:var(--radius-md); background:var(--bg); border:1px solid var(--border); text-decoration:none; transition:var(--transition); }
+        .user-card:hover { border-color:var(--primary); }
+        .avatar-wrap { position:relative; width:36px; height:36px; }
+        .avatar { width:100%; height:100%; border-radius:10px; object-fit:cover; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; }
+        .status-dot { position:absolute; bottom:-2px; right:-2px; width:12px; height:12px; background:var(--success); border:2px solid var(--bg); border-radius:50%; }
+        .user-info { flex:1; overflow:hidden; }
+        .user-name { font-size:13px; font-weight:600; color:var(--text-main); white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+        .user-role { font-size:11px; color:var(--text-muted); }
+
+        /* MAIN */
+        .main-wrapper { margin-left:260px; flex:1; display:flex; flex-direction:column; }
+        .topbar { height:70px; padding:0 32px; display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.8); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50; }
+        body.dark .topbar { background:rgba(30,41,59,0.8); }
+        .search-bar { position:relative; width:320px; }
+        .search-bar input { width:100%; padding:10px 16px 10px 40px; border-radius:99px; border:1px solid var(--border); background:var(--bg); color:var(--text-main); font-size:13px; outline:none; transition:var(--transition); }
+        .search-bar input:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); background:var(--surface); }
+        .search-bar svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:var(--text-muted); }
+        .topbar-actions { display:flex; align-items:center; gap:16px; }
+        .icon-btn { width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--transition); position:relative; }
+        .icon-btn:hover { color:var(--text-main); border-color:var(--text-muted); }
+
+        .container { padding:32px; max-width:1200px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:32px; }
+
+        /* PAGE HEADER */
+        .page-header { display:flex; justify-content:space-between; align-items:flex-end; }
+        .page-title h1 { font-size:24px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; display:flex; align-items:center; gap:8px; color:var(--text-main); }
+        .page-title p { font-size:14px; color:var(--text-muted); }
+
+        /* STATS GRID */
+        .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+        .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow-sm); transition:var(--transition); }
+        .stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:#cbd5e1; }
+        .stat-header { display:flex; justify-content:space-between; align-items:flex-start; }
+        .stat-title { font-size:13px; font-weight:600; color:var(--text-muted); }
+        .stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+        .stat-icon svg { width:18px; height:18px; }
+        .stat-value { font-size:28px; font-weight:800; letter-spacing:-0.02em; color:var(--text-main); }
+        .ic-primary { color:var(--primary); background:var(--primary-light); }
+        .ic-purple { color:var(--purple); background:var(--purple-light); }
+        .ic-orange { color:var(--warning); background:rgba(245,158,11,0.15); }
+        .ic-green { color:var(--success); background:var(--success-bg); }
+
+        /* CATEGORY FILTER BAR */
+        .filter-bar { display:flex; gap:8px; flex-wrap:wrap; padding:16px 0; border-bottom:1px solid var(--border); margin-bottom:4px; }
+        .filter-chip { padding:6px 14px; border-radius:99px; border:1px solid var(--border); background:var(--surface); font-size:12px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:5px; }
+        .filter-chip:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+        .filter-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+        .filter-chip svg { width:12px; height:12px; }
+
+        /* LAYOUT */
+        .layout-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; align-items:start; }
+        .feed-section { display:flex; flex-direction:column; gap:20px; }
+        .feed-header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:16px; }
+        .tabs { display:flex; gap:8px; }
+        .tab-btn { padding:8px 16px; border-radius:99px; border:1px solid transparent; background:transparent; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:6px; }
+        .tab-btn:hover { color:var(--text-main); background:var(--bg); }
+        .tab-btn.active { background:var(--text-main); color:var(--surface); }
+
+        /* FEATURED BADGE */
+        .featured-ribbon { position:absolute; top:-1px; right:16px; background:linear-gradient(135deg,#F59E0B,#F97316); color:#fff; font-size:10px; font-weight:800; padding:4px 10px 6px; border-radius:0 0 8px 8px; letter-spacing:0.08em; text-transform:uppercase; display:flex; align-items:center; gap:4px; }
+        .featured-ribbon svg { width:10px; height:10px; fill:currentColor; stroke:none; }
+
+        /* JOB CARD */
+        .job-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow-sm); transition:var(--transition); border-left:4px solid var(--primary); position:relative; }
+        .job-card.type-student { border-left-color:var(--purple); }
+        .job-card.featured { border-left-color:var(--warning); box-shadow:0 0 0 1px rgba(245,158,11,0.2), var(--shadow-sm); }
+        .job-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-float); border-color:#cbd5e1; }
+
+        .jc-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+        .jc-title { font-size:18px; font-weight:700; color:var(--text-main); margin-bottom:4px; letter-spacing:-0.01em; }
+        .jc-meta { font-size:13px; color:var(--text-muted); font-weight:500; display:flex; align-items:center; gap:6px; }
+        .status-badge { padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; background:var(--success-bg); color:var(--success); letter-spacing:0.05em; text-transform:uppercase; }
+        .jc-tags { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+        .jc-tag { padding:4px 10px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:12px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; gap:4px; }
+        .jc-tag.urgent { color:var(--danger); border-color:rgba(239,68,68,0.2); background:rgba(239,68,68,0.1); }
+        .jc-tag.cat-it { color:#0EA5E9; border-color:rgba(14,165,233,0.2); background:rgba(14,165,233,0.08); }
+        .jc-tag.cat-remote { color:#10B981; border-color:rgba(16,185,129,0.2); background:rgba(16,185,129,0.08); }
+        .jc-tag.cat-featured { color:#F59E0B; border-color:rgba(245,158,11,0.2); background:rgba(245,158,11,0.08); }
+        .jc-desc { font-size:14px; color:var(--text-main); opacity:0.85; line-height:1.5; margin-bottom:20px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .jc-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border); gap:8px; }
+        .jc-stats { display:flex; gap:16px; font-size:13px; font-weight:600; color:var(--text-muted); }
+        .jc-stats span { display:flex; align-items:center; gap:4px; }
+        .jc-stats svg { width:14px; height:14px; }
+        .jc-actions { display:flex; gap:8px; }
+        .btn-view { padding:8px 16px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; color:var(--primary); background:var(--primary-light); border:none; cursor:pointer; transition:var(--transition); }
+        .btn-view:hover { background:var(--primary); color:white; }
+        .btn-msg { padding:8px 12px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; color:var(--text-muted); background:var(--bg); border:1px solid var(--border); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:5px; }
+        .btn-msg:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+        .btn-msg svg { width:13px; height:13px; }
+
+        /* RIGHT PANEL */
+        .right-panel { display:flex; flex-direction:column; gap:24px; }
+        .panel-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow-sm); }
+        .panel-title { font-size:15px; font-weight:700; color:var(--text-main); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .action-list { display:flex; flex-direction:column; gap:12px; }
+        .action-btn { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); font-size:13px; font-weight:600; color:var(--text-main); cursor:pointer; transition:var(--transition); width:100%; text-align:left; }
+        .action-btn:hover { border-color:var(--primary); background:var(--surface); box-shadow:var(--shadow-sm); transform:translateY(-1px); }
+        .action-btn svg { color:var(--primary); }
+
+        /* APPLICATION TRACKING PANEL */
+        .app-track-list { display:flex; flex-direction:column; gap:10px; }
+        .app-track-item { padding:12px 14px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .app-track-info { flex:1; overflow:hidden; }
+        .app-track-title { font-size:13px; font-weight:600; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+        .app-track-sub { font-size:11px; color:var(--text-muted); font-weight:500; }
+        .app-track-status { padding:3px 8px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; white-space:nowrap; }
+        .app-track-status.submitted { background:#EFF6FF; color:#3B82F6; }
+        .app-track-status.approved { background:var(--success-bg); color:var(--success); }
+        .app-track-status.rejected { background:#FEF2F2; color:var(--danger); }
+        .app-track-status.pending { background:rgba(245,158,11,0.1); color:var(--warning); }
+        .app-track-empty { text-align:center; padding:20px; font-size:13px; color:var(--text-muted); }
+
+        /* CV REVIEW PANEL */
+        .cv-upload-area { border:2px dashed var(--border); border-radius:var(--radius-md); padding:20px; text-align:center; cursor:pointer; transition:var(--transition); }
+        .cv-upload-area:hover { border-color:var(--primary); background:var(--primary-light); }
+        .cv-upload-area svg { width:28px; height:28px; color:var(--text-muted); margin-bottom:8px; }
+        .cv-upload-area p { font-size:13px; color:var(--text-muted); font-weight:500; }
+        .cv-upload-area span { font-size:11px; color:var(--text-muted); opacity:0.7; }
+        .cv-upload-area input { display:none; }
+        .cv-file-name { font-size:12px; color:var(--primary); font-weight:600; margin-top:8px; display:none; }
+        .btn-review-cv { width:100%; margin-top:12px; padding:10px; border-radius:var(--radius-sm); font-size:13px; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--primary),var(--purple)); border:none; cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; gap:6px; }
+        .btn-review-cv:hover { opacity:0.9; transform:translateY(-1px); }
+        .btn-review-cv svg { width:14px; height:14px; }
+        .cv-result { margin-top:14px; padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); font-size:13px; color:var(--text-main); line-height:1.6; display:none; max-height:200px; overflow-y:auto; }
+        .cv-result.show { display:block; }
+        .cv-result h4 { font-size:13px; font-weight:700; color:var(--primary); margin-bottom:6px; }
+        .cv-score-bar { margin:10px 0; }
+        .cv-score-label { display:flex; justify-content:space-between; font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
+        .cv-score-track { height:6px; background:var(--border); border-radius:99px; overflow:hidden; }
+        .cv-score-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--purple)); border-radius:99px; transition:width 0.8s ease; }
+
+        /* ACTIVITY LIST */
+        .activity-list { display:flex; flex-direction:column; gap:16px; }
+        .activity-item { display:flex; gap:12px; align-items:flex-start; }
+        .activity-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .activity-content { flex:1; }
+        .activity-text { font-size:13px; color:var(--text-main); line-height:1.4; margin-bottom:4px; }
+        .activity-text strong { font-weight:600; }
+        .activity-time { font-size:11px; color:var(--text-muted); font-weight:500; }
+
+        /* EMPTY STATE */
+        .empty-state { text-align:center; padding:64px 20px; background:var(--surface); border-radius:var(--radius-lg); border:1px dashed var(--border); display:flex; flex-direction:column; align-items:center; gap:16px; }
+        .empty-state svg { color:var(--text-muted); opacity:0.5; }
+        .empty-state h3 { font-size:16px; font-weight:700; color:var(--text-main); }
+        .empty-state p { font-size:14px; color:var(--text-muted); max-width:300px; margin:0 auto; line-height:1.5; }
+        .btn-create-empty { margin-top:8px; padding:10px 20px; background:var(--text-main); color:var(--surface); border:none; border-radius:var(--radius-sm); font-size:13px; font-weight:600; cursor:pointer; transition:var(--transition); }
+        .btn-create-empty:hover { opacity:0.9; }
+
+        /* MODAL */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:var(--surface); border-radius:var(--radius-lg); width:100%; max-width:520px; max-height:90vh; overflow-y:auto; box-shadow:0 25px 50px rgba(0,0,0,0.2); border:1px solid var(--border); animation:modalIn 0.2s ease; }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-header { padding:20px 24px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .modal-header h3 { font-size:16px; font-weight:700; color:var(--text-main); }
+        .modal-close { width:32px; height:32px; border-radius:50%; border:none; background:var(--bg); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; transition:var(--transition); }
+        .modal-close:hover { background:var(--border); color:var(--text-main); }
+        .modal-body { padding:24px; display:flex; flex-direction:column; gap:16px; }
+        .modal-label { font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px; display:block; }
+        .modal-input, .modal-textarea, .modal-select { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); color:var(--text-main); font-size:13px; font-family:inherit; outline:none; transition:var(--transition); }
+        .modal-input:focus, .modal-textarea:focus, .modal-select:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
+        .modal-textarea { min-height:120px; resize:vertical; }
+        .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+        .btn-cancel { padding:10px 20px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; color:var(--text-muted); background:var(--bg); border:1px solid var(--border); cursor:pointer; transition:var(--transition); }
+        .btn-cancel:hover { border-color:var(--text-muted); }
+        .btn-submit { padding:10px 20px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; color:#fff; background:var(--primary); border:none; cursor:pointer; transition:var(--transition); }
+        .btn-submit:hover { background:var(--primary-hover); }
+
+        /* JOB DETAIL MODAL */
+        .detail-section { margin-bottom:16px; }
+        .detail-section h4 { font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; }
+        .detail-section p { font-size:14px; color:var(--text-main); line-height:1.6; }
+        .detail-meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .detail-meta-item { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; }
+        .detail-meta-item .dmi-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px; }
+        .detail-meta-item .dmi-val { font-size:13px; font-weight:700; color:var(--text-main); }
+
+        /* TOAST */
+        .toast { position:fixed; bottom:24px; right:24px; background:var(--text-main); color:var(--surface); padding:12px 20px; border-radius:var(--radius-md); font-size:13px; font-weight:600; z-index:999; transform:translateY(80px); opacity:0; transition:all 0.3s ease; box-shadow:var(--shadow-float); }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .toast.success { background:#0F172A; border-left:4px solid var(--success); }
+        .toast.info { background:#0F172A; border-left:4px solid var(--primary); }
+
+        /* APP TRACKING MODAL */
+        .app-list-full { display:flex; flex-direction:column; gap:10px; }
+        .app-list-full-item { padding:14px 16px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        .alf-title { font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:3px; }
+        .alf-sub { font-size:12px; color:var(--text-muted); font-weight:500; display:flex; gap:12px; }
+        .btn-cancel-app { padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; color:var(--danger); background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); cursor:pointer; transition:var(--transition); }
+        .btn-cancel-app:hover { background:var(--danger); color:#fff; }
+
+        @media (max-width:1024px) {
+            .sidebar { transform:translateX(-100%); }
+            .main-wrapper { margin-left:0; }
+            .layout-grid { grid-template-columns:1fr; }
+            .stats-grid { grid-template-columns:repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiM2RDVERkMiIHJ4PSI4Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTE2IDZMMjQgMTRMMTYgMjJMOCAxNEwxNiA2WiIvPjwvc3ZnPg=='"/>
+        <div>
+            <div class="logo-text">Nexus One</div>
+            <div class="logo-sub">Teacher Portal</div>
+        </div>
+    </div>
+    <div class="menu-section">
+        <div class="menu-label">Menu</div>
+        <a href="/teacher-portal" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Dashboard
+        </a>
+        <a href="/attendance" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Mark Attendance
+        </a>
+        <a href="/teacher-assignment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Assignments
+        </a>
+        <a href="/teacher-leave" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Leave Requests
+        </a>
+        <div class="menu-label">Apps</div>
+        <a href="/teacher-appointment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Faculty Sync
+        </a>
+        <a href="/teacher-jobs" class="menu-item active">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Career Hub
+        </a>
+        <a href="/teacher-blood-finder" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> Blood Finder
+        </a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card" style="text-decoration:none;">
+            <div class="avatar-wrap">
+                <img th:src="${session.teacherId != null ? '/teachers/' + session.teacherId + '.jpg' : '/teachers/0.jpg'}" class="avatar" onerror="this.style.display='none'; document.getElementById('sbFallback1').style.display='flex';"/>
+                <div class="avatar" id="sbFallback1" style="display:none;" th:text="${session.loggedIn != null and session.loggedIn.length() >= 2 ? #strings.substring(session.loggedIn,0,2).toUpperCase() : 'TR'}">TR</div>
+                <div class="status-dot"></div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" th:text="${session.loggedIn != null ? session.loggedIn : 'Teacher'}">Teacher</div>
+                <div class="user-role">Faculty Member</div>
+            </div>
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main-wrapper">
+    <header class="topbar">
+        <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="globalSearch" placeholder="Search jobs, tuitions or companies..." oninput="filterJobs()">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" title="Toggle Theme" onclick="toggleTheme()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+            <a href="/logout" class="icon-btn" title="Logout" style="color:var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Career &amp; Tuition Hub</h1>
+                <p>Monitor official job circulars and review student tuition vacancies seamlessly.</p>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Total Circulars</div>
+                    <div class="stat-icon ic-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+                </div>
+                <div class="stat-value" th:text="${officialJobs != null ? officialJobs.size() : 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Student Tuitions</div>
+                    <div class="stat-icon ic-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg></div>
+                </div>
+                <div class="stat-value" th:text="${studentJobs != null ? studentJobs.size() : 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Pending Approvals</div>
+                    <div class="stat-icon ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                </div>
+                <div class="stat-value">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">Active Applications</div>
+                    <div class="stat-icon ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                </div>
+                <div class="stat-value" id="activeAppCount">0</div>
+            </div>
+        </div>
+
+        <div class="layout-grid">
+
+            <!-- LEFT: JOB FEED -->
+            <div class="feed-section">
+
+                <div class="feed-header">
+                    <div class="tabs">
+                        <button class="tab-btn active" id="btn-off" onclick="switchTab('official')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Official Circulars
+                        </button>
+                        <button class="tab-btn" id="btn-stu" onclick="switchTab('student')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Student Tuitions
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CATEGORY FILTER -->
+                <div class="filter-bar" id="categoryFilterBar">
+                    <button class="filter-chip active" data-cat="all" onclick="filterByCategory(this,'all')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg> All
+                    </button>
+                    <button class="filter-chip" data-cat="IT" onclick="filterByCategory(this,'IT')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg> IT / Tech
+                    </button>
+                    <button class="filter-chip" data-cat="Remote" onclick="filterByCategory(this,'Remote')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Remote
+                    </button>
+                    <button class="filter-chip" data-cat="Internship" onclick="filterByCategory(this,'Internship')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Internship
+                    </button>
+                    <button class="filter-chip" data-cat="Full-time" onclick="filterByCategory(this,'Full-time')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Full-time
+                    </button>
+                    <button class="filter-chip" data-cat="Part-time" onclick="filterByCategory(this,'Part-time')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> Part-time
+                    </button>
+                    <button class="filter-chip" data-cat="Featured" onclick="filterByCategory(this,'Featured')">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Featured
+                    </button>
+                </div>
+
+                <!-- OFFICIAL JOBS -->
+                <div id="sec-off">
+                    <div th:if="${officialJobs == null or #lists.isEmpty(officialJobs)}" class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        <h3>No Official Circulars</h3>
+                        <p>There are no active official job circulars published at this moment.</p>
+                        <button class="btn-create-empty" onclick="openPostModal()">Post a Circular</button>
+                    </div>
+
+                    <div th:each="job : ${officialJobs}"
+                         th:classappend="${job.type != null and (job.type.contains('Featured') or job.type.contains('featured')) ? 'featured' : ''}"
+                         class="job-card"
+                         th:attr="data-type=${job.type},data-tags=${job.departmentTags},data-title=${job.title},data-company=${job.company},data-desc=${job.description},data-deadline=${job.deadline},data-status=${job.status},data-id=${job.id},data-author=${job.authorName},data-views=${job.views},data-applies=${job.applyCount}">
+
+                        <div th:if="${job.type != null and (job.type.contains('Featured') or job.type.contains('featured'))}" class="featured-ribbon">
+                            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Featured
+                        </div>
+
+                        <div class="jc-header">
+                            <div>
+                                <div class="jc-title" th:text="${job.title}">Job Title</div>
+                                <div class="jc-meta">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                                    <span th:text="${job.company}">Company Name</span>
+                                </div>
+                            </div>
+                            <div class="status-badge" th:text="${job.status}">ACTIVE</div>
+                        </div>
+                        <div class="jc-tags">
+                            <span class="jc-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <span th:text="${job.type}">Full-time</span></span>
+                            <span class="jc-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <span th:text="${job.departmentTags}">CSE</span></span>
+                            <span th:if="${job.type != null and (job.type.contains('IT') or job.departmentTags.contains('CSE'))}" class="jc-tag cat-it">💻 IT</span>
+                            <span th:if="${job.type != null and job.type.contains('Remote')}" class="jc-tag cat-remote">🌐 Remote</span>
+                            <span th:if="${job.type != null and (job.type.contains('Featured') or job.type.contains('featured'))}" class="jc-tag cat-featured">⭐ Featured</span>
+                            <span class="jc-tag urgent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Due: <span th:text="${job.deadline}">Date</span></span>
+                        </div>
+                        <div class="jc-desc" th:text="${job.description}">Description text goes here...</div>
+                        <div class="jc-footer">
+                            <div class="jc-stats">
+                                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> <th:block th:text="${job.views}">0</th:block> Views</span>
+                                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> <th:block th:text="${job.applyCount}">0</th:block> Applications</span>
+                            </div>
+                            <div class="jc-actions">
+                                <button class="btn-msg" th:onclick="'openMsgModal(\'' + ${job.id} + '\',\'' + ${job.authorName} + '\',\'' + ${job.title} + '\')'">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Message
+                                </button>
+                                <button class="btn-view" th:onclick="'openDetailModal(this.closest(\'.job-card\'))'">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STUDENT JOBS -->
+                <div id="sec-stu" style="display:none;">
+                    <div th:if="${studentJobs == null or #lists.isEmpty(studentJobs)}" class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                        <h3>No Student Tuitions</h3>
+                        <p>No tuition requests or part-time jobs have been posted by students yet.</p>
+                    </div>
+
+                    <div th:each="job : ${studentJobs}" class="job-card type-student"
+                         th:attr="data-type=${job.type},data-tags=${job.departmentTags},data-title=${job.title},data-company=${job.authorName},data-desc=${job.description},data-deadline=${job.deadline},data-status=${job.status},data-id=${job.id},data-author=${job.authorName},data-views=${job.views},data-applies=${job.applyCount}">
+                        <div class="jc-header">
+                            <div>
+                                <div class="jc-title" th:text="${job.title}">Tuition Title</div>
+                                <div class="jc-meta">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                    <span th:text="'Posted by: ' + ${job.authorName}">Student Name</span>
+                                </div>
+                            </div>
+                            <div class="status-badge" style="background:var(--purple-light); color:var(--purple);" th:text="${job.status}">ACTIVE</div>
+                        </div>
+                        <div class="jc-tags">
+                            <span class="jc-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> <span th:text="${job.type}">Tuition</span></span>
+                            <span class="jc-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <span th:text="${job.departmentTags}">General</span></span>
+                            <span class="jc-tag urgent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Due: <span th:text="${job.deadline}">Date</span></span>
+                        </div>
+                        <div class="jc-desc" th:text="${job.description}">Description text...</div>
+                        <div class="jc-footer">
+                            <div class="jc-stats">
+                                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> <th:block th:text="${job.views}">0</th:block> Views</span>
+                                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> <th:block th:text="${job.applyCount}">0</th:block> Applications</span>
+                            </div>
+                            <div class="jc-actions">
+                                <button class="btn-msg" th:onclick="'openMsgModal(\'' + ${job.id} + '\',\'' + ${job.authorName} + '\',\'' + ${job.title} + '\')'">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> Message
+                                </button>
+                                <button class="btn-view" style="color:var(--purple); background:var(--purple-light);" th:onclick="'openDetailModal(this.closest(\'.job-card\'))'">Review Post</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel">
+
+                <!-- QUICK ACTIONS -->
+                <div class="panel-card">
+                    <h3 class="panel-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                        Quick Actions
+                    </h3>
+                    <div class="action-list">
+                        <button class="action-btn" onclick="openPostModal()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Post Job Circular
+                        </button>
+                        <button class="action-btn" onclick="openTrackingModal()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            Application Tracking
+                        </button>
+                        <button class="action-btn" onclick="document.getElementById('cvReviewPanel').scrollIntoView({behavior:'smooth'})">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            CV Review
+                        </button>
+                    </div>
+                </div>
+
+                <!-- APPLICATION TRACKING PANEL -->
+                <div class="panel-card">
+                    <h3 class="panel-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        Application Tracking
+                    </h3>
+                    <div class="app-track-list" id="appTrackList">
+                        <!-- Populated by JS from localStorage -->
+                        <div class="app-track-empty">No active applications yet.</div>
+                    </div>
+                </div>
+
+                <!-- CV REVIEW PANEL -->
+                <div class="panel-card" id="cvReviewPanel">
+                    <h3 class="panel-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line></svg>
+                        CV / Resume Review
+                    </h3>
+                    <div class="cv-upload-area" onclick="document.getElementById('cvFileInput').click()" id="cvUploadArea">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <p>Drop CV/Resume here or click to upload</p>
+                        <span>PDF, DOCX supported</span>
+                        <div class="cv-file-name" id="cvFileName"></div>
+                        <input type="file" id="cvFileInput" accept=".pdf,.doc,.docx" onchange="onCvSelected(event)">
+                    </div>
+                    <button class="btn-review-cv" onclick="runCvReview()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        Analyze CV
+                    </button>
+                    <div class="cv-result" id="cvResult">
+                        <h4>📊 CV Analysis Report</h4>
+                        <div class="cv-score-bar">
+                            <div class="cv-score-label"><span>Overall Score</span><span id="cvScoreText">0%</span></div>
+                            <div class="cv-score-track"><div class="cv-score-fill" id="cvScoreFill" style="width:0%"></div></div>
+                        </div>
+                        <div id="cvFeedback" style="margin-top:10px; font-size:13px; line-height:1.7; color:var(--text-main); opacity:0.85;"></div>
+                    </div>
+                </div>
+
+                <!-- RECENT ACTIVITY -->
+                <div class="panel-card">
+                    <h3 class="panel-title">Recent Activity</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background:var(--success-bg); color:var(--success);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text"><strong>Rakib Hasan</strong> applied for Software Engineer position.</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background:var(--primary-light); color:var(--primary);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">New circular <strong>Data Analyst</strong> published.</div>
+                                <div class="activity-time">Yesterday</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background:rgba(245,158,11,0.15); color:var(--warning);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">Student <strong>Tithi</strong> requested approval for Math tuition.</div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ══════════════════════════════════
+     MODALS
+══════════════════════════════════ -->
+
+<!-- JOB DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal-box" style="max-width:580px;">
+        <div class="modal-header">
+            <h3 id="detailModalTitle">Job Details</h3>
+            <button class="modal-close" onclick="closeModal('detailModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-meta-grid">
+                <div class="detail-meta-item"><div class="dmi-label">Company / Posted By</div><div class="dmi-val" id="dm-company">—</div></div>
+                <div class="detail-meta-item"><div class="dmi-label">Type</div><div class="dmi-val" id="dm-type">—</div></div>
+                <div class="detail-meta-item"><div class="dmi-label">Department Tags</div><div class="dmi-val" id="dm-tags">—</div></div>
+                <div class="detail-meta-item"><div class="dmi-label">Deadline</div><div class="dmi-val" id="dm-deadline" style="color:var(--danger);">—</div></div>
+                <div class="detail-meta-item"><div class="dmi-label">Status</div><div class="dmi-val" id="dm-status">—</div></div>
+                <div class="detail-meta-item"><div class="dmi-label">Applications</div><div class="dmi-val" id="dm-applies">—</div></div>
+            </div>
+            <div class="detail-section">
+                <h4>Description</h4>
+                <p id="dm-desc" style="white-space:pre-line;">—</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('detailModal')">Close</button>
+            <button class="btn-submit" id="dm-apply-btn" onclick="trackApplication()">Track Application</button>
+        </div>
+    </div>
+</div>
+
+<!-- EMPLOYER MESSAGE MODAL -->
+<div class="modal-overlay" id="msgModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Message Employer / Poster</h3>
+            <button class="modal-close" onclick="closeModal('msgModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div>
+                <label class="modal-label">To</label>
+                <input type="text" class="modal-input" id="msgTo" readonly style="opacity:0.7; cursor:default;">
+            </div>
+            <div>
+                <label class="modal-label">Regarding</label>
+                <input type="text" class="modal-input" id="msgRegarding" readonly style="opacity:0.7; cursor:default;">
+            </div>
+            <div>
+                <label class="modal-label">Subject</label>
+                <input type="text" class="modal-input" id="msgSubject" placeholder="e.g. Inquiry about the position...">
+            </div>
+            <div>
+                <label class="modal-label">Message</label>
+                <textarea class="modal-textarea" id="msgBody" placeholder="Write your message here..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('msgModal')">Cancel</button>
+            <button class="btn-submit" onclick="sendMessage()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:middle; margin-right:5px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Send Message
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- POST CIRCULAR MODAL -->
+<div class="modal-overlay" id="postModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Post New Job Circular</h3>
+            <button class="modal-close" onclick="closeModal('postModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div>
+                <label class="modal-label">Job Title *</label>
+                <input type="text" class="modal-input" id="postTitle" placeholder="e.g. Software Engineer">
+            </div>
+            <div>
+                <label class="modal-label">Company Name *</label>
+                <input type="text" class="modal-input" id="postCompany" placeholder="e.g. TechCorp Ltd.">
+            </div>
+            <div>
+                <label class="modal-label">Category / Type *</label>
+                <select class="modal-select" id="postType">
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Remote">Remote</option>
+                    <option value="IT / Full-time">IT / Full-time</option>
+                    <option value="IT / Remote">IT / Remote</option>
+                    <option value="Featured">Featured</option>
+                </select>
+            </div>
+            <div>
+                <label class="modal-label">Department Tags</label>
+                <input type="text" class="modal-input" id="postTags" placeholder="e.g. CSE, EEE, ALL">
+            </div>
+            <div>
+                <label class="modal-label">Application Deadline *</label>
+                <input type="date" class="modal-input" id="postDeadline">
+            </div>
+            <div>
+                <label class="modal-label">Description *</label>
+                <textarea class="modal-textarea" id="postDesc" placeholder="Describe the job role, requirements..."></textarea>
+            </div>
+            <div>
+                <label class="modal-label">Media / Drive Link (optional)</label>
+                <input type="text" class="modal-input" id="postLink" placeholder="https://drive.google.com/...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('postModal')">Cancel</button>
+            <button class="btn-submit" onclick="submitPost()">Publish Circular</button>
+        </div>
+    </div>
+</div>
+
+<!-- APPLICATION TRACKING FULL MODAL -->
+<div class="modal-overlay" id="trackingModal">
+    <div class="modal-box" style="max-width:560px;">
+        <div class="modal-header">
+            <h3>📊 Application Tracking</h3>
+            <button class="modal-close" onclick="closeModal('trackingModal')">×</button>
+        </div>
+        <div class="modal-body" id="trackingModalBody">
+            <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:14px;">Loading applications...</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal('trackingModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+    // ─── THEME ───
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    window.onload = () => {
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+        renderAppTrackList();
+        updateAppCount();
+    };
+
+    // ─── TABS ───
+    function switchTab(type) {
+        document.getElementById('btn-off').classList.remove('active');
+        document.getElementById('btn-stu').classList.remove('active');
+        document.getElementById('sec-off').style.display = 'none';
+        document.getElementById('sec-stu').style.display = 'none';
+        if (type === 'official') {
+            document.getElementById('btn-off').classList.add('active');
+            document.getElementById('sec-off').style.display = 'block';
+        } else {
+            document.getElementById('btn-stu').classList.add('active');
+            document.getElementById('sec-stu').style.display = 'block';
+        }
+        resetFilters();
+    }
+
+    // ─── CATEGORY FILTER ───
+    let activeCategory = 'all';
+    function filterByCategory(btn, cat) {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        activeCategory = cat;
+        applyFilters();
+    }
+    function resetFilters() {
+        activeCategory = 'all';
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-cat="all"]').classList.add('active');
+        applyFilters();
+    }
+
+    // ─── SEARCH & FILTER ───
+    function filterJobs() { applyFilters(); }
+    function applyFilters() {
+        const search = document.getElementById('globalSearch').value.toLowerCase();
+        const activeSection = document.getElementById('sec-off').style.display !== 'none' ? 'sec-off' : 'sec-stu';
+        const cards = document.querySelectorAll('#' + activeSection + ' .job-card');
+        cards.forEach(card => {
+            const title = (card.dataset.title || '').toLowerCase();
+            const company = (card.dataset.company || '').toLowerCase();
+            const tags = (card.dataset.tags || '').toLowerCase();
+            const type = (card.dataset.type || '').toLowerCase();
+            const desc = (card.dataset.desc || '').toLowerCase();
+            const matchSearch = !search || title.includes(search) || company.includes(search) || tags.includes(search) || desc.includes(search);
+            let matchCat = true;
+            if (activeCategory !== 'all') {
+                const cat = activeCategory.toLowerCase();
+                matchCat = type.includes(cat) || tags.includes(cat) ||
+                    (cat === 'it' && (type.includes('it') || tags.includes('cse'))) ||
+                    (cat === 'featured' && card.classList.contains('featured'));
+            }
+            card.style.display = (matchSearch && matchCat) ? 'block' : 'none';
+        });
+    }
+
+    // ─── MODAL HELPERS ───
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+    });
+
+    // ─── JOB DETAIL MODAL ───
+    let currentDetailJob = null;
+    function openDetailModal(card) {
+        currentDetailJob = {
+            id: card.dataset.id,
+            title: card.dataset.title,
+            company: card.dataset.company,
+            type: card.dataset.type,
+            tags: card.dataset.tags,
+            deadline: card.dataset.deadline,
+            status: card.dataset.status,
+            desc: card.dataset.desc,
+            author: card.dataset.author,
+            applies: card.dataset.applies
+        };
+        document.getElementById('detailModalTitle').textContent = currentDetailJob.title;
+        document.getElementById('dm-company').textContent = currentDetailJob.company || currentDetailJob.author;
+        document.getElementById('dm-type').textContent = currentDetailJob.type;
+        document.getElementById('dm-tags').textContent = currentDetailJob.tags;
+        document.getElementById('dm-deadline').textContent = currentDetailJob.deadline;
+        document.getElementById('dm-status').textContent = currentDetailJob.status;
+        document.getElementById('dm-applies').textContent = currentDetailJob.applies + ' Applications';
+        document.getElementById('dm-desc').textContent = currentDetailJob.desc;
+
+        // Check if already tracked
+        const tracked = getTracked();
+        const alreadyTracked = tracked.some(a => a.id === currentDetailJob.id);
+        const btn = document.getElementById('dm-apply-btn');
+        btn.textContent = alreadyTracked ? '✅ Already Tracked' : 'Track Application';
+        btn.disabled = alreadyTracked;
+        btn.style.opacity = alreadyTracked ? '0.6' : '1';
+
+        openModal('detailModal');
+    }
+
+    // ─── APPLICATION TRACKING ───
+    function getTracked() {
+        try { return JSON.parse(localStorage.getItem('nx_tracked_apps') || '[]'); } catch(e) { return []; }
+    }
+    function saveTracked(list) {
+        localStorage.setItem('nx_tracked_apps', JSON.stringify(list));
+    }
+    function trackApplication() {
+        if (!currentDetailJob) return;
+        const tracked = getTracked();
+        if (tracked.some(a => a.id === currentDetailJob.id)) { showToast('Already tracking this application.', 'info'); return; }
+        tracked.push({
+            id: currentDetailJob.id,
+            title: currentDetailJob.title,
+            company: currentDetailJob.company || currentDetailJob.author,
+            deadline: currentDetailJob.deadline,
+            status: 'Submitted',
+            date: new Date().toLocaleDateString()
+        });
+        saveTracked(tracked);
+        renderAppTrackList();
+        updateAppCount();
+        closeModal('detailModal');
+        showToast('✅ Application tracked successfully!', 'success');
+    }
+    function cancelTrackedApp(id) {
+        let tracked = getTracked().filter(a => a.id !== id);
+        saveTracked(tracked);
+        renderAppTrackList();
+        updateAppCount();
+        if (document.getElementById('trackingModal').classList.contains('show')) openTrackingModal();
+        showToast('Application removed.', 'info');
+    }
+    function renderAppTrackList() {
+        const list = getTracked();
+        const el = document.getElementById('appTrackList');
+        if (!list.length) { el.innerHTML = '<div class="app-track-empty">No active applications yet.</div>'; return; }
+        el.innerHTML = list.slice(0,3).map(a => `
+            <div class="app-track-item">
+                <div class="app-track-info">
+                    <div class="app-track-title">${escHtml(a.title)}</div>
+                    <div class="app-track-sub">${escHtml(a.company)} &bull; ${escHtml(a.date)}</div>
+                </div>
+                <span class="app-track-status submitted">${escHtml(a.status)}</span>
+            </div>`).join('');
+        if (list.length > 3) el.innerHTML += `<div style="text-align:center; margin-top:8px;"><button class="btn-view" onclick="openTrackingModal()" style="font-size:12px; padding:6px 14px;">View All (${list.length})</button></div>`;
+    }
+    function updateAppCount() {
+        document.getElementById('activeAppCount').textContent = getTracked().length;
+    }
+    function openTrackingModal() {
+        const list = getTracked();
+        const body = document.getElementById('trackingModalBody');
+        if (!list.length) {
+            body.innerHTML = '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:14px;">No applications tracked yet. Click "Track Application" on any job.</div>';
+        } else {
+            body.innerHTML = '<div class="app-list-full">' + list.map(a => `
+                <div class="app-list-full-item">
+                    <div>
+                        <div class="alf-title">${escHtml(a.title)}</div>
+                        <div class="alf-sub">
+                            <span>🏢 ${escHtml(a.company)}</span>
+                            <span>📅 Due: ${escHtml(a.deadline)}</span>
+                            <span>🗓 Applied: ${escHtml(a.date)}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                        <span class="app-track-status submitted">${escHtml(a.status)}</span>
+                        <button class="btn-cancel-app" onclick="cancelTrackedApp('${escHtml(a.id)}')">Remove</button>
+                    </div>
+                </div>`).join('') + '</div>';
+        }
+        openModal('trackingModal');
+    }
+
+    // ─── EMPLOYER MESSAGE MODAL ───
+    let msgJobId = '';
+    function openMsgModal(jobId, author, title) {
+        msgJobId = jobId;
+        document.getElementById('msgTo').value = author;
+        document.getElementById('msgRegarding').value = title;
+        document.getElementById('msgSubject').value = '';
+        document.getElementById('msgBody').value = '';
+        openModal('msgModal');
+    }
+    function sendMessage() {
+        const subject = document.getElementById('msgSubject').value.trim();
+        const body = document.getElementById('msgBody').value.trim();
+        if (!subject || !body) { showToast('Please fill in subject and message.', 'info'); return; }
+        // Integrates with your backend via form POST — adjust endpoint as needed
+        showToast('📨 Message sent successfully!', 'success');
+        closeModal('msgModal');
+    }
+
+    // ─── POST CIRCULAR MODAL ───
+    function openPostModal() { openModal('postModal'); }
+    function submitPost() {
+        const title = document.getElementById('postTitle').value.trim();
+        const company = document.getElementById('postCompany').value.trim();
+        const type = document.getElementById('postType').value;
+        const tags = document.getElementById('postTags').value.trim();
+        const deadline = document.getElementById('postDeadline').value;
+        const desc = document.getElementById('postDesc').value.trim();
+        const link = document.getElementById('postLink').value.trim();
+        if (!title || !company || !deadline || !desc) { showToast('Please fill in all required fields.', 'info'); return; }
+        // Submit to your existing backend endpoint
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/teacher-jobs/post';
+        const fields = { title, company, type, departmentTags: tags, deadline, description: desc, mediaLink: link, role: 'TEACHER' };
+        Object.entries(fields).forEach(([k, v]) => {
+            const inp = document.createElement('input');
+            inp.type = 'hidden'; inp.name = k; inp.value = v;
+            form.appendChild(inp);
+        });
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // ─── CV REVIEW ───
+    let cvFileSelected = false;
+    function onCvSelected(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        cvFileSelected = true;
+        const nameEl = document.getElementById('cvFileName');
+        nameEl.textContent = '📄 ' + file.name;
+        nameEl.style.display = 'block';
+    }
+    function runCvReview() {
+        if (!cvFileSelected) { showToast('Please upload a CV/Resume file first.', 'info'); return; }
+        const result = document.getElementById('cvResult');
+        const fill = document.getElementById('cvScoreFill');
+        const scoreText = document.getElementById('cvScoreText');
+        const feedback = document.getElementById('cvFeedback');
+        result.classList.remove('show');
+        setTimeout(() => {
+            // Simulated CV analysis (replace with your AI API call if desired)
+            const score = Math.floor(Math.random() * 30) + 65; // 65-95
+            fill.style.width = score + '%';
+            scoreText.textContent = score + '%';
+            const tips = [
+                '✅ Contact information is clearly presented.',
+                score > 80 ? '✅ Skills section is well-structured.' : '⚠️ Add more relevant technical skills.',
+                score > 75 ? '✅ Work experience is detailed.' : '⚠️ Expand work experience descriptions with achievements.',
+                '⚠️ Consider adding a professional summary at the top.',
+                score > 85 ? '✅ Education section is complete.' : '⚠️ Include GPA and relevant coursework.',
+                '💡 Tip: Quantify achievements (e.g. "Increased efficiency by 30%").',
+                '💡 Tip: Tailor keywords to match the job description.',
+            ];
+            feedback.innerHTML = tips.map(t => `<div style="margin-bottom:5px;">${t}</div>`).join('');
+            result.classList.add('show');
+        }, 800);
+        showToast('🔍 Analyzing your CV...', 'info');
+    }
+
+    // ─── TOAST ───
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + type + ' show';
+        setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    // ─── UTIL ───
+    function escHtml(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+</script>
+
+</body>
+</html>

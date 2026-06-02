@@ -1,0 +1,39 @@
+1|06224205101001|Md. Rakibul Islam|CSE|2025-05-21|2025-05-21|Medical appointment|REJECTED|0
+2|06224205101002|Siam Hossain|CSE|2025-05-09|2025-05-10|Urgent personal work|PENDING|0
+3|06224205101003|Md. Radoun Hossin Mukta|CSE|2025-05-24|2025-05-24|Family emergency|REJECTED|0
+4|06224205101004|Md. Shahariar Ahmed Kanon|CSE|2025-05-14|2025-05-14|Medical appointment|PENDING|0
+5|06224205101005|Mst. Anamika Jahan|CSE|2025-05-07|2025-05-08|Medical appointment|REJECTED|0
+6|06224205101006|Md. Sojib Ahmed|CSE|2025-05-01|2025-05-01|Severe sickness and fever|PENDING|0
+7|06224205101007|Most. Ananna Khandaker|CSE|2025-05-15|2025-05-16|Accidental injury|PENDING|0
+8|06224205101008|Md. Rakib Hasan Riyad|CSE|2025-05-25|2025-05-27|Severe sickness and fever|REJECTED|0
+9|06224205101010|Most. Khadija Khatun|CSE|2025-05-21|2025-05-21|Family emergency|APPROVED|0
+10|06224205101011|Md. Rezwan Ahmed Ratul|CSE|2025-05-08|2025-05-11|Urgent personal work|APPROVED|0
+11|06224205101012|Maruf Ibna Abdullah Rifat|CSE|2025-05-05|2025-05-05|Going to village home|PENDING|0
+12|06224205101013|Md. Rabbi|CSE|2025-05-25|2025-05-29|Sister's wedding gala|REJECTED|0
+13|06224205101014|Mst. Mushkat Jahan Shila|CSE|2025-05-03|2025-05-04|Dental surgery checkup|REJECTED|0
+14|06224205101016|Ijaj Ahmed Rafi|CSE|2025-05-04|2025-05-07|Going to village home|PENDING|0
+15|06224205101017|Md. Sabbir Hossain Rahat|CSE|2025-05-16|2025-05-19|Medical appointment|REJECTED|0
+16|06224205101018|Abid Hasan Hujaifa|CSE|2025-05-09|2025-05-10|Sister's wedding gala|PENDING|0
+17|06224205101019|Sabiha Rumman Medha|CSE|2025-05-19|2025-05-20|Accidental injury|APPROVED|0
+18|06224205101020|Md. Intaj Hassan Nibir|CSE|2025-05-12|2025-05-14|Going to village home|REJECTED|0
+19|06224205101021|Md. Asif Foysal|CSE|2025-05-06|2025-05-08|Dental surgery checkup|APPROVED|0
+20|06224205101022|Tarak Rahman Shakib (Re-add)|CSE|2025-05-12|2025-05-14|Accidental injury|APPROVED|0
+21|06224205101023|Fardin Khan Sadi|CSE|2025-05-17|2025-05-18|Sister's wedding gala|REJECTED|0
+22|06224205101024|Abir Deb|CSE|2025-05-24|2025-05-28|Severe sickness and fever|REJECTED|0
+23|0622410105101024|Robiul Awal Sumon(17th)|CSE|2025-05-08|2025-05-10|Urgent personal work|PENDING|0
+24|06224205101025|Bashudeb Kumer Paul|CSE|2025-05-11|2025-05-14|Urgent personal work|REJECTED|0
+25|06224205101026|Md. Abdur Rahim Ratul|CSE|2025-05-09|2025-05-12|Accidental injury|PENDING|0
+26|06224205101027|Tahsin Tasnim Tandra|CSE|2025-05-14|2025-05-17|Urgent personal work|REJECTED|0
+27|06224205101028|Maream|CSE|2025-05-10|2025-05-12|Medical appointment|APPROVED|0
+28|06224205101029|Md. Imran Hassain|CSE|2025-05-06|2025-05-08|Sister's wedding gala|PENDING|0
+29|06224205101030|Abu Sowad Mohammad Ali Siam|CSE|2025-05-18|2025-05-19|Going to village home|APPROVED|0
+30|06224205101031|Fatima Rahman Shoshi|CSE|2025-05-12|2025-05-12|Dental surgery checkup|APPROVED|0
+31|06224205101032|Rukaiya Rafiq Ulfa|CSE|2025-05-03|2025-05-05|Medical appointment|REJECTED|0
+32|06224205101033|S. M. Salman Farshi|CSE|2025-05-06|2025-05-09|Severe sickness and fever|PENDING|0
+33|06224205101034|Tawhidur Rahman Shishir|CSE|2025-05-02|2025-05-03|Severe sickness and fever|PENDING|0
+34|0622410105101034|Md.Rashedul Islam (17th)|CSE|2025-05-15|2025-05-18|Going to village home|APPROVED|0
+35|06224205101035|Md. Samiul Islam Shihab|CSE|2025-05-09|2025-05-12|Dental surgery checkup|REJECTED|0
+36|06224205101036|Md. Abu Raihan|CSE|2025-05-20|2025-05-24|Severe sickness and fever|PENDING|0
+37|06224205101037|Md. Shimul Sarkar|CSE|2025-05-02|2025-05-03|Dental surgery checkup|PENDING|0
+38|06224205101038|Khairun Nahar Sara|CSE|2025-05-16|2025-05-19|Going to village home|APPROVED|0
+39|06224205101039|Md. Montasir Monir Alif|CSE|2025-05-01|2025-05-01|Accidental injury|PENDING|0

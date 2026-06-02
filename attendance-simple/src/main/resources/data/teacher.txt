@@ -1,0 +1,13 @@
+1|F M Javed Mehedi Shamrat|CSE|Software Engineering|Assistant Professor & Head|shamrat.cse@kyau.edu.bd
+2|Md. Abu Raihan|CSE|Database Systems|Lecturer|raihan.cse@kyau.edu.bd
+3|Miss. Rokeya Akter|CSE|Data Structures & Algorithms|Lecturer & Program Coordinator|rokeya.cse@kyau.edu.bd
+4|Ishrat Zahan Raka|CSE|Web Technologies|Lecturer|ishrat.cse@kyau.edu.bd
+5|Md. Rahat Khan|CSE|Computer Networks|Lecturer|rahat.cse@kyau.edu.bd
+6|Md. Abdur Razzak|CSE|Operating Systems|Lecturer|razzak.cse@kyau.edu.bd
+7|Md. Hasibur Rahman|CSE|Artificial Intelligence|Lecturer|hasibur.cse@kyau.edu.bd
+8|Md. Iftekhar Hossain Tushar|CSE|Machine Learning|Lecturer on Probation|mdihtushar.cse@kyau.edu.bd
+9|Md. Sadi Al Huda|CSE|Computer Architecture|Lecturer on Probation|sadi.cse@kyau.edu.bd
+10|Mst Anika Amzad|CSE|Discrete Mathematics|Lecturer|anika.cse@kyau.edu.bd
+11|Md Mohidul Alam|CSE|Object-Oriented Programming|Lecturer|mohidul.cse@kyau.edu.bd
+
+12|abir deb|CSE|Software Engineering|Lecturer|debabir137@gmail.com

@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Course Outlines - Teacher Portal | Nexus One</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --bg-canvas: #F4F6FA;
+            --bg-surface: #FFFFFF;
+            --border: #E8ECF2;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --text-light: #9CA3AF;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --primary-light: #EEF2FF;
+            --primary-muted: #C7D2FE;
+            --danger: #EF4444;
+            --danger-bg: #FEF2F2;
+            --success: #10B981;
+            --success-bg: #ECFDF5;
+            --warning: #F59E0B;
+            --warning-bg: #FFFBEB;
+            --orange: #F97316;
+            --orange-bg: #FFF7ED;
+            --pin: #EC4899;
+            --pin-bg: #FDF2F8;
+            --video: #8B5CF6;
+            --video-bg: #F5F3FF;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.07);
+            --shadow-float: 0 8px 30px rgba(79,70,229,0.18);
+            --transition: all 0.18s ease;
+        }
+        body.dark {
+            --bg-canvas: #0E1117;
+            --bg-surface: #161B26;
+            --border: #222D3F;
+            --text-main: #EEF2FF;
+            --text-muted: #8B9AB5;
+            --text-light: #5A6A82;
+            --primary-light: rgba(79,70,229,0.15);
+            --danger-bg: rgba(239,68,68,0.1);
+            --success-bg: rgba(16,185,129,0.1);
+            --warning-bg: rgba(245,158,11,0.1);
+            --orange-bg: rgba(249,115,22,0.1);
+            --pin-bg: rgba(236,72,153,0.1);
+            --video-bg: rgba(139,92,246,0.1);
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.25);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.35);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Plus Jakarta Sans',system-ui,sans-serif; background:var(--bg-canvas); color:var(--text-main); min-height:100vh; display:flex; -webkit-font-smoothing:antialiased; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width:220px;
+            background:var(--bg-surface);
+            border-right:1px solid var(--border);
+            display:flex;
+            flex-direction:column;
+            position:fixed;
+            top:0; left:0; bottom:0;
+            z-index:100;
+        }
+        .sidebar-header {
+            padding:20px 16px 16px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            border-bottom:1px solid var(--border);
+        }
+        .logo-img { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+        .logo-text { font-size:14px; font-weight:800; color:var(--text-main); letter-spacing:-0.01em; }
+        .logo-sub { font-size:11px; color:var(--text-muted); font-weight:500; margin-top:1px; }
+        .menu-section { padding:12px 10px; flex:1; overflow-y:auto; }
+        .menu-label {
+            font-size:10px;
+            color:var(--text-light);
+            text-transform:uppercase;
+            letter-spacing:0.09em;
+            margin:14px 0 5px 8px;
+            font-weight:700;
+        }
+        .menu-item {
+            display:flex;
+            align-items:center;
+            gap:9px;
+            padding:8px 10px;
+            margin-bottom:1px;
+            border-radius:var(--radius-md);
+            text-decoration:none;
+            color:var(--text-muted);
+            font-size:13px;
+            font-weight:500;
+            transition:var(--transition);
+        }
+        .menu-item svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; flex-shrink:0; }
+        .menu-item:hover { background:var(--bg-canvas); color:var(--text-main); }
+        .menu-item.active { background:var(--primary); color:#fff; font-weight:600; }
+        .notif-badge { margin-left:auto; background:var(--danger); color:white; font-size:10px; font-weight:700; padding:1px 6px; border-radius:99px; min-width:18px; text-align:center; }
+        .sidebar-footer { padding:12px; border-top:1px solid var(--border); }
+        .user-card {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:10px 12px;
+            border-radius:var(--radius-md);
+            background:var(--bg-canvas);
+            border:1px solid var(--border);
+            text-decoration:none;
+            transition:var(--transition);
+            position:relative;
+        }
+        .user-card:hover { border-color:var(--primary); }
+        .user-card .online-dot {
+            position:absolute;
+            bottom:11px; left:36px;
+            width:9px; height:9px;
+            border-radius:50%;
+            background:#10B981;
+            border:2px solid var(--bg-surface);
+        }
+        .avatar { width:32px; height:32px; border-radius:8px; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; object-fit:cover; flex-shrink:0; }
+        .user-name { font-size:13px; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; color:var(--text-main); }
+        .user-role { font-size:11px; color:var(--text-muted); }
+
+        /* ── MAIN ── */
+        .main-wrapper { margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+        .topbar {
+            height:60px;
+            padding:0 30px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            background:var(--bg-surface);
+            border-bottom:1px solid var(--border);
+            position:sticky; top:0; z-index:50;
+        }
+        body.dark .topbar { background:var(--bg-surface); }
+        .search-container { position:relative; width:280px; }
+        .search-input {
+            width:100%;
+            padding:8px 14px 8px 36px;
+            border-radius:var(--radius-md);
+            border:1px solid var(--border);
+            background:var(--bg-canvas);
+            color:var(--text-main);
+            font-size:13px;
+            outline:none;
+            transition:var(--transition);
+            font-family:inherit;
+        }
+        .search-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); }
+        .search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--text-muted); pointer-events:none; }
+        .topbar-actions { display:flex; align-items:center; gap:8px; }
+        .icon-btn {
+            width:32px; height:32px;
+            border-radius:8px;
+            border:1px solid var(--border);
+            background:var(--bg-canvas);
+            color:var(--text-muted);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition:var(--transition); text-decoration:none;
+        }
+        .icon-btn:hover { color:var(--primary); border-color:var(--primary); background:var(--primary-light); }
+        .icon-btn svg { width:14px; height:14px; }
+
+        .container { padding:28px 30px; max-width:1300px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:22px; }
+
+        /* ── PAGE HEADER ── */
+        .page-header { display:flex; justify-content:space-between; align-items:center; }
+        .page-title { font-size:22px; font-weight:800; letter-spacing:-0.02em; color:var(--text-main); }
+        .page-desc { font-size:13px; color:var(--text-muted); margin-top:2px; }
+        .header-actions { display:flex; gap:8px; }
+        .btn-primary {
+            background:var(--primary);
+            color:white;
+            border:none;
+            padding:9px 16px;
+            border-radius:var(--radius-md);
+            font-size:13px;
+            font-weight:600;
+            cursor:pointer;
+            display:flex; align-items:center; gap:6px;
+            transition:var(--transition);
+            text-decoration:none;
+            font-family:inherit;
+        }
+        .btn-primary:hover { background:var(--primary-hover); box-shadow:var(--shadow-float); }
+        .btn-outline-sm {
+            background:var(--bg-surface);
+            color:var(--text-main);
+            border:1px solid var(--border);
+            padding:9px 14px;
+            border-radius:var(--radius-md);
+            font-size:13px;
+            font-weight:600;
+            cursor:pointer;
+            display:flex; align-items:center; gap:6px;
+            transition:var(--transition);
+            text-decoration:none;
+            font-family:inherit;
+        }
+        .btn-outline-sm:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+
+        /* ── STATS ── */
+        .stats-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+        .mini-stat {
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            padding:18px 18px 16px;
+            display:flex;
+            flex-direction:column;
+            box-shadow:var(--shadow-sm);
+            transition:var(--transition);
+            cursor:default;
+            position:relative;
+            overflow:hidden;
+        }
+        .mini-stat:hover { box-shadow:var(--shadow-md); transform:translateY(-1px); }
+        .mini-stat-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+        .mini-stat-label { font-size:12px; color:var(--text-muted); font-weight:600; }
+        .mini-stat-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .mini-stat-icon svg { width:16px; height:16px; }
+        .ms-indigo { background:#EEF2FF; color:#4F46E5; }
+        .ms-green  { background:#ECFDF5; color:#10B981; }
+        .ms-orange { background:#FFF7ED; color:#F97316; }
+        .ms-warn   { background:#FFFBEB; color:#F59E0B; }
+        .ms-pink   { background:#FDF2F8; color:#EC4899; }
+        body.dark .ms-indigo { background:rgba(79,70,229,0.15); }
+        body.dark .ms-green  { background:rgba(16,185,129,0.12); }
+        body.dark .ms-orange { background:rgba(249,115,22,0.12); }
+        body.dark .ms-warn   { background:rgba(245,158,11,0.12); }
+        body.dark .ms-pink   { background:rgba(236,72,153,0.12); }
+        .mini-stat-val { font-size:26px; font-weight:800; letter-spacing:-0.03em; line-height:1; color:var(--text-main); }
+
+        /* ── VIEW TABS ── */
+        .view-tabs { display:flex; align-items:center; gap:3px; background:var(--bg-canvas); border:1px solid var(--border); border-radius:var(--radius-md); padding:4px; }
+        .view-tab {
+            padding:7px 14px;
+            border-radius:8px;
+            font-size:12.5px;
+            font-weight:600;
+            cursor:pointer;
+            transition:var(--transition);
+            border:none;
+            background:none;
+            color:var(--text-muted);
+            font-family:inherit;
+            display:flex; align-items:center; gap:6px;
+        }
+        .view-tab svg { width:13px; height:13px; }
+        .view-tab.active { background:var(--bg-surface); color:var(--text-main); box-shadow:var(--shadow-sm); }
+        .view-tab:not(.active):hover { color:var(--text-main); }
+
+        /* ── FILTER BAR ── */
+        .filter-bar { display:flex; align-items:center; gap:10px; }
+        .filter-input {
+            padding:8px 12px;
+            border:1px solid var(--border);
+            border-radius:var(--radius-md);
+            font-size:12.5px;
+            background:var(--bg-surface);
+            color:var(--text-main);
+            font-family:inherit;
+            outline:none;
+            transition:var(--transition);
+            width:220px;
+        }
+        .filter-input:focus { border-color:var(--primary); }
+        .filter-chips { display:flex; gap:6px; flex-wrap:wrap; }
+        .chip {
+            padding:5px 12px;
+            border-radius:99px;
+            font-size:11.5px;
+            font-weight:600;
+            border:1px solid var(--border);
+            background:var(--bg-surface);
+            color:var(--text-muted);
+            cursor:pointer;
+            transition:var(--transition);
+        }
+        .chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+        .chip:hover:not(.active) { border-color:var(--primary); color:var(--primary); }
+
+        /* ── MODULE VIEW ── */
+        #moduleView { display:flex; flex-direction:column; gap:10px; }
+        .module-group {
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            overflow:hidden;
+            box-shadow:var(--shadow-sm);
+            transition:var(--transition);
+        }
+        .module-group:hover { box-shadow:var(--shadow-md); }
+        .module-header { display:flex; align-items:center; gap:12px; padding:16px 20px; cursor:pointer; user-select:none; }
+        .module-num {
+            width:34px; height:34px;
+            border-radius:9px;
+            background:var(--primary-light);
+            color:var(--primary);
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800;
+            font-size:13px;
+            flex-shrink:0;
+        }
+        .module-info { flex:1; }
+        .module-name { font-size:14px; font-weight:700; color:var(--text-main); }
+        .module-meta { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+        .module-actions { display:flex; align-items:center; gap:7px; }
+        .module-count {
+            background:var(--bg-canvas);
+            border:1px solid var(--border);
+            padding:2px 9px;
+            border-radius:99px;
+            font-size:11px;
+            font-weight:700;
+            color:var(--text-muted);
+        }
+        .module-toggle {
+            width:26px; height:26px;
+            border-radius:7px;
+            border:1px solid var(--border);
+            background:var(--bg-canvas);
+            color:var(--text-muted);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition:var(--transition);
+        }
+        .module-toggle svg { width:13px; height:13px; transition:transform 0.22s; }
+        .module-toggle.open svg { transform:rotate(180deg); }
+        .module-body { border-top:1px solid var(--border); overflow:hidden; }
+        .module-body.collapsed { display:none; }
+        .topic-list { display:flex; flex-direction:column; }
+
+        /* ── TOPIC ROW ── */
+        .topic-row {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            padding:13px 20px;
+            border-bottom:1px solid var(--border);
+            transition:var(--transition);
+            position:relative;
+        }
+        .topic-row:last-child { border-bottom:none; }
+        .topic-row:hover { background:var(--bg-canvas); }
+        .topic-row.pinned { background:linear-gradient(to right,rgba(236,72,153,0.04),transparent 50%); }
+        .topic-row.pinned::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--pin); }
+        .pin-icon { color:var(--pin); flex-shrink:0; }
+        .type-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .type-dot.pdf { background:var(--danger); }
+        .type-dot.video { background:var(--video); }
+        .type-dot.link { background:var(--warning); }
+        .type-dot.none { background:var(--border); }
+        .topic-info { flex:1; min-width:0; }
+        .topic-title { font-size:13px; font-weight:600; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+        .topic-desc { font-size:11.5px; color:var(--text-muted); margin-top:1px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+        .topic-badges { display:flex; gap:5px; align-items:center; flex-shrink:0; }
+        .tbadge { display:flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600; }
+        .tbadge-pdf   { background:var(--danger-bg); color:var(--danger); }
+        .tbadge-video { background:var(--video-bg); color:var(--video); }
+        .tbadge-link  { background:var(--warning-bg); color:var(--warning); }
+        .tbadge-pin   { background:var(--pin-bg); color:var(--pin); }
+        .tbadge-course{ background:var(--primary-light); color:var(--primary); }
+        .tbadge-batch { background:var(--success-bg); color:var(--success); }
+        .tbadge-date  { background:var(--bg-canvas); color:var(--text-muted); border:1px solid var(--border); }
+        .topic-actions { display:flex; gap:5px; flex-shrink:0; }
+        .tact-btn {
+            padding:5px 9px;
+            border-radius:7px;
+            font-size:11.5px;
+            font-weight:600;
+            border:1px solid var(--border);
+            background:var(--bg-surface);
+            color:var(--text-muted);
+            cursor:pointer; transition:var(--transition);
+            display:flex; align-items:center; gap:4px;
+            text-decoration:none; font-family:inherit;
+        }
+        .tact-btn svg { width:11px; height:11px; }
+        .tact-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+        .tact-btn.pin-btn:hover { border-color:var(--pin); color:var(--pin); background:var(--pin-bg); }
+        .tact-btn.del-btn:hover { border-color:var(--danger); color:var(--danger); background:var(--danger-bg); }
+        .tact-btn.discuss-btn:hover { border-color:var(--success); color:var(--success); background:var(--success-bg); }
+
+        /* ── GRID VIEW ── */
+        #gridView { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px; }
+        .outline-card {
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            box-shadow:var(--shadow-sm);
+            overflow:hidden; transition:var(--transition);
+            display:flex; flex-direction:column;
+        }
+        .outline-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+        .outline-card.pinned { border-color:var(--pin); }
+        .card-top { padding:16px 16px 12px; flex:1; position:relative; }
+        .pin-strip {
+            position:absolute; top:10px; right:10px;
+            background:var(--pin-bg); color:var(--pin);
+            padding:2px 7px; border-radius:5px;
+            font-size:10px; font-weight:700;
+            display:flex; align-items:center; gap:3px;
+        }
+        .card-header { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+        .course-badge { background:var(--primary-light); color:var(--primary); padding:3px 9px; border-radius:6px; font-size:11px; font-weight:700; white-space:nowrap; }
+        .type-badge { padding:3px 8px; border-radius:6px; font-size:10px; font-weight:700; }
+        .type-badge.pdf { background:var(--danger-bg); color:var(--danger); }
+        .type-badge.video { background:var(--video-bg); color:var(--video); }
+        .type-badge.link { background:var(--warning-bg); color:var(--warning); }
+        .card-date { font-size:11px; color:var(--text-muted); font-weight:500; margin-left:auto; }
+        .card-title { font-size:13.5px; font-weight:700; line-height:1.35; margin-bottom:5px; color:var(--text-main); }
+        .card-desc { font-size:12px; color:var(--text-muted); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:10px; }
+        .card-meta { display:flex; flex-wrap:wrap; gap:5px; }
+        .meta-tag { display:flex; align-items:center; gap:3px; padding:3px 8px; border-radius:99px; font-size:11px; font-weight:600; }
+        .mt-batch { background:var(--warning-bg); color:var(--warning); }
+        .mt-dept  { background:var(--success-bg); color:var(--success); }
+        .card-footer {
+            padding:10px 16px;
+            border-top:1px solid var(--border);
+            background:var(--bg-canvas);
+            display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+        }
+        .cf-btn {
+            display:flex; align-items:center; gap:5px;
+            padding:6px 10px;
+            border-radius:7px;
+            font-size:11.5px; font-weight:600;
+            text-decoration:none; transition:var(--transition);
+            border:1px solid var(--border);
+            background:var(--bg-surface);
+            color:var(--text-muted);
+            cursor:pointer; font-family:inherit;
+        }
+        .cf-btn svg { width:11px; height:11px; flex-shrink:0; }
+        .cf-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+        .cf-btn.del:hover { border-color:var(--danger); color:var(--danger); background:var(--danger-bg); }
+        .cf-btn.pin:hover { border-color:var(--pin); color:var(--pin); background:var(--pin-bg); }
+        .cf-btn.discuss:hover { border-color:var(--success); color:var(--success); background:var(--success-bg); }
+        .cf-btn.no-file { opacity:0.4; cursor:default; pointer-events:none; }
+
+        /* ── PROGRESS VIEW ── */
+        #progressView { display:flex; flex-direction:column; gap:16px; }
+        .progress-section {
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            overflow:hidden;
+            box-shadow:var(--shadow-sm);
+        }
+        .progress-header {
+            padding:16px 20px;
+            border-bottom:1px solid var(--border);
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .progress-course { font-size:14px; font-weight:700; }
+        .progress-stats { display:flex; gap:14px; align-items:center; }
+        .prog-stat { text-align:right; }
+        .prog-stat-val { font-size:17px; font-weight:800; color:var(--primary); }
+        .prog-stat-lbl { font-size:10.5px; color:var(--text-muted); font-weight:600; }
+        .progress-bar-wrap { padding:14px 20px; }
+        .prog-bar-label { display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); font-weight:600; margin-bottom:7px; }
+        .prog-bar { height:7px; background:var(--bg-canvas); border-radius:99px; overflow:hidden; border:1px solid var(--border); }
+        .prog-bar-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--success)); border-radius:99px; transition:width 1s cubic-bezier(0.4,0,0.2,1); }
+        .progress-modules { padding:0 20px 16px; display:flex; flex-direction:column; gap:7px; }
+        .prog-module-row { display:flex; align-items:center; gap:10px; }
+        .prog-module-name { font-size:12.5px; font-weight:500; flex:1; }
+        .prog-module-bar { flex:2; height:5px; background:var(--bg-canvas); border-radius:99px; overflow:hidden; }
+        .prog-module-fill { height:100%; border-radius:99px; background:var(--primary); }
+        .prog-module-val { font-size:11px; font-weight:700; color:var(--text-muted); min-width:34px; text-align:right; }
+
+        /* ── DISCUSSION PANEL ── */
+        .discuss-panel {
+            background:var(--bg-surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            overflow:hidden;
+            box-shadow:var(--shadow-sm);
+            margin-top:6px;
+        }
+        .discuss-panel-header {
+            padding:12px 18px;
+            border-bottom:1px solid var(--border);
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .discuss-panel-title { font-size:13.5px; font-weight:700; }
+        .discuss-msgs { padding:12px 18px; display:flex; flex-direction:column; gap:9px; max-height:260px; overflow-y:auto; }
+        .discuss-msg { display:flex; gap:9px; }
+        .discuss-av { width:28px; height:28px; border-radius:7px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+        .discuss-content { flex:1; }
+        .discuss-name { font-size:12px; font-weight:700; }
+        .discuss-text { font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-top:2px; }
+        .discuss-time { font-size:10px; color:var(--text-muted); margin-top:2px; }
+        .discuss-input-row { padding:10px 18px; border-top:1px solid var(--border); display:flex; gap:7px; }
+        .discuss-input {
+            flex:1; padding:7px 11px;
+            border:1px solid var(--border);
+            border-radius:var(--radius-md);
+            font-size:12.5px;
+            background:var(--bg-canvas);
+            color:var(--text-main);
+            font-family:inherit; outline:none; transition:var(--transition);
+        }
+        .discuss-input:focus { border-color:var(--primary); }
+        .discuss-send {
+            padding:7px 14px;
+            border-radius:var(--radius-md);
+            background:var(--primary);
+            color:#fff; border:none;
+            font-size:12.5px; font-weight:600;
+            cursor:pointer; transition:var(--transition); font-family:inherit;
+        }
+        .discuss-send:hover { background:var(--primary-hover); }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            background:var(--bg-surface);
+            border:2px dashed var(--border);
+            border-radius:var(--radius-xl);
+            padding:60px 24px;
+            text-align:center;
+            display:flex; flex-direction:column; align-items:center; gap:12px;
+        }
+        .empty-state svg { color:var(--text-light); }
+        .empty-state h3 { font-size:16px; font-weight:700; }
+        .empty-state p { font-size:13px; color:var(--text-muted); max-width:260px; line-height:1.6; }
+
+        /* ── DRAWER ── */
+        .drawer-overlay { position:fixed; inset:0; background:rgba(10,15,30,0.45); backdrop-filter:blur(5px); z-index:999; opacity:0; pointer-events:none; transition:opacity 0.28s; }
+        .drawer-overlay.active { opacity:1; pointer-events:auto; }
+        .drawer {
+            position:fixed; top:0; right:0; height:100vh;
+            width:500px; max-width:100vw;
+            background:var(--bg-surface); z-index:1000;
+            transform:translateX(100%);
+            transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow:-10px 0 40px rgba(0,0,0,0.1);
+            display:flex; flex-direction:column;
+        }
+        .drawer.active { transform:translateX(0); }
+        .drawer-header {
+            padding:18px 20px;
+            border-bottom:1px solid var(--border);
+            display:flex; justify-content:space-between; align-items:center;
+            background:var(--bg-canvas);
+        }
+        .drawer-title { font-size:16px; font-weight:800; }
+        .drawer-subtitle { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+        .close-btn {
+            background:none; border:1px solid var(--border);
+            color:var(--text-muted); cursor:pointer;
+            padding:5px; border-radius:7px; transition:var(--transition);
+            width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+        }
+        .close-btn:hover { background:var(--danger-bg); color:var(--danger); border-color:var(--danger); }
+        .close-btn svg { width:13px; height:13px; }
+        .drawer-body { padding:20px; flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+        .drawer-footer {
+            padding:14px 20px;
+            border-top:1px solid var(--border);
+            background:var(--bg-canvas);
+            display:flex; justify-content:flex-end; gap:8px;
+        }
+        .form-group { display:flex; flex-direction:column; gap:5px; }
+        .form-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .form-label { font-size:12.5px; font-weight:600; }
+        .form-sublabel { font-size:11px; color:var(--text-muted); margin-top:2px; }
+        .form-control {
+            width:100%; padding:9px 12px;
+            border:1px solid var(--border);
+            border-radius:var(--radius-md);
+            font-size:13px;
+            background:var(--bg-canvas);
+            color:var(--text-main);
+            font-family:inherit; outline:none; transition:var(--transition);
+        }
+        .form-control:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-light); background:var(--bg-surface); }
+        textarea.form-control { resize:vertical; min-height:70px; }
+        select.form-control option { background:var(--bg-surface); }
+
+        .upload-zone {
+            border:2px dashed var(--border);
+            border-radius:var(--radius-lg);
+            padding:20px 14px;
+            text-align:center; cursor:pointer;
+            transition:var(--transition);
+            background:var(--bg-canvas);
+            position:relative;
+        }
+        .upload-zone:hover, .upload-zone.dragover { border-color:var(--primary); background:var(--primary-light); }
+        .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .upload-zone p { font-size:12.5px; font-weight:600; color:var(--text-muted); margin-top:7px; }
+        .upload-zone span { font-size:11px; color:var(--text-muted); }
+        .upload-zone svg { color:var(--text-muted); }
+        .file-preview { display:none; font-size:12px; color:var(--success); font-weight:600; margin-top:5px; align-items:center; gap:5px; }
+        .file-preview.show { display:flex; }
+        .form-divider { display:flex; align-items:center; gap:8px; color:var(--text-muted); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; }
+        .form-divider::before, .form-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+        .rtype-tabs { display:flex; gap:6px; }
+        .rtype-tab {
+            flex:1; padding:9px;
+            border-radius:var(--radius-md);
+            border:1.5px solid var(--border);
+            background:var(--bg-canvas);
+            cursor:pointer; text-align:center; transition:var(--transition);
+        }
+        .rtype-tab:hover { border-color:var(--primary); background:var(--primary-light); }
+        .rtype-tab.active { border-color:var(--primary); background:var(--primary-light); }
+        .rtype-tab .rtype-icon { font-size:18px; display:block; margin-bottom:3px; }
+        .rtype-tab .rtype-label { font-size:11px; font-weight:700; color:var(--text-muted); }
+        .rtype-tab.active .rtype-label { color:var(--primary); }
+        .toggle-checkbox { width:16px; height:16px; accent-color:var(--pin); cursor:pointer; }
+        .checkbox-row { display:flex; align-items:center; gap:8px; }
+        .checkbox-row label { font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:7px; }
+
+        /* Toast */
+        .toast {
+            position:fixed; bottom:20px; right:20px;
+            background:var(--text-main); color:var(--bg-canvas);
+            padding:11px 18px; border-radius:var(--radius-md);
+            font-size:13px; font-weight:600;
+            box-shadow:var(--shadow-float); z-index:9999;
+            transform:translateY(70px); opacity:0;
+            transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+            display:flex; align-items:center; gap:9px;
+        }
+        .toast.show { transform:translateY(0); opacity:1; }
+        .toast svg { width:14px; height:14px; color:var(--success); flex-shrink:0; }
+
+        @media (max-width:1100px) { .stats-row { grid-template-columns:repeat(3,1fr); } }
+        @media (max-width:900px) {
+            .sidebar { transform:translateX(-100%); }
+            .main-wrapper { margin-left:0; }
+            .container { padding:18px 14px; }
+            .stats-row { grid-template-columns:repeat(2,1fr); }
+            #gridView { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"
+             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDM2IDM2Ij48cmVjdCB3aWR0aD0iMzYiIGhlaWdodD0iMzYiIGZpbGw9IiM0RjQ2RTUiIHJ4PSIxMCIvPjxwYXRoIGZpbGw9IiNGRkYiIGQ9Ik0xOCA3TDI3IDE2TDE4IDI1TDkgMTZMMTggN1oiLz48L3N2Zz4='"/>
+        <div>
+            <div class="logo-text">Nexus One</div>
+            <div class="logo-sub">Teacher Portal</div>
+        </div>
+    </div>
+    <div class="menu-section">
+        <div class="menu-label">Menu</div>
+        <a href="/teacher-portal" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            Dashboard
+        </a>
+        <a href="/attendance" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Mark Attendance
+        </a>
+        <a href="/teacher-assignment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Assignments
+        </a>
+        <a href="/teacher-outlines" class="menu-item active">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+            Course Outlines
+        </a>
+        <div class="menu-label">Management</div>
+        <a href="/teacher-leave" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Leave Requests
+            <span class="notif-badge" th:if="${pendingLeaveCount != null and pendingLeaveCount > 0}" th:text="${pendingLeaveCount}"></span>
+        </a>
+        <a href="/teacher-appointment" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Faculty Sync
+        </a>
+        <a href="/teacher-jobs" class="menu-item">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            Career Hub
+        </a>
+        <a href="/teacher-blood-finder" class="menu-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            Blood Finder
+        </a>
+        <div class="menu-label">Updates</div>
+        <a href="/notifications/teacher" class="menu-item">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifications
+            <span class="notif-badge" th:if="${unreadNotifCount != null and unreadNotifCount > 0}" th:text="${unreadNotifCount}"></span>
+        </a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/profile" class="user-card">
+            <img th:src="${session.teacherId != null ? '/teachers/' + session.teacherId + '.jpg' : '/teachers/0.jpg'}"
+                 class="avatar"
+                 onerror="this.style.display='none'; document.getElementById('sbFallback1').style.display='flex';"/>
+            <div class="avatar" id="sbFallback1" style="display:none;"
+                 th:text="${username != null and username.length() >= 2 ? #strings.substring(username,0,2).toUpperCase() : 'TR'}">TR</div>
+            <div class="user-info">
+                <div class="user-name" th:text="${username != null ? username : 'Teacher'}">Teacher</div>
+                <div class="user-role">Lecturer</div>
+            </div>
+            <div class="online-dot"></div>
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main-wrapper">
+    <header class="topbar">
+        <div class="search-container">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search courses, topics..." oninput="filterAll()">
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+            <a href="/logout" class="icon-btn" title="Logout" style="color:var(--danger);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Course Outlines</h1>
+                <p class="page-desc">Manage course materials, modules, videos, and resources.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline-sm" onclick="openDrawer('module')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+                    New Module
+                </button>
+                <button class="btn-primary" onclick="openDrawer('topic')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add Topic / File
+                </button>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="mini-stat">
+                <div class="mini-stat-top">
+                    <div class="mini-stat-label">Total Topics</div>
+                    <div class="mini-stat-icon ms-indigo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    </div>
+                </div>
+                <div class="mini-stat-val" th:text="${outlines != null ? outlines.size() : 0}">0</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-top">
+                    <div class="mini-stat-label">Unique Courses</div>
+                    <div class="mini-stat-icon ms-green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    </div>
+                </div>
+                <div class="mini-stat-val" id="statCourses">0</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-top">
+                    <div class="mini-stat-label">Files Uploaded</div>
+                    <div class="mini-stat-icon ms-orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </div>
+                </div>
+                <div class="mini-stat-val" id="statFiles">0</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-top">
+                    <div class="mini-stat-label">Resource Links</div>
+                    <div class="mini-stat-icon ms-warn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </div>
+                </div>
+                <div class="mini-stat-val" id="statLinks">0</div>
+            </div>
+            <div class="mini-stat">
+                <div class="mini-stat-top">
+                    <div class="mini-stat-label">Pinned Topics</div>
+                    <div class="mini-stat-icon ms-pink">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 10 7 10 12 15"></polygon></svg>
+                    </div>
+                </div>
+                <div class="mini-stat-val" id="statPinned">0</div>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div th:if="${outlines == null or outlines.isEmpty()}" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <h3>No Materials Posted Yet</h3>
+            <p>Start by creating a Module, then add topics, PDFs, videos and resource links.</p>
+            <button class="btn-primary" onclick="openDrawer('topic')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add First Topic
+            </button>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div th:if="${outlines != null and !outlines.isEmpty()}">
+
+            <!-- VIEW SWITCHER + FILTER -->
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <div class="view-tabs">
+                    <button class="view-tab active" id="tab-module" onclick="switchView('module')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+                        Module View
+                    </button>
+                    <button class="view-tab" id="tab-grid" onclick="switchView('grid')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="3" y="16" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect></svg>
+                        Card View
+                    </button>
+                    <button class="view-tab" id="tab-progress" onclick="switchView('progress')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        Progress
+                    </button>
+                </div>
+                <div class="filter-bar">
+                    <input type="text" class="filter-input" id="filterInput" placeholder="Filter topics..." oninput="filterAll()">
+                </div>
+                <div class="filter-chips">
+                    <span class="chip active" onclick="setChip(this,'all')">All</span>
+                    <span class="chip" onclick="setChip(this,'pdf')">📄 PDF</span>
+                    <span class="chip" onclick="setChip(this,'video')">🎥 Video</span>
+                    <span class="chip" onclick="setChip(this,'link')">🔗 Links</span>
+                    <span class="chip" onclick="setChip(this,'pinned')">📌 Pinned</span>
+                </div>
+            </div>
+
+            <!-- MODULE VIEW -->
+            <div id="moduleView">
+                <div th:each="outline : ${outlines}"
+                     class="outline-card-data"
+                     style="display:none;"
+                     th:attr="
+                        data-id=${outline.id},
+                        data-course=${outline.courseCode},
+                        data-title=${outline.title},
+                        data-desc=${outline.description != null ? outline.description : ''},
+                        data-batch=${outline.batch},
+                        data-dept=${outline.department},
+                        data-file=${outline.fileOrLink != null ? outline.fileOrLink : ''},
+                        data-date=${outline.postDate},
+                        data-teacher=${outline.teacherName},
+                        data-module=${outline.description != null and outline.description.startsWith('[MOD]') ? #strings.substring(outline.description,5) : 'General'},
+                        data-pinned=${outline.description != null and outline.description.contains('[PIN]') ? 'true' : 'false'},
+                        data-type=${outline.fileOrLink != null and outline.fileOrLink.contains('.mp4') ? 'video' : (outline.fileOrLink != null and outline.fileOrLink.startsWith('http') ? 'link' : (outline.fileOrLink != null and !outline.fileOrLink.isEmpty() ? 'pdf' : 'none'))}">
+                </div>
+                <div id="moduleContainer"></div>
+            </div>
+
+            <!-- GRID VIEW -->
+            <div id="gridView" style="display:none;">
+                <div th:each="outline : ${outlines}"
+                     class="outline-card"
+                     th:classappend="${outline.description != null and outline.description.contains('[PIN]')} ? 'pinned' : ''"
+                     th:attr="data-search=${outline.courseCode + ' ' + outline.title + ' ' + outline.batch + ' ' + outline.department},
+                              data-type=${outline.fileOrLink != null and outline.fileOrLink.contains('.mp4') ? 'video' : (outline.fileOrLink != null and outline.fileOrLink.startsWith('http') ? 'link' : (outline.fileOrLink != null and !outline.fileOrLink.isEmpty() ? 'pdf' : 'none'))},
+                              data-pinned=${outline.description != null and outline.description.contains('[PIN]') ? 'true' : 'false'}">
+                    <div class="card-top">
+                        <div th:if="${outline.description != null and outline.description.contains('[PIN]')}" class="pin-strip">📌 Pinned</div>
+                        <div class="card-header">
+                            <span class="course-badge" th:text="${outline.courseCode}">CSE-3201</span>
+                            <span th:if="${outline.fileOrLink != null and outline.fileOrLink.contains('.mp4')}" class="type-badge video">🎥 Video</span>
+                            <span th:if="${outline.fileOrLink != null and outline.fileOrLink.startsWith('http') and !outline.fileOrLink.contains('.mp4')}" class="type-badge link">🔗 Link</span>
+                            <span th:if="${outline.fileOrLink != null and !outline.fileOrLink.isEmpty() and !outline.fileOrLink.startsWith('http')}" class="type-badge pdf">📄 PDF</span>
+                            <span class="card-date" th:text="${outline.postDate}">2026-01-01</span>
+                        </div>
+                        <div class="card-title" th:text="${outline.title}">Topic Title</div>
+                        <div class="card-desc" th:text="${outline.description != null and !outline.description.startsWith('[') ? outline.description : 'No description.'}">Desc</div>
+                        <div class="card-meta">
+                            <span class="meta-tag mt-batch">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line></svg>
+                                <span th:text="${outline.batch}">18th</span>
+                            </span>
+                            <span class="meta-tag mt-dept">
+                                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                                <span th:text="${outline.department}">CSE</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a th:if="${outline.fileOrLink != null and !outline.fileOrLink.isEmpty() and outline.fileOrLink.startsWith('http')}"
+                           th:href="${outline.fileOrLink}" target="_blank" class="cf-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            Open
+                        </a>
+                        <a th:if="${outline.fileOrLink != null and !outline.fileOrLink.isEmpty() and !outline.fileOrLink.startsWith('http')}"
+                           th:href="'/outlines/' + ${outline.fileOrLink}" target="_blank" class="cf-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            View File
+                        </a>
+                        <span th:if="${outline.fileOrLink == null or outline.fileOrLink.isEmpty()}" class="cf-btn no-file">No File</span>
+                        <form th:action="@{'/teacher-outlines/pin/' + ${outline.id}}" method="post" style="margin:0;">
+                            <button type="submit" class="cf-btn pin">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 10 7 10 12 15"></polygon></svg>
+                                <span th:text="${outline.description != null and outline.description.contains('[PIN]')} ? 'Unpin' : 'Pin'">Pin</span>
+                            </button>
+                        </form>
+                        <button class="cf-btn discuss" th:onclick="'toggleDiscuss(' + ${outline.id} + ')'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            Discuss
+                        </button>
+                        <form th:action="@{'/teacher-outlines/delete/' + ${outline.id}}" method="post" style="margin:0;"
+                              th:attr="onsubmit='return confirmDel(event, this, ' + ${outline.id} + ')'">
+                            <button type="submit" class="cf-btn del">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                    <div class="discuss-panel" th:id="'discuss-' + ${outline.id}" style="display:none;margin:0 14px 14px;">
+                        <div class="discuss-panel-header">
+                            <div class="discuss-panel-title">💬 <span th:text="${outline.title}">Topic</span></div>
+                            <button class="close-btn" th:onclick="'toggleDiscuss(' + ${outline.id} + ')'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div class="discuss-msgs" th:id="'discuss-msgs-' + ${outline.id}">
+                            <div style="text-align:center;color:var(--text-muted);font-size:12.5px;padding:18px;">No comments yet. Start the discussion!</div>
+                        </div>
+                        <div class="discuss-input-row">
+                            <input type="text" class="discuss-input" th:id="'discuss-inp-' + ${outline.id}" placeholder="Write a note..."
+                                   th:onkeydown="'if(event.key===\'Enter\') postDiscuss(' + ${outline.id} + ')'">
+                            <button class="discuss-send" th:onclick="'postDiscuss(' + ${outline.id} + ')'">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROGRESS VIEW -->
+            <div id="progressView" style="display:none;">
+                <div id="progressContainer"></div>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="outlineDrawer">
+    <div class="drawer-header">
+        <div>
+            <div class="drawer-title" id="drawerTitle">Add Topic / Resource</div>
+            <div class="drawer-subtitle" id="drawerSubtitle">Upload file, video or add a resource link.</div>
+        </div>
+        <button class="close-btn" onclick="closeDrawer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+    <form id="topicForm" action="/teacher-outlines/post" method="POST" enctype="multipart/form-data"
+          style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="drawer-body">
+            <div class="form-group">
+                <label class="form-label">Resource Type</label>
+                <div class="rtype-tabs">
+                    <label class="rtype-tab active" onclick="setRtype(this,'pdf')">
+                        <input type="radio" name="resourceType" value="pdf" style="display:none" checked>
+                        <span class="rtype-icon">📄</span>
+                        <span class="rtype-label">PDF / Doc</span>
+                    </label>
+                    <label class="rtype-tab" onclick="setRtype(this,'video')">
+                        <input type="radio" name="resourceType" value="video" style="display:none">
+                        <span class="rtype-icon">🎥</span>
+                        <span class="rtype-label">Video</span>
+                    </label>
+                    <label class="rtype-tab" onclick="setRtype(this,'link')">
+                        <input type="radio" name="resourceType" value="link" style="display:none">
+                        <span class="rtype-icon">🔗</span>
+                        <span class="rtype-label">Link</span>
+                    </label>
+                    <label class="rtype-tab" onclick="setRtype(this,'text')">
+                        <input type="radio" name="resourceType" value="text" style="display:none">
+                        <span class="rtype-icon">📝</span>
+                        <span class="rtype-label">Text Only</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-row2">
+                <div class="form-group">
+                    <label class="form-label">Course Code *</label>
+                    <input type="text" name="courseCode" class="form-control" placeholder="e.g. CSE-3201" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <input type="text" name="department" class="form-control" placeholder="e.g. CSE or All">
+                </div>
+            </div>
+            <div class="form-row2">
+                <div class="form-group">
+                    <label class="form-label">Target Batch</label>
+                    <input type="text" name="batch" class="form-control" placeholder="e.g. 18th or All">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Module Name</label>
+                    <input type="text" name="moduleName" id="moduleNameInput" class="form-control" placeholder="e.g. Module 1 – Arrays">
+                    <div class="form-sublabel">Groups topics in Module View.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Topic Title *</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g. Week 3 — Pointers & Memory" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <textarea name="description" id="descInput" class="form-control" placeholder="Brief notes or instructions..."></textarea>
+            </div>
+            <div class="form-group" id="uploadSection">
+                <label class="form-label">Upload File</label>
+                <label class="upload-zone" id="uploadZone">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <p id="uploadHint">Click to upload or drag &amp; drop</p>
+                    <span id="uploadAccept">PDF, DOCX, PPTX, ZIP — max 50MB</span>
+                    <input type="file" id="fileInput" name="file" onchange="showFileName(this)">
+                </label>
+                <div class="file-preview" id="fileNameDisplay">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span id="fileNameText"></span>
+                </div>
+            </div>
+            <div class="form-divider" id="orDivider">OR</div>
+            <div class="form-group" id="linkSection">
+                <label class="form-label" id="linkLabel">External Link</label>
+                <input type="url" name="externalLink" id="linkInput" class="form-control" placeholder="https://drive.google.com/ or YouTube URL...">
+                <div class="form-sublabel" id="linkSublabel">Google Drive, YouTube, Notion, OneDrive — any public URL.</div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox-row">
+                    <label>
+                        <input type="checkbox" name="pinTopic" id="pinTopicCheck" class="toggle-checkbox">
+                        📌 Pin this topic (highlighted at top of module)
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button type="button" class="btn-outline-sm" onclick="closeDrawer()">Cancel</button>
+            <button type="submit" class="btn-primary">Publish Topic</button>
+        </div>
+    </form>
+
+    <form id="moduleForm" action="/teacher-outlines/create-module" method="POST"
+          style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="drawer-body">
+            <div class="form-group">
+                <label class="form-label">Module Name *</label>
+                <input type="text" name="moduleName" class="form-control" placeholder="e.g. Module 1 – Arrays and Pointers" required>
+            </div>
+            <div class="form-row2">
+                <div class="form-group">
+                    <label class="form-label">Course Code *</label>
+                    <input type="text" name="courseCode" class="form-control" placeholder="e.g. CSE-3201" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Batch</label>
+                    <input type="text" name="batch" class="form-control" placeholder="e.g. 18th or All">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" placeholder="What will students learn in this module?"></textarea>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button type="button" class="btn-outline-sm" onclick="closeDrawer()">Cancel</button>
+            <button type="submit" class="btn-primary">Create Module</button>
+        </div>
+    </form>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastMsg">Done!</span>
+</div>
+
+<script>
+    /* ── THEME ── */
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    (function(){ if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark'); })();
+
+    /* ── DRAWER ── */
+    function openDrawer(type) {
+        document.getElementById('drawerOverlay').classList.add('active');
+        document.getElementById('outlineDrawer').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        const tf = document.getElementById('topicForm');
+        const mf = document.getElementById('moduleForm');
+        if (type === 'module') {
+            tf.style.display = 'none'; mf.style.display = 'flex';
+            document.getElementById('drawerTitle').textContent = 'Create Module';
+            document.getElementById('drawerSubtitle').textContent = 'Group your topics under a named module.';
+        } else {
+            tf.style.display = 'flex'; mf.style.display = 'none';
+            document.getElementById('drawerTitle').textContent = 'Add Topic / Resource';
+            document.getElementById('drawerSubtitle').textContent = 'Upload file, video or add a resource link.';
+        }
+    }
+    function closeDrawer() {
+        document.getElementById('drawerOverlay').classList.remove('active');
+        document.getElementById('outlineDrawer').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    /* ── RESOURCE TYPE ── */
+    function setRtype(tab, type) {
+        document.querySelectorAll('.rtype-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const up = document.getElementById('uploadSection');
+        const lk = document.getElementById('linkSection');
+        const or = document.getElementById('orDivider');
+        const lbl = document.getElementById('linkLabel');
+        const acc = document.getElementById('uploadAccept');
+        const fi = document.getElementById('fileInput');
+        if (type === 'pdf') {
+            up.style.display=''; lk.style.display=''; or.style.display='';
+            lbl.textContent='External Link (optional)';
+            acc.textContent='PDF, DOCX, PPTX, ZIP — max 50MB';
+            fi.accept='.pdf,.docx,.pptx,.zip,.doc';
+        } else if (type === 'video') {
+            up.style.display=''; lk.style.display=''; or.style.display='';
+            lbl.textContent='Video URL (YouTube/Drive)';
+            acc.textContent='MP4, MOV — max 100MB, or paste a YouTube link below';
+            fi.accept='.mp4,.mov,.avi,.mkv';
+        } else if (type === 'link') {
+            up.style.display='none'; lk.style.display=''; or.style.display='none';
+            lbl.textContent='Resource URL *';
+            document.getElementById('linkInput').required = true;
+        } else {
+            up.style.display='none'; lk.style.display='none'; or.style.display='none';
+        }
+    }
+
+    /* ── FILE NAME ── */
+    function showFileName(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('fileNameText').textContent = input.files[0].name;
+            document.getElementById('fileNameDisplay').classList.add('show');
+        }
+    }
+
+    /* ── DRAG & DROP ── */
+    const uz = document.getElementById('uploadZone');
+    if (uz) {
+        uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dragover'); });
+        uz.addEventListener('dragleave', () => uz.classList.remove('dragover'));
+        uz.addEventListener('drop', e => {
+            e.preventDefault(); uz.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                document.getElementById('fileInput').files = files;
+                document.getElementById('fileNameText').textContent = files[0].name;
+                document.getElementById('fileNameDisplay').classList.add('show');
+            }
+        });
+    }
+
+    /* ── PIN HELPER ── */
+    document.getElementById('topicForm').addEventListener('submit', function() {
+        const pinCheck = document.getElementById('pinTopicCheck');
+        const moduleInput = document.getElementById('moduleNameInput');
+        const descInput = document.getElementById('descInput');
+        let desc = descInput.value;
+        if (moduleInput.value.trim()) desc = '[MOD]' + moduleInput.value.trim() + ' | ' + desc;
+        if (pinCheck.checked) desc = '[PIN] ' + desc;
+        descInput.value = desc;
+    });
+
+    /* ── VIEW SWITCHER ── */
+    function switchView(v) {
+        ['module','grid','progress'].forEach(k => {
+            const el = document.getElementById(k+'View');
+            if (el) el.style.display = (k===v) ? '' : 'none';
+            const tab = document.getElementById('tab-'+k);
+            if (tab) tab.classList.toggle('active', k===v);
+        });
+        if (v === 'progress') renderProgress();
+        if (v === 'module') renderModules();
+    }
+
+    /* ── FILTER CHIP ── */
+    let activeChip = 'all';
+    function setChip(el, val) {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        activeChip = val;
+        filterAll();
+    }
+
+    /* ── FILTER ALL ── */
+    function filterAll() {
+        const q = ((document.getElementById('globalSearch').value || '') + ' ' +
+            (document.getElementById('filterInput') ? document.getElementById('filterInput').value : '')).toLowerCase().trim();
+        document.querySelectorAll('#gridView .outline-card').forEach(card => {
+            const txt = (card.getAttribute('data-search')||'').toLowerCase();
+            const type = card.getAttribute('data-type');
+            const pinned = card.getAttribute('data-pinned')==='true';
+            let show = !q || txt.includes(q);
+            if (activeChip !== 'all') {
+                if (activeChip === 'pinned') show = show && pinned;
+                else show = show && type === activeChip;
+            }
+            card.style.display = show ? '' : 'none';
+        });
+        renderModules(q);
+    }
+
+    /* ── GET RAW DATA ── */
+    function getRawData() {
+        const items = [];
+        document.querySelectorAll('.outline-card-data').forEach(el => {
+            items.push({
+                id: el.dataset.id, course: el.dataset.course, title: el.dataset.title,
+                desc: el.dataset.desc, batch: el.dataset.batch, dept: el.dataset.dept,
+                file: el.dataset.file, date: el.dataset.date, teacher: el.dataset.teacher,
+                module: el.dataset.module || 'General', pinned: el.dataset.pinned === 'true',
+                type: el.dataset.type
+            });
+        });
+        return items;
+    }
+
+    /* ── RENDER MODULE VIEW ── */
+    function renderModules(q) {
+        q = q || '';
+        const items = getRawData();
+        const groups = {};
+        items.forEach(item => {
+            const txt = (item.course+' '+item.title+' '+item.batch+' '+item.dept).toLowerCase();
+            if (q && !txt.includes(q)) return;
+            if (activeChip !== 'all') {
+                if (activeChip==='pinned' && !item.pinned) return;
+                if (activeChip!=='pinned' && activeChip!=='all' && item.type!==activeChip) return;
+            }
+            if (!groups[item.module]) groups[item.module] = [];
+            groups[item.module].push(item);
+        });
+        const container = document.getElementById('moduleContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        if (Object.keys(groups).length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:36px;color:var(--text-muted);font-size:13px;">No matching topics found.</div>';
+            return;
+        }
+        let modNum = 1;
+        Object.entries(groups).forEach(([modName, topics]) => {
+            const sorted = [...topics.filter(t=>t.pinned), ...topics.filter(t=>!t.pinned)];
+            const el = document.createElement('div');
+            el.className = 'module-group';
+            el.innerHTML = `
+          <div class="module-header" onclick="toggleModule(this)">
+            <div class="module-num">M${modNum}</div>
+            <div class="module-info">
+              <div class="module-name">${escHtml(modName)}</div>
+              <div class="module-meta">${topics.length} topic${topics.length!==1?'s':''} &middot; ${topics.filter(t=>t.type==='pdf').length} PDFs &middot; ${topics.filter(t=>t.type==='video').length} videos</div>
+            </div>
+            <div class="module-actions">
+              <span class="module-count">${topics.length}</span>
+              <div class="module-toggle open">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </div>
+          </div>
+          <div class="module-body">
+            <div class="topic-list">${sorted.map(t => renderTopicRow(t)).join('')}</div>
+          </div>`;
+            container.appendChild(el);
+            modNum++;
+        });
+    }
+
+    function renderTopicRow(t) {
+        const typeIcon = t.type==='pdf' ? '📄' : t.type==='video' ? '🎥' : t.type==='link' ? '🔗' : '📝';
+        const typeBadge = t.type==='pdf' ? `<span class="tbadge tbadge-pdf">PDF</span>` :
+            t.type==='video' ? `<span class="tbadge tbadge-video">Video</span>` :
+                t.type==='link' ? `<span class="tbadge tbadge-link">Link</span>` : '';
+        const fileLink = t.file ? (t.file.startsWith('http') ? t.file : '/outlines/'+t.file) : '';
+        const fileBtn = fileLink
+            ? `<a href="${escHtml(fileLink)}" target="_blank" class="tact-btn">${typeIcon} Open</a>`
+            : `<span class="tact-btn" style="opacity:0.4;pointer-events:none">No File</span>`;
+        const pinBtn = `<form action="/teacher-outlines/pin/${t.id}" method="post" style="margin:0;"><button type="submit" class="tact-btn pin-btn">📌 ${t.pinned?'Unpin':'Pin'}</button></form>`;
+        const delBtn = `<form action="/teacher-outlines/delete/${t.id}" method="post" style="margin:0;" onsubmit="return confirmDel(event,this,${t.id})"><button type="submit" class="tact-btn del-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Delete</button></form>`;
+        const discussBtn = `<button class="tact-btn discuss-btn" onclick="toggleDiscuss(${t.id})">💬 Discuss</button>`;
+        const discussPanel = `<div class="discuss-panel" id="discuss-${t.id}" style="display:none;margin:0 20px 12px;"><div class="discuss-panel-header"><div class="discuss-panel-title">💬 ${escHtml(t.title)}</div><button class="close-btn" onclick="toggleDiscuss(${t.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div><div class="discuss-msgs" id="discuss-msgs-${t.id}"><div style="text-align:center;color:var(--text-muted);font-size:12.5px;padding:18px;">No comments yet.</div></div><div class="discuss-input-row"><input type="text" class="discuss-input" id="discuss-inp-${t.id}" placeholder="Write a note..." onkeydown="if(event.key==='Enter') postDiscuss(${t.id})"><button class="discuss-send" onclick="postDiscuss(${t.id})">Send</button></div></div>`;
+        return `<div class="topic-row ${t.pinned?'pinned':''}" data-id="${t.id}">${t.pinned?'<svg class="pin-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><line x1="12" y1="17" x2="12" y2="22" stroke="currentColor" stroke-width="2" fill="none"></line><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 10 7 10 12 15"></polygon></svg>':''}<div class="type-dot ${t.type}"></div><div class="topic-info"><div class="topic-title">${escHtml(t.title)}</div><div class="topic-desc">${escHtml(t.desc.replace(/\[MOD\][^|]*\|/,'').replace('[PIN]','').trim()||'No description')}</div></div><div class="topic-badges">${typeBadge}<span class="tbadge tbadge-course">${escHtml(t.course)}</span><span class="tbadge tbadge-batch">${escHtml(t.batch)}</span><span class="tbadge tbadge-date">${escHtml(t.date)}</span></div><div class="topic-actions">${fileBtn}${pinBtn}${discussBtn}${delBtn}</div></div>${discussPanel}`;
+    }
+
+    function toggleModule(header) {
+        const body = header.nextElementSibling;
+        const toggle = header.querySelector('.module-toggle');
+        body.classList.toggle('collapsed');
+        toggle.classList.toggle('open');
+    }
+
+    /* ── PROGRESS VIEW ── */
+    function renderProgress() {
+        const items = getRawData();
+        const courseMap = {};
+        items.forEach(item => {
+            if (!courseMap[item.course]) courseMap[item.course] = { topics:[], modules:new Set() };
+            courseMap[item.course].topics.push(item);
+            courseMap[item.course].modules.add(item.module);
+        });
+        const c = document.getElementById('progressContainer');
+        if (!c) return;
+        c.innerHTML = '';
+        Object.entries(courseMap).forEach(([course, data]) => {
+            const total = data.topics.length;
+            const withFiles = data.topics.filter(t => t.file).length;
+            const pct = total > 0 ? Math.round(withFiles/total*100) : 0;
+            const div = document.createElement('div');
+            div.className = 'progress-section';
+            div.innerHTML = `<div class="progress-header"><div class="progress-course">${escHtml(course)}</div><div class="progress-stats"><div class="prog-stat"><div class="prog-stat-val">${total}</div><div class="prog-stat-lbl">Topics</div></div><div class="prog-stat"><div class="prog-stat-val">${data.modules.size}</div><div class="prog-stat-lbl">Modules</div></div><div class="prog-stat"><div class="prog-stat-val">${pct}%</div><div class="prog-stat-lbl">Coverage</div></div></div></div><div class="progress-bar-wrap"><div class="prog-bar-label"><span>Material Coverage</span><span>${withFiles}/${total} topics with files</span></div><div class="prog-bar"><div class="prog-bar-fill" style="width:${pct}%"></div></div></div><div class="progress-modules">${[...data.modules].map(mod=>{const mt=data.topics.filter(t=>t.module===mod);const mp=mt.length>0?Math.round(mt.filter(t=>t.file).length/mt.length*100):0;return`<div class="prog-module-row"><div class="prog-module-name">${escHtml(mod)}</div><div class="prog-module-bar"><div class="prog-module-fill" style="width:${mp}%"></div></div><div class="prog-module-val">${mp}%</div></div>`;}).join('')}</div>`;
+            c.appendChild(div);
+        });
+        if (!c.children.length) c.innerHTML = '<div style="text-align:center;padding:36px;color:var(--text-muted);">No data yet.</div>';
+    }
+
+    /* ── DISCUSSION ── */
+    const discussData = {};
+    function toggleDiscuss(id) {
+        const panel = document.getElementById('discuss-'+id);
+        if (!panel) return;
+        panel.style.display = panel.style.display === 'none' ? '' : 'none';
+        if (!discussData[id]) { discussData[id] = []; loadDiscuss(id); }
+    }
+    function loadDiscuss(id) {
+        const stored = localStorage.getItem('discuss_'+id);
+        if (stored) { discussData[id] = JSON.parse(stored); renderDiscuss(id); }
+    }
+    function postDiscuss(id) {
+        const inp = document.getElementById('discuss-inp-'+id);
+        if (!inp || !inp.value.trim()) return;
+        if (!discussData[id]) discussData[id] = [];
+        const now = new Date();
+        discussData[id].push({ name:'You (Teacher)', text:inp.value.trim(), time:now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+', '+now.toLocaleDateString() });
+        localStorage.setItem('discuss_'+id, JSON.stringify(discussData[id]));
+        inp.value = '';
+        renderDiscuss(id);
+    }
+    function renderDiscuss(id) {
+        const box = document.getElementById('discuss-msgs-'+id);
+        if (!box) return;
+        const msgs = discussData[id] || [];
+        if (!msgs.length) { box.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:12.5px;padding:18px;">No comments yet.</div>'; return; }
+        box.innerHTML = msgs.map(m=>`<div class="discuss-msg"><div class="discuss-av">${m.name.substring(0,2).toUpperCase()}</div><div class="discuss-content"><div class="discuss-name">${escHtml(m.name)}</div><div class="discuss-text">${escHtml(m.text)}</div><div class="discuss-time">${escHtml(m.time)}</div></div></div>`).join('');
+        box.scrollTop = box.scrollHeight;
+    }
+
+    /* ── STATS ── */
+    function updateStats() {
+        const items = getRawData();
+        const codes = new Set(items.map(i=>i.course));
+        const sc = document.getElementById('statCourses'); if(sc) sc.textContent = codes.size;
+        const sf = document.getElementById('statFiles'); if(sf) sf.textContent = items.filter(i=>i.type==='pdf').length;
+        const sl = document.getElementById('statLinks'); if(sl) sl.textContent = items.filter(i=>i.type==='link'||i.type==='video').length;
+        const sp = document.getElementById('statPinned'); if(sp) sp.textContent = items.filter(i=>i.pinned).length;
+    }
+
+    /* ── DELETE CONFIRM ── */
+    function confirmDel(event, form, id) {
+        event.preventDefault();
+        Swal.fire({
+            title:'Delete this topic?', text:'This action cannot be undone.', icon:'warning',
+            showCancelButton:true, confirmButtonColor:'#EF4444', cancelButtonColor:'#6B7280',
+            confirmButtonText:'Yes, delete',
+            background:document.body.classList.contains('dark')?'#161B26':'#fff',
+            color:document.body.classList.contains('dark')?'#EEF2FF':'#111827'
+        }).then(r => { if(r.isConfirmed) form.submit(); });
+        return false;
+    }
+
+    /* ── TOAST ── */
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    /* ── ESCAPE HTML ── */
+    function escHtml(str) {
+        return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── INIT ── */
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('success')) {
+            const map = { posted:'Topic published successfully! 🎉', deleted:'Topic deleted.', pinned:'Pin status updated.' };
+            const msg = map[params.get('success')] || 'Done!';
+            window.history.replaceState({}, '', window.location.pathname);
+            Swal.fire({
+                title:'Success!', text:msg, icon:'success',
+                confirmButtonColor:'#4F46E5', timer:2800, timerProgressBar:true,
+                background:document.body.classList.contains('dark')?'#161B26':'#fff',
+                color:document.body.classList.contains('dark')?'#EEF2FF':'#111827'
+            });
+        }
+        updateStats();
+        renderModules();
+    });
+</script>
+</body>
+</html>

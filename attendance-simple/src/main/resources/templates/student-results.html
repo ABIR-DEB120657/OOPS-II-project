@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Academic Results | Nexus One Premium</title>
+    <meta charset="UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        :root {
+            --bg: #f8fafc; --sidebar-bg: rgba(255,255,255,0.95); --surface: #ffffff;
+            --border: rgba(0,0,0,0.08); --text: #0f172a; --subtext: #64748b;
+            --accent: #6366f1; --accent-hover: #4f46e5; --glass-bg: rgba(255,255,255,0.6);
+            --card-shadow: 0 12px 30px rgba(0,0,0,0.04);
+        }
+        body.dark-mode {
+            --bg: #050508; --sidebar-bg: rgba(15,15,25,0.85); --surface: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08); --text: #f8fafc; --subtext: #94a3b8;
+            --glass-bg: rgba(255,255,255,0.03); --card-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; display: flex;
+            transition: background 0.5s ease, color 0.5s ease; overflow-x: hidden;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes ringFill {
+            from { stroke-dashoffset: 283; }
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.3); }
+            50% { box-shadow: 0 0 0 12px rgba(99,102,241,0); }
+        }
+        @keyframes glowA {
+            0%,100% { box-shadow: 0 0 8px rgba(16,185,129,0.5), 0 0 20px rgba(16,185,129,0.2); }
+            50% { box-shadow: 0 0 15px rgba(16,185,129,0.8), 0 0 35px rgba(16,185,129,0.4); }
+        }
+        @keyframes glowB {
+            0%,100% { box-shadow: 0 0 8px rgba(59,130,246,0.5); }
+            50% { box-shadow: 0 0 15px rgba(59,130,246,0.8), 0 0 35px rgba(59,130,246,0.4); }
+        }
+        @keyframes glowC {
+            0%,100% { box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+            50% { box-shadow: 0 0 15px rgba(245,158,11,0.8), 0 0 35px rgba(245,158,11,0.4); }
+        }
+        @keyframes glowD {
+            0%,100% { box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+            50% { box-shadow: 0 0 15px rgba(239,68,68,0.8); }
+        }
+        @keyframes progressBar {
+            from { width: 0; }
+        }
+        @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16,1,0.3,1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px; height: calc(100vh - 40px); background: var(--sidebar-bg);
+            backdrop-filter: blur(25px); border: 1px solid var(--border); margin: 20px;
+            border-radius: 30px; padding: 30px 20px; position: fixed; display: flex;
+            flex-direction: column; z-index: 1000; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .logo-box { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; padding-left: 5px; }
+        .logo-img { width: 45px; height: 45px; border-radius: 15px; box-shadow: 0 5px 15px rgba(99,102,241,0.4); }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+
+        .menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .menu::-webkit-scrollbar { width: 4px; }
+        .menu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .menu a {
+            display: flex; align-items: center; gap: 15px; padding: 14px 20px;
+            border-radius: 18px; text-decoration: none; color: var(--subtext);
+            font-size: 14px; font-weight: 600; margin-bottom: 8px; transition: var(--transition);
+        }
+        .menu a:hover { background: var(--surface); color: var(--text); transform: translateX(5px); }
+        .menu a.active { background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white; box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
+
+        .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .sb-user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--card-shadow); }
+        .avatar { width: 45px; height: 45px; border-radius: 15px; background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 0 5px 15px rgba(99,102,241,0.3); }
+        .btn-logout {
+            display: flex; align-items: center; justify-content: center; padding: 15px; gap: 10px;
+            background: rgba(239,68,68,0.1); color: #f87171; border-radius: 18px;
+            font-size: 14px; font-weight: 800; text-decoration: none; transition: var(--transition); border: 1px solid rgba(239,68,68,0.15);
+        }
+        .btn-logout:hover { background: #ef4444; color: white; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(239,68,68,0.2); }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-wrapper { margin-left: 320px; flex: 1; padding: 40px; max-width: calc(100% - 320px - 320px); }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .topbar h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+        .theme-toggle {
+            background: var(--surface); border: 1px solid var(--border); padding: 10px 20px;
+            border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            color: var(--text); font-weight: 700; font-size: 13px; transition: var(--transition); box-shadow: var(--card-shadow);
+        }
+        .theme-toggle:hover { transform: scale(1.05); border-color: var(--accent); }
+
+        /* ===== HERO SECTION ===== */
+        .hero-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--border);
+            border-radius: 35px; padding: 40px; margin-bottom: 30px; box-shadow: var(--card-shadow);
+            position: relative; overflow: hidden;
+        }
+        .hero-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #10b981, #3b82f6, #6366f1, #a855f7);
+        }
+        .hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .s-info h2 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px; }
+        .s-info p { font-size: 15px; color: var(--subtext); font-weight: 500; }
+
+        /* CGPA Ring */
+        .hero-stats { display: flex; gap: 25px; align-items: center; flex-wrap: wrap; }
+        .cgpa-ring-wrap { position: relative; width: 130px; height: 130px; flex-shrink: 0; }
+        .cgpa-ring-wrap svg { transform: rotate(-90deg); }
+        .cgpa-ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+        .cgpa-ring-fill {
+            fill: none; stroke: url(#ringGrad); stroke-width: 10;
+            stroke-linecap: round; stroke-dasharray: 283; stroke-dashoffset: 85;
+            animation: ringFill 1.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        .cgpa-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            text-align: center;
+        }
+        .cgpa-center .val { font-size: 22px; font-weight: 900; color: var(--text); display: block; letter-spacing: -1px; }
+        .cgpa-center .lbl { font-size: 9px; font-weight: 800; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Hero Stat Boxes */
+        .hero-stat-boxes { display: flex; gap: 15px; flex-wrap: wrap; }
+        .hstat {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+            padding: 18px 22px; min-width: 110px; text-align: center; transition: var(--transition);
+        }
+        .hstat:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .hstat .hval { font-size: 24px; font-weight: 900; color: var(--text); display: block; letter-spacing: -1px; }
+        .hstat .hlbl { font-size: 10px; font-weight: 700; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; display: block; }
+        .hstat.accent .hval { color: var(--accent); }
+        .hstat.green .hval { color: #10b981; }
+        .hstat.orange .hval { color: #f59e0b; }
+
+        /* AI Insight Banner */
+        .ai-insight {
+            display: flex; align-items: center; gap: 15px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(99,102,241,0.03));
+            border: 1px solid rgba(99,102,241,0.2); border-radius: 18px; padding: 16px 22px; margin-top: 5px;
+        }
+        .ai-icon { font-size: 24px; flex-shrink: 0; }
+        .ai-text { font-size: 14px; font-weight: 600; color: var(--text); }
+        .ai-text span { color: var(--accent); font-weight: 800; }
+
+        /* Credit Progress */
+        .credit-progress { margin-top: 25px; }
+        .cp-label { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .cp-label span { font-size: 13px; font-weight: 700; color: var(--subtext); }
+        .cp-label strong { font-size: 13px; font-weight: 800; color: var(--accent); }
+        .cp-bar { height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
+        .cp-fill {
+            height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, #10b981, #3b82f6, #6366f1);
+            animation: progressBar 1.5s cubic-bezier(0.16,1,0.3,1) forwards;
+            background-size: 200% auto; animation: progressBar 1.5s cubic-bezier(0.16,1,0.3,1) forwards, shimmer 3s linear infinite;
+        }
+
+        /* Semester Comparison */
+        .sem-compare { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+        .sc-item {
+            flex: 1; min-width: 120px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 14px 16px; transition: var(--transition);
+        }
+        .sc-item:hover { border-color: var(--accent); }
+        .sc-item .sc-sem { font-size: 11px; font-weight: 700; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .sc-item .sc-gpa { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+        .sc-item .sc-bar { height: 4px; border-radius: 99px; margin-top: 8px; }
+        .sc-up { color: #10b981; }
+        .sc-bar-up { background: linear-gradient(90deg, #10b981, #34d399); }
+        .sc-low { color: #f59e0b; }
+        .sc-bar-low { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+        .sc-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 99px; margin-left: 8px; }
+        .sc-badge.up { background: rgba(16,185,129,0.15); color: #10b981; }
+        .sc-badge.down { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+        /* Smart Features */
+        .smart-features { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+        .sf-card {
+            flex: 1; min-width: 130px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 18px; padding: 16px; text-align: center; transition: var(--transition);
+        }
+        .sf-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--card-shadow); }
+        .sf-icon { font-size: 22px; margin-bottom: 8px; }
+        .sf-val { font-size: 18px; font-weight: 900; color: var(--text); display: block; }
+        .sf-lbl { font-size: 10px; font-weight: 700; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; display: block; }
+
+        /* ===== SEMESTER CARD ===== */
+        .semester-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 30px;
+            padding: 35px; margin-bottom: 30px; box-shadow: var(--card-shadow); transition: var(--transition);
+        }
+        .semester-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(99,102,241,0.1); }
+        .sem-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px dashed var(--border); padding-bottom: 20px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+        }
+        .sem-title { font-size: 20px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .sem-title span { background: rgba(99,102,241,0.1); color: var(--accent); padding: 5px 15px; border-radius: 12px; font-size: 14px; font-weight: 800; }
+        .sem-summary { display: flex; gap: 20px; }
+        .sum-item { background: var(--bg); padding: 10px 18px; border-radius: 14px; border: 1px solid var(--border); text-align: center; }
+        .sum-item .lbl { display: block; font-size: 10px; font-weight: 800; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .sum-item .val { font-size: 16px; font-weight: 800; color: var(--text); }
+        .sum-item .val.highlight { color: var(--accent); }
+
+        /* Table Search/Filter Bar */
+        .table-controls {
+            display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap;
+        }
+        .tc-search {
+            flex: 1; min-width: 180px; background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 10px 16px; font-size: 13px; font-weight: 600;
+            color: var(--text); outline: none; transition: var(--transition);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .tc-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+        .tc-select {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+            padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--text);
+            outline: none; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: var(--transition);
+        }
+        .tc-select:focus { border-color: var(--accent); }
+
+        /* Smart Table */
+        .table-wrap { overflow-x: auto; border-radius: 16px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        thead { position: sticky; top: 0; z-index: 2; }
+        th {
+            text-align: left; font-size: 11px; font-weight: 800; color: var(--subtext);
+            text-transform: uppercase; letter-spacing: 1px; padding: 15px 12px;
+            border-bottom: 2px solid var(--border); background: var(--surface); cursor: pointer;
+            white-space: nowrap; user-select: none;
+        }
+        th:hover { color: var(--accent); }
+        td { padding: 16px 12px; font-size: 14px; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tbody tr { transition: var(--transition); }
+        tbody tr:hover { background: rgba(99,102,241,0.04); transform: scale(1.001); }
+
+        .course-code { color: var(--accent); font-weight: 700; font-size: 13px; background: rgba(99,102,241,0.05); padding: 4px 10px; border-radius: 8px; white-space: nowrap; }
+        .course-icon { margin-right: 6px; }
+        .enroll-type { font-size: 12px; font-weight: 700; color: var(--subtext); background: var(--bg); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); }
+
+        /* GLOW GRADE BADGES */
+        .grade-badge {
+            padding: 7px 16px; border-radius: 12px; font-size: 13px; font-weight: 900;
+            display: inline-block; min-width: 50px; text-align: center;
+            position: relative; letter-spacing: 0.5px; transition: var(--transition);
+        }
+        .grade-badge:hover { transform: scale(1.1); }
+
+        .gb-aplus {
+            background: linear-gradient(135deg, #064e3b, #065f46);
+            color: #6ee7b7;
+            border: 1px solid rgba(110,231,183,0.3);
+            animation: glowA 2.5s ease-in-out infinite;
+        }
+        .gb-a {
+            background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1));
+            color: #10b981; border: 1px solid rgba(16,185,129,0.3);
+            box-shadow: 0 0 8px rgba(16,185,129,0.3);
+        }
+        .gb-b {
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.1));
+            color: #3b82f6; border: 1px solid rgba(59,130,246,0.3);
+            box-shadow: 0 0 8px rgba(59,130,246,0.25); animation: glowB 3s ease-in-out infinite;
+        }
+        .gb-c {
+            background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.1));
+            color: #f59e0b; border: 1px solid rgba(245,158,11,0.3);
+            box-shadow: 0 0 8px rgba(245,158,11,0.25);
+        }
+        .gb-d {
+            background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.1));
+            color: #ef4444; border: 1px solid rgba(239,68,68,0.3);
+            box-shadow: 0 0 8px rgba(239,68,68,0.25); animation: glowD 2s ease-in-out infinite;
+        }
+        .gb-f {
+            background: linear-gradient(135deg, rgba(127,29,29,0.3), rgba(127,29,29,0.2));
+            color: #fca5a5; border: 1px solid rgba(239,68,68,0.4);
+            animation: glowD 1.5s ease-in-out infinite;
+        }
+
+        .gp-text { font-weight: 800; font-size: 15px; }
+
+        /* ===== PRINT / TRANSCRIPT BUTTON ===== */
+        .btn-print {
+            background: var(--surface); border: 1px solid var(--border); color: var(--text);
+            padding: 12px 25px; border-radius: 15px; font-size: 14px; font-weight: 800; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; gap: 8px; box-shadow: var(--card-shadow);
+        }
+        .btn-print:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+        .btn-pdf {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white;
+            padding: 12px 25px; border-radius: 15px; font-size: 14px; font-weight: 800; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; gap: 8px;
+            border: none; box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+        }
+        .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(99,102,241,0.4); }
+
+        /* ===== RIGHT SIDEBAR ===== */
+        .right-sidebar {
+            width: 300px; flex-shrink: 0; padding: 40px 30px 40px 0;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+        }
+        .right-sidebar::-webkit-scrollbar { width: 4px; }
+        .right-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .widget {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+            padding: 22px; box-shadow: var(--card-shadow);
+        }
+        .widget-title { font-size: 13px; font-weight: 800; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+        /* Goal CGPA Tracker */
+        .goal-tracker .gt-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .goal-tracker .gt-label { font-size: 13px; font-weight: 600; color: var(--subtext); }
+        .goal-tracker .gt-val { font-size: 14px; font-weight: 800; color: var(--text); }
+        .goal-tracker .gt-bar { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 6px; }
+        .goal-tracker .gt-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), #a855f7); transition: width 1s cubic-bezier(0.16,1,0.3,1); }
+        .gt-input {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+            padding: 10px 14px; font-size: 14px; font-weight: 700; color: var(--text);
+            outline: none; font-family: 'Plus Jakarta Sans', sans-serif; margin-top: 10px;
+            transition: var(--transition);
+        }
+        .gt-input:focus { border-color: var(--accent); }
+
+        /* Academic Calendar */
+        .cal-mini { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-day-header { font-size: 9px; font-weight: 800; color: var(--subtext); text-align: center; text-transform: uppercase; margin-bottom: 2px; }
+        .cal-day {
+            aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; color: var(--subtext); cursor: default; transition: var(--transition);
+        }
+        .cal-day:hover { background: var(--bg); }
+        .cal-day.today { background: var(--accent); color: white; font-weight: 900; }
+        .cal-day.national-holiday { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.4); }
+        .cal-day.holiday { background: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); }
+        .cal-day.exam { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .cal-day.event { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .cal-day.empty { opacity: 0; }
+
+        /* Upcoming Exams */
+        .exam-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .exam-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .exam-date { background: rgba(239,68,68,0.1); color: #ef4444; border-radius: 12px; padding: 8px 10px; text-align: center; min-width: 45px; }
+        .exam-date .ed-day { font-size: 18px; font-weight: 900; display: block; }
+        .exam-date .ed-mon { font-size: 9px; font-weight: 800; text-transform: uppercase; }
+        .exam-info .ei-course { font-size: 13px; font-weight: 800; color: var(--text); }
+        .exam-info .ei-time { font-size: 12px; color: var(--subtext); font-weight: 600; margin-top: 3px; }
+
+        /* Forecast */
+        .forecast-box { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(99,102,241,0.02)); border: 1px solid rgba(99,102,241,0.2); border-radius: 16px; padding: 18px; text-align: center; }
+        .forecast-val { font-size: 42px; font-weight: 900; color: var(--accent); letter-spacing: -2px; display: block; }
+        .forecast-lbl { font-size: 12px; font-weight: 700; color: var(--subtext); margin-top: 5px; }
+        .forecast-note { font-size: 11px; color: var(--subtext); margin-top: 10px; line-height: 1.4; }
+
+        /* ===== TRANSCRIPT MODAL ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .transcript-modal {
+            background: white; color: #0f172a; border-radius: 30px; padding: 50px;
+            max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+        }
+        .tm-header { text-align: center; margin-bottom: 30px; border-bottom: 3px double #e2e8f0; padding-bottom: 25px; }
+        .tm-logo { font-size: 40px; margin-bottom: 10px; }
+        .tm-uni { font-size: 20px; font-weight: 900; color: #1e3a8a; letter-spacing: 1px; }
+        .tm-subtitle { font-size: 13px; color: #64748b; font-weight: 600; margin-top: 5px; }
+        .tm-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        .tm-student { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+        .tm-field { background: #f8fafc; border-radius: 10px; padding: 12px 15px; }
+        .tm-field .tf-lbl { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: block; }
+        .tm-field .tf-val { font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 3px; }
+        .tm-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .tm-table th { background: #1e3a8a; color: white; padding: 10px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
+        .tm-table td { padding: 10px 14px; font-size: 13px; font-weight: 600; border-bottom: 1px solid #e2e8f0; }
+        .tm-table tr:last-child td { border-bottom: none; }
+        .tm-sem-header td { background: #f1f5f9; font-weight: 800; font-size: 12px; color: #475569; padding: 8px 14px; }
+        .tm-cgpa-box { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; border-radius: 20px; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .tm-cgpa-box .tc-lbl { font-size: 14px; font-weight: 700; opacity: 0.9; }
+        .tm-cgpa-box .tc-val { font-size: 36px; font-weight: 900; letter-spacing: -1px; }
+        .tm-qr { display: flex; align-items: center; gap: 20px; background: #f8fafc; border-radius: 16px; padding: 20px; }
+        .qr-box { width: 80px; height: 80px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; }
+        .qr-text { font-size: 12px; color: #64748b; font-weight: 600; line-height: 1.5; }
+        .qr-code-val { font-size: 10px; font-family: monospace; color: #94a3b8; margin-top: 5px; }
+        .tm-footer { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+        .tm-footer p { font-size: 11px; color: #94a3b8; font-weight: 600; }
+        .modal-close { position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; border-radius: 12px; width: 40px; height: 40px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .modal-close:hover { background: #e2e8f0; }
+        .tm-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+        .tm-btn { padding: 13px 28px; border-radius: 14px; font-size: 14px; font-weight: 800; cursor: pointer; border: none; transition: all 0.2s; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; gap: 8px; }
+        .tm-btn.primary { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; }
+        .tm-btn.secondary { background: #f1f5f9; color: #475569; }
+        .tm-btn:hover { transform: translateY(-2px); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1400px) {
+            .right-sidebar { display: none; }
+            .main-wrapper { max-width: calc(100% - 320px); }
+        }
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; padding: 20px; max-width: 100%; }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="modal-overlay" id="transcriptModal">
+    <div class="transcript-modal">
+        <button class="modal-close" onclick="closeTranscript()">✕</button>
+        <div class="tm-header">
+            <div class="tm-logo">🎓</div>
+            <div class="tm-uni">KHWAJA YUNUS ALI UNIVERSITY</div>
+            <div class="tm-subtitle">Department of Computer Science & Engineering</div>
+            <div class="tm-title">Official Academic Transcript</div>
+        </div>
+        <div class="tm-student">
+            <div class="tm-field"><span class="tf-lbl">Student Name</span><span class="tf-val" th:text="${student.name}">Abir Deb</span></div>
+            <div class="tm-field"><span class="tf-lbl">Student ID</span><span class="tf-val" th:text="${student.studentId}">06224205101024</span></div>
+            <div class="tm-field"><span class="tf-lbl">Program</span><span class="tf-val">B.Sc in CSE</span></div>
+            <div class="tm-field"><span class="tf-lbl">Issue Date</span><span class="tf-val" id="issueDate"></span></div>
+        </div>
+        <div class="tm-cgpa-box">
+            <div><div class="tc-lbl">Cumulative GPA (CGPA)</div><div style="font-size:12px;opacity:0.7;margin-top:4px;">Based on all completed semesters</div></div>
+            <div class="tc-val" th:text="${cgpa != null ? cgpa : '3.07'}">3.07</div>
+        </div>
+        <table class="tm-table">
+            <thead><tr><th>Code</th><th>Course</th><th>Cr.</th><th>Grade</th><th>GP</th></tr></thead>
+            <tbody>
+            <tr class="tm-sem-header"><td colspan="5">📅 Summer 2025 — TGPA: 2.38</td></tr>
+            <tr><td>CSE 0311</td><td>Economics</td><td>2.0</td><td>D</td><td>2.00</td></tr>
+            <tr><td>CSE 0411</td><td>Financial Accounting</td><td>2.0</td><td>C</td><td>2.25</td></tr>
+            <tr><td>CSE 0612</td><td>Digital Logic Design</td><td>3.0</td><td>B+</td><td>3.25</td></tr>
+            <tr><td>CSE 0613</td><td>Data Structure</td><td>3.0</td><td>C+</td><td>2.50</td></tr>
+            <tr><td>CSE 0613L</td><td>Data Structure Lab</td><td>1.5</td><td>C</td><td>2.25</td></tr>
+            <tr class="tm-sem-header"><td colspan="5">📅 Spring 2025 — TGPA: 3.75</td></tr>
+            <tr><td>CSE 0211</td><td>Structured Programming</td><td>3.0</td><td>A+</td><td>4.00</td></tr>
+            <tr><td>CSE 0211L</td><td>SPL Lab</td><td>1.5</td><td>A</td><td>3.75</td></tr>
+            <tr><td>MAT 0111</td><td>Differential & Integral Calculus</td><td>3.0</td><td>B+</td><td>3.25</td></tr>
+            </tbody>
+        </table>
+        <div class="tm-qr">
+            <div class="qr-box">▦</div>
+            <div>
+                <div class="qr-text"><strong>QR Verification Code</strong><br>Scan to verify the authenticity of this transcript via the KYAU Academic Portal.</div>
+                <div class="qr-code-val" id="qrCode"></div>
+            </div>
+        </div>
+        <div class="tm-footer">
+            <p>This is a digitally generated official transcript. Unauthorized alterations are a punishable offense.</p>
+            <p style="margin-top:6px;">© Khwaja Yunus Ali University — Academic Registrar Office</p>
+        </div>
+        <div class="tm-actions">
+            <button class="tm-btn secondary" onclick="closeTranscript()">✕ Close</button>
+            <button class="tm-btn primary" onclick="window.print()">🖨️ Print Transcript</button>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar">
+    <div class="logo-box">
+        <img src="/images/kyau_logo.png" alt="Logo" class="logo-img"/>
+        <div class="logo-text">NEXUS ONE</div>
+    </div>
+    <div class="menu">
+        <a href="/student-portal">💠 Dashboard</a>
+        <a href="/student-profile">👤 My Profile</a>
+        <a href="/student-finance">💎 Finance &amp; Fees</a>
+        <a href="/student-leave">📅 Leave Request</a>
+        <a href="/student-assignments">📚 Assignments</a>
+        <a href="/student-outlines">📑 Course Outlines</a>
+        <a href="/student-appointment">👨‍🏫 Faculty Sync</a>
+        <a href="/student-jobs">💼 Career Hub</a>
+        <a href="/student-blood-finder">🩸 Blood Finder</a>
+        <a href="/my-notifications">🔔 Notifications</a>
+    </div>
+    <div class="sidebar-bottom">
+        <div class="sb-user-card">
+            <div class="avatar" th:text="${initials}">AD</div>
+            <div class="user-info">
+                <span style="font-size:14px;font-weight:800;color:var(--text);display:block;" th:text="${student.name}">Abir Deb</span>
+                <span style="font-size:12px;color:var(--subtext);font-weight:500;">Student</span>
+            </div>
+        </div>
+        <a href="/logout" class="btn-logout">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </a>
+    </div>
+</div>
+
+<div style="display:flex;flex:1;margin-left:320px;">
+    <div class="main-wrapper" style="margin-left:0;">
+        <div class="topbar animate-up">
+            <h1>Semester <span style="font-weight:300;color:var(--subtext);">Results</span></h1>
+            <div style="display:flex;gap:15px;">
+                <button class="btn-pdf" onclick="openTranscript()">🎓 Download Transcript</button>
+                <button class="btn-print" onclick="window.print()">🖨️ Print</button>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">☀️</span>
+                    <span id="theme-text">Day Mode</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="hero-card animate-up delay-1">
+            <div class="hero-top">
+                <div class="s-info">
+                    <h2>Academic Transcript Record</h2>
+                    <p><strong>Student ID:</strong> <span th:text="${student.studentId}">06224205101024</span> &nbsp;|&nbsp; <strong>Program:</strong> B.Sc in CSE</p>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="cgpa-ring-wrap">
+                        <svg width="130" height="130" viewBox="0 0 100 100">
+                            <defs>
+                                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#10b981"/>
+                                    <stop offset="50%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#a855f7"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="cgpa-ring-bg" cx="50" cy="50" r="45"/>
+                            <circle class="cgpa-ring-fill" cx="50" cy="50" r="45" id="cgpaRing"/>
+                        </svg>
+                        <div class="cgpa-center">
+                            <span class="val" th:text="${cgpa != null ? cgpa : '3.07'}">3.07</span>
+                            <span class="lbl">CGPA</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-stat-boxes">
+                        <div class="hstat accent">
+                            <span class="hval" th:text="${totalCredits != null ? totalCredits : '40'}">40</span>
+                            <span class="hlbl">Credits Earned</span>
+                        </div>
+                        <div class="hstat green">
+                            <span class="hval">87%</span>
+                            <span class="hlbl">Academic Health</span>
+                        </div>
+                        <div class="hstat orange">
+                            <span class="hval">↑ 57%</span>
+                            <span class="hlbl">Improvement</span>
+                        </div>
+                        <div class="hstat">
+                            <span class="hval">#12</span>
+                            <span class="hlbl">Semester Rank</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-insight">
+                <div class="ai-icon">🤖</div>
+                <div class="ai-text">You improved <span>57% from last semester</span> 🚀 — TGPA jumped from 2.38 → 3.75. If you maintain this pace, you could reach <span>CGPA 3.5+</span> by next year!</div>
+            </div>
+
+            <div class="credit-progress" style="margin-top:22px;">
+                <div class="cp-label">
+                    <span>Credit Completion Progress</span>
+                    <strong th:text="${totalCredits != null ? totalCredits : '40'} + ' / 160 Credits'">40 / 160 Credits</strong>
+                </div>
+                <div class="cp-bar"><div class="cp-fill" style="width:25%;"></div></div>
+            </div>
+
+            <div class="sem-compare">
+                <div class="sc-item">
+                    <div class="sc-sem">Spring 2025</div>
+                    <div><span class="sc-gpa sc-up">3.75</span><span class="sc-badge up">↑ Best</span></div>
+                    <div class="sc-bar sc-bar-up" style="width:94%;"></div>
+                </div>
+                <div class="sc-item">
+                    <div class="sc-sem">Summer 2025</div>
+                    <div><span class="sc-gpa sc-low">2.38</span><span class="sc-badge down">↓ Lower</span></div>
+                    <div class="sc-bar sc-bar-low" style="width:60%;"></div>
+                </div>
+            </div>
+
+            <div class="smart-features">
+                <div class="sf-card">
+                    <div class="sf-icon">🎯</div>
+                    <span class="sf-val">3.50</span>
+                    <span class="sf-lbl">Goal CGPA</span>
+                </div>
+                <div class="sf-card">
+                    <div class="sf-icon">⚡</div>
+                    <span class="sf-val">78%</span>
+                    <span class="sf-lbl">Focus Score</span>
+                </div>
+                <div class="sf-card">
+                    <div class="sf-icon">📈</div>
+                    <span class="sf-val">3.12</span>
+                    <span class="sf-lbl">Predicted Next GPA</span>
+                </div>
+                <div class="sf-card">
+                    <div class="sf-icon">🏆</div>
+                    <span class="sf-val">92%</span>
+                    <span class="sf-lbl">Consistency</span>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${semesterResults != null}">
+            <div class="semester-card animate-up delay-2" th:each="sem : ${semesterResults}">
+                <div class="sem-header">
+                    <div class="sem-title">Semester: <span th:text="${sem.semesterName}">Spring 2025</span></div>
+                    <div class="sem-summary">
+                        <div class="sum-item"><span class="lbl">Enrolled Cr.</span><span class="val" th:text="${sem.enrolledCredits}">0</span></div>
+                        <div class="sum-item"><span class="lbl">Earned Cr.</span><span class="val" th:text="${sem.earnedCredits}">0</span></div>
+                        <div class="sum-item"><span class="lbl">TGPA</span><span class="val highlight" th:text="${sem.tgpa}">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Title</th>
+                            <th>Type</th>
+                            <th>Credits</th>
+                            <th>Letter Grade</th>
+                            <th>Grade Point</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="course : ${sem.courses}">
+                            <td><span class="course-code"><span class="course-icon">📘</span><span th:text="${course.code}">CSE-000</span></span></td>
+                            <td th:text="${course.title}">Course Title</td>
+                            <td><span class="enroll-type" th:text="${course.type}">Regular</span></td>
+                            <td th:text="${course.credits}">3.0</td>
+                            <td>
+                                <span class="grade-badge"
+                                      th:classappend="${course.grade.startsWith('A') ? (course.grade == 'A+' ? 'gb-aplus' : 'gb-a') : (course.grade.startsWith('B') ? 'gb-b' : (course.grade.startsWith('C') ? 'gb-c' : (course.grade == 'D' ? 'gb-d' : 'gb-f')))}"
+                                      th:text="${course.grade}">A+</span>
+                            </td>
+                            <td class="gp-text" th:text="${course.gradePoint}">4.00</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${semesterResults == null}">
+            <div class="semester-card animate-up delay-2" id="sem-summer-2025">
+                <div class="sem-header">
+                    <div class="sem-title">Semester: <span>Summer 2025</span></div>
+                    <div class="sem-summary">
+                        <div class="sum-item"><span class="lbl">Enrolled Cr.</span><span class="val">22</span></div>
+                        <div class="sum-item"><span class="lbl">Earned Cr.</span><span class="val">22</span></div>
+                        <div class="sum-item"><span class="lbl">TGPA</span><span class="val highlight">2.38</span></div>
+                    </div>
+                </div>
+
+                <div class="table-controls">
+                    <input class="tc-search" type="text" placeholder="🔍 Search courses..." oninput="filterTable('summer', this.value)"/>
+                    <select class="tc-select" onchange="filterGrade('summer', this.value)">
+                        <option value="">All Grades</option>
+                        <option value="A">A Range</option>
+                        <option value="B">B Range</option>
+                        <option value="C">C Range</option>
+                        <option value="D">D Range</option>
+                    </select>
+                    <select class="tc-select" onchange="sortTable('summer', this.value)">
+                        <option value="">Sort by...</option>
+                        <option value="gpa-desc">GPA: High → Low</option>
+                        <option value="gpa-asc">GPA: Low → High</option>
+                        <option value="credits-desc">Credits: High → Low</option>
+                    </select>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="summer-table">
+                        <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Title</th>
+                            <th>Type</th>
+                            <th>Credits</th>
+                            <th>Letter Grade</th>
+                            <th>Grade Point</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr data-grade="D" data-gpa="2.00" data-credits="2.0">
+                            <td><span class="course-code"><span class="course-icon">📊</span>CSE 0311-2101</span></td>
+                            <td>Economics</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>2.0</td>
+                            <td><span class="grade-badge gb-d">D</span></td>
+                            <td class="gp-text" style="color:#ef4444;">2.00</td>
+                        </tr>
+                        <tr data-grade="C" data-gpa="2.25" data-credits="2.0">
+                            <td><span class="course-code"><span class="course-icon">💰</span>CSE 0411-2101</span></td>
+                            <td>Financial, Cost and Managerial Accounting</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>2.0</td>
+                            <td><span class="grade-badge gb-c">C</span></td>
+                            <td class="gp-text" style="color:#f59e0b;">2.25</td>
+                        </tr>
+                        <tr data-grade="B" data-gpa="3.25" data-credits="3.0">
+                            <td><span class="course-code"><span class="course-icon">🔬</span>CSE 0612-2107</span></td>
+                            <td>Digital Logic Design</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>3.0</td>
+                            <td><span class="grade-badge gb-b">B+</span></td>
+                            <td class="gp-text" style="color:#3b82f6;">3.25</td>
+                        </tr>
+                        <tr data-grade="C" data-gpa="2.50" data-credits="3.0">
+                            <td><span class="course-code"><span class="course-icon">🌳</span>CSE 0613-2103</span></td>
+                            <td>Data Structure</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>3.0</td>
+                            <td><span class="grade-badge gb-c">C+</span></td>
+                            <td class="gp-text" style="color:#f59e0b;">2.50</td>
+                        </tr>
+                        <tr data-grade="C" data-gpa="2.25" data-credits="1.5">
+                            <td><span class="course-code"><span class="course-icon">🧪</span>CSE 0613-2104</span></td>
+                            <td>Data Structure Lab</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>1.5</td>
+                            <td><span class="grade-badge gb-c">C</span></td>
+                            <td class="gp-text" style="color:#f59e0b;">2.25</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="semester-card animate-up delay-3" id="sem-spring-2025">
+                <div class="sem-header">
+                    <div class="sem-title">Semester: <span>Spring 2025</span></div>
+                    <div class="sem-summary">
+                        <div class="sum-item"><span class="lbl">Enrolled Cr.</span><span class="val">18</span></div>
+                        <div class="sum-item"><span class="lbl">Earned Cr.</span><span class="val">18</span></div>
+                        <div class="sum-item"><span class="lbl">TGPA</span><span class="val highlight">3.75</span></div>
+                    </div>
+                </div>
+
+                <div class="table-controls">
+                    <input class="tc-search" type="text" placeholder="🔍 Search courses..." oninput="filterTable('spring', this.value)"/>
+                    <select class="tc-select" onchange="filterGrade('spring', this.value)">
+                        <option value="">All Grades</option>
+                        <option value="A">A Range</option>
+                        <option value="B">B Range</option>
+                    </select>
+                    <select class="tc-select" onchange="sortTable('spring', this.value)">
+                        <option value="">Sort by...</option>
+                        <option value="gpa-desc">GPA: High → Low</option>
+                        <option value="gpa-asc">GPA: Low → High</option>
+                    </select>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="spring-table">
+                        <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Title</th>
+                            <th>Type</th>
+                            <th>Credits</th>
+                            <th>Letter Grade</th>
+                            <th>Grade Point</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr data-grade="A" data-gpa="4.00" data-credits="3.0">
+                            <td><span class="course-code"><span class="course-icon">💻</span>CSE 0211-1101</span></td>
+                            <td>Structured Programming Language</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>3.0</td>
+                            <td><span class="grade-badge gb-aplus">A+</span></td>
+                            <td class="gp-text" style="color:#10b981;">4.00</td>
+                        </tr>
+                        <tr data-grade="A" data-gpa="3.75" data-credits="1.5">
+                            <td><span class="course-code"><span class="course-icon">🧪</span>CSE 0211-1102</span></td>
+                            <td>Structured Programming Language Lab</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>1.5</td>
+                            <td><span class="grade-badge gb-a">A</span></td>
+                            <td class="gp-text" style="color:#10b981;">3.75</td>
+                        </tr>
+                        <tr data-grade="B" data-gpa="3.25" data-credits="3.0">
+                            <td><span class="course-code"><span class="course-icon">∫</span>MAT 0111-1101</span></td>
+                            <td>Differential &amp; Integral Calculus</td>
+                            <td><span class="enroll-type">Regular</span></td>
+                            <td>3.0</td>
+                            <td><span class="grade-badge gb-b">B+</span></td>
+                            <td class="gp-text" style="color:#3b82f6;">3.25</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="right-sidebar animate-up delay-4">
+
+        <div class="widget goal-tracker">
+            <div class="widget-title">🎯 Goal CGPA Tracker</div>
+            <div class="gt-row">
+                <span class="gt-label">Current CGPA</span>
+                <span class="gt-val" th:text="${cgpa != null ? cgpa : '3.07'}">3.07</span>
+            </div>
+            <div class="gt-row">
+                <span class="gt-label">Your Goal</span>
+                <span class="gt-val" id="goalVal">3.50</span>
+            </div>
+            <div class="gt-bar"><div class="gt-fill" id="goalFill" style="width:87.7%;"></div></div>
+            <div style="font-size:11px;color:var(--subtext);font-weight:600;">87.7% toward your goal</div>
+            <input class="gt-input" type="number" min="0" max="4" step="0.01" value="3.50" placeholder="Set your goal CGPA..." oninput="updateGoal(this.value)"/>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">📅 Academic Calendar — <span id="calTitleMonth"></span></div>
+            <div class="cal-mini" id="miniCal"></div>
+            <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--subtext);">
+                    <div style="width:12px;height:12px;border-radius:4px;background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.4);"></div>National
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--subtext);">
+                    <div style="width:12px;height:12px;border-radius:4px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);"></div>Exam
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--subtext);">
+                    <div style="width:12px;height:12px;border-radius:4px;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.3);"></div>Event
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--subtext);">
+                    <div style="width:12px;height:12px;border-radius:4px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);"></div>Holiday
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--subtext);">
+                    <div style="width:12px;height:12px;border-radius:4px;background:var(--accent);"></div>Today
+                </div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">📋 Upcoming Exams</div>
+            <div class="exam-item">
+                <div class="exam-date"><span class="ed-day">22</span><span class="ed-mon">May</span></div>
+                <div class="exam-info"><div class="ei-course">Operating Systems</div><div class="ei-time">⏰ 9:00 AM — Room 301</div></div>
+            </div>
+            <div class="exam-item">
+                <div class="exam-date"><span class="ed-day">27</span><span class="ed-mon">May</span></div>
+                <div class="exam-info"><div class="ei-course">Computer Networks</div><div class="ei-time">⏰ 2:00 PM — Room 205</div></div>
+            </div>
+            <div class="exam-item">
+                <div class="exam-date"><span class="ed-day">03</span><span class="ed-mon">Jun</span></div>
+                <div class="exam-info"><div class="ei-course">Software Engineering</div><div class="ei-time">⏰ 10:00 AM — Room 401</div></div>
+            </div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-title">🔮 Performance Forecast</div>
+            <div class="forecast-box">
+                <span class="forecast-val">3.12</span>
+                <div class="forecast-lbl">Predicted Next Semester GPA</div>
+            </div>
+            <p class="forecast-note" style="margin-top:12px;font-size:12px;color:var(--subtext);line-height:1.6;">Based on your current trend, focus score, and historical performance. Improving Data Structure and Economics grades could push this to <strong style="color:var(--accent);">3.40+</strong>.</p>
+        </div>
+
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // Receive API Data from backend
+    const calendarEventsStr = /*[[${calendarEventsJson != null ? calendarEventsJson : '[]'}]]*/ '[]';
+    const calendarEvents = JSON.parse(calendarEventsStr);
+</script>
+
+<script>
+    // Theme
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            icon.innerText = '☀️'; text.innerText = 'Day Mode'; localStorage.setItem('theme', 'dark');
+        } else {
+            icon.innerText = '🌙'; text.innerText = 'Night Mode'; localStorage.setItem('theme', 'light');
+        }
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-icon').innerText = '🌙';
+            document.getElementById('theme-text').innerText = 'Night Mode';
+        }
+        buildCalendar();
+        setIssueDate();
+        generateQR();
+    };
+
+    // Search / Filter
+    function filterTable(sem, query) {
+        const table = document.getElementById(sem === 'summer' ? 'summer-table' : 'spring-table');
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const show = text.includes(query.toLowerCase());
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function filterGrade(sem, grade) {
+        const table = document.getElementById(sem === 'summer' ? 'summer-table' : 'spring-table');
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            if (!grade) { row.style.display = ''; return; }
+            const g = row.getAttribute('data-grade') || '';
+            row.style.display = g.startsWith(grade) ? '' : 'none';
+        });
+    }
+
+    function sortTable(sem, mode) {
+        if (!mode) return;
+        const table = document.getElementById(sem === 'summer' ? 'summer-table' : 'spring-table');
+        if (!table) return;
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+            const ga = parseFloat(a.getAttribute('data-gpa')) || 0;
+            const gb = parseFloat(b.getAttribute('data-gpa')) || 0;
+            const ca = parseFloat(a.getAttribute('data-credits')) || 0;
+            const cb = parseFloat(b.getAttribute('data-credits')) || 0;
+            if (mode === 'gpa-desc') return gb - ga;
+            if (mode === 'gpa-asc') return ga - gb;
+            if (mode === 'credits-desc') return cb - ca;
+            return 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+    }
+
+    // Goal tracker
+    function updateGoal(val) {
+        const goal = parseFloat(val) || 4.0;
+        const currentElement = document.querySelector('.cgpa-center .val');
+        const current = parseFloat(currentElement ? currentElement.innerText : 3.07) || 3.07;
+        const pct = Math.min(100, (current / goal) * 100).toFixed(1);
+        document.getElementById('goalVal').textContent = goal.toFixed(2);
+        document.getElementById('goalFill').style.width = pct + '%';
+    }
+
+    // Dynamic Mini Calendar Engine
+    function buildCalendar() {
+        const cal = document.getElementById('miniCal');
+        if (!cal) return;
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const today = now.getDate();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDay = new Date(year, month, 1).getDay();
+
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        document.getElementById('calTitleMonth').innerText = monthNames[month] + ' ' + year;
+
+        const eventMap = {};
+        calendarEvents.forEach(e => {
+            if(e.eventDate) {
+                const d = new Date(e.eventDate);
+                if(d.getMonth() === month && d.getFullYear() === year) {
+                    eventMap[d.getDate()] = { type: e.eventType, title: e.title };
+                }
+            }
+        });
+
+        // Demo fallback if no DB events
+        if(calendarEvents.length === 0) {
+            eventMap[15] = {type: 'EVENT', title: 'Campus Fest'};
+            eventMap[22] = {type: 'EXAM', title: 'OS Midterm'};
+            eventMap[27] = {type: 'EXAM', title: 'CN Final'};
+        }
+
+        const dayHeaders = ['S','M','T','W','T','F','S'];
+        let html = dayHeaders.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+
+        for (let i = 0; i < firstDay; i++) {
+            html += `<div class="cal-day empty"></div>`;
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            let cls = 'cal-day';
+            let titleAttr = '';
+
+            if (d === today) {
+                cls += ' today';
+            } else if (eventMap[d]) {
+                const t = eventMap[d].type;
+                titleAttr = `title="${eventMap[d].title}"`;
+                if (t === 'EXAM') cls += ' exam';
+                else if (t === 'NATIONAL_HOLIDAY') cls += ' national-holiday';
+                else if (t === 'HOLIDAY') cls += ' holiday';
+                else if (t === 'EVENT') cls += ' event';
+            }
+
+            html += `<div class="${cls}" ${titleAttr}>${d}</div>`;
+        }
+        cal.innerHTML = html;
+    }
+
+    // Transcript modal
+    function openTranscript() { document.getElementById('transcriptModal').classList.add('active'); }
+    function closeTranscript() { document.getElementById('transcriptModal').classList.remove('active'); }
+
+    function setIssueDate() {
+        const el = document.getElementById('issueDate');
+        if (el) el.textContent = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+    }
+
+    function generateQR() {
+        const el = document.getElementById('qrCode');
+        if (el) el.textContent = 'KYAU-TXN-' + Math.random().toString(36).substr(2,9).toUpperCase() + '-2026';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('transcriptModal').addEventListener('click', function(e) {
+        if (e.target === this) closeTranscript();
+    });
+</script>
+</body>
+</html>
